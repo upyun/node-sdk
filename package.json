@@ -1,6 +1,6 @@
 {
   "name": "node-upyun",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "official upyun sdk for node.js (with upyun api v2.0)",
   "main": "index.js",
   "scripts": {

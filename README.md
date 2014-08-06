@@ -1,7 +1,20 @@
 # node-upyun
 official upyun sdk for node.js (with upyun api v2.0)
 
+# Docs
+## API
+* [`getUsage`](#getUsage)
+* [`getFileList`](#getFileList)
+* [`createDir`](#createDir)
+* [`removeDir`](#removeDir)
+* [`uploadFile`](#uploadFile)
+* [`getFileInfo`](#getFileInfo)
+* [`downloadFile`](#downloadFile)
+* [`removeFile`](#removeFile)
 
+## Utils
+
+* [`setEndpoint`](#setEndpoint)
 
 
 # info

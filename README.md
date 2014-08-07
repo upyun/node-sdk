@@ -4,7 +4,7 @@ official upyun sdk for node.js (with upyun api v2.0)
 # Docs
 ## API
 * [`getUsage`](#getUsage)
-* [`getFileList`](#getFileList)
+* [`listDir`](#listDir)
 * [`createDir`](#createDir)
 * [`removeDir`](#removeDir)
 * [`uploadFile`](#uploadFile)

@@ -18,11 +18,10 @@ function UPYUN(bucket, username, password, endpoint) {
 
 function request(options, callback) {
     var resData = '';
-    console.log(options)
     var req = http.request(options, function(res) {
         res.setEncoding('utf8');
         res.on('data', function (chunk) {
-            resData += chunk;  
+            resData += chunk;
         });
         res.on('end', function() {
             if(res.statusCode > 200) {
@@ -97,6 +96,22 @@ UPYUN.prototype.listDir = function(remotePath, limit, order, iter, callback) {
 
     request(options, function(err, result) {
         if(err) return callback(err);
+        callback(null, result);
+    })
+}
+
+UPYUN.prototype.createDir = function(remotePath, callback) {
+    var options = utils.genReqOpts(this, 'PUT', this._conf.bucket + remotePath, null, 0, { "X-Type": "folder" });
+    request(options, function(err, result) {
+        if (err) return callback(err);
+        callback(null, result);
+    })
+}
+
+UPYUN.prototype.removeDir = function(remotePath, callback) {
+    var options = utils.genReqOpts(this, 'DELETE', this._conf.bucket + remotePath, null, 0, { "type": "folder" });
+    request(options, function(err, result) {
+        if (err) return callback(err);
         callback(null, result);
     })
 }

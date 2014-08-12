@@ -24,7 +24,8 @@ function request(options, localFile, callback) {
             resData += chunk;
         });
         res.on('end', function() {
-            if(res.statusCode > 200) {
+            // TODO: more error handles
+            if(res.statusCode > 400) {
                 try {
                     var err = JSON.parse(resData);
                 }
@@ -165,6 +166,15 @@ UPYUN.prototype.uploadFile = function(remotePath, localFile, type, checksum, opt
             callback(null, result);
         })
     }
+}
+
+UPYUN.prototype.downloadFile = function(remotePath, callback) {
+    var options = utils.genReqOpts(this, 'GET', this._conf.bucket + remotePath);
+
+    request(options, null, function(err, result) {
+        if(err) return callback(err);
+        callback(null, result);
+    })
 }
 
 UPYUN.prototype.removeFile = function(remotePath, callback) {

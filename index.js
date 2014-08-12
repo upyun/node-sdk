@@ -120,7 +120,7 @@ UPYUN.prototype.createDir = function(remotePath, callback) {
 }
 
 UPYUN.prototype.removeDir = function(remotePath, callback) {
-    var options = utils.genReqOpts(this, 'DELETE', this._conf.bucket + remotePath, 0, { "type": "folder" });
+    var options = utils.genReqOpts(this, 'DELETE', this._conf.bucket + remotePath + '?type=folder');
     request(options, null, function(err, result) {
         if (err) return callback(err);
         callback(null, result);
@@ -136,24 +136,35 @@ UPYUN.prototype.getFileInfo = function(remotePath, callback) {
 }
 
 UPYUN.prototype.uploadFile = function(remotePath, localFile, type, checksum, opts, callback) {
-    if(fs.existsSync(localFile)) {
+    var isFile = fs.existsSync(localFile);
+    var _self = this;
+    opts = opts || {};
+    opts['Content-Type'] = type;
+
+    if(isFile && checksum === true) {
         var contentLength = fs.statSync(localFile).size;
+        utils.md5sumFile(localFile, function(err, result) {
+            opts['Content-MD5'] = result;
+            _upload(contentLength, opts);
+        })
+    } else if(isFile && typeof checksum === 'string') {
+        var contentLength = fs.statSync(localFile).size;
+        opts['Content-MD5'] = checksum;
+        _upload(contentLength, opts);
     } else {
         var contentLength = localFile.length;
-    }
-
-    if(localFile && checksum === true) {
         opts['Content-MD5'] = utils.md5sum(localFile);
-    } else if(typeof checksum === 'string') {
-        opts['Content-MD5'] = checksum;
+        _upload(contentLength, opts);
     }
 
-    var options = utils.genReqOpts(this, 'PUT', this._conf.bucket + remotePath, contentLength, opts);
+    function _upload(contentLength, opts) {
+        var options = utils.genReqOpts(_self, 'PUT', _self._conf.bucket + remotePath, contentLength, opts);
 
-    request(options, localFile, function(err, result) {
-        if(err) return callback(err);
-        callback(null, result);
-    })
+        request(options, localFile, function(err, result) {
+            if(err) return callback(err);
+            callback(null, result);
+        })
+    }
 }
 
 UPYUN.prototype.removeFile = function(remotePath, callback) {

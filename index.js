@@ -18,6 +18,8 @@ function UPYUN(bucket, username, password, endpoint) {
 
 function request(options, localFile, callback) {
     var resData = '';
+    var err = {};
+    
     var req = http.request(options, function(res) {
         res.setEncoding('utf8');
         res.on('data', function (chunk) {
@@ -27,7 +29,7 @@ function request(options, localFile, callback) {
             // TODO: more error handles
             if(res.statusCode > 400) {
                 try {
-                    var err = JSON.parse(resData);
+                    err = JSON.parse(resData);
                 }
                 catch(e) {
                     return callback(null, e);

@@ -172,7 +172,7 @@ UPYUN.prototype.removeFile = function(remotePath, callback) {
 
     request(options, null, function(err, result) {
         if(err) return callback(err);
-        callback(err, null);
+        callback(null, result);
     })
 }
 

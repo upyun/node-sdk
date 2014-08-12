@@ -2,6 +2,7 @@
 official upyun sdk for node.js (with upyun api v2.0)
 
 # Install
+__NOT AVAILABLE NOW__
 ```sh
 $ npm install upyun --save
 ```
@@ -24,7 +25,7 @@ upyun.getUsage(function(err, result) {
 * [`createDir`](#createDir)
 * [`removeDir`](#removeDir)
 * [`uploadFile`](#uploadFile)
-* [`getFileInfo`](#getFileInfo)
+* [`existsFile`](#existsFile)
 * [`downloadFile`](#downloadFile)
 * [`removeFile`](#removeFile)
 

@@ -6,7 +6,8 @@ test:
 	@$(NODE) ./node_modules/.bin/mocha \
 		--require should \
 		--reporter spec \
-		--slow 2s \
+		--slow 5s \
+		--timeout 30000 \
 		--bail
 
 test-cov:
@@ -26,7 +27,7 @@ test-travis:
 		--report lcovonly \
 		-- -u exports \
 		--require should \
-		--slow 2s \
+		--slow 5s \
 		--timeout 30000 \
 		$(TESTS) \
 		--bail

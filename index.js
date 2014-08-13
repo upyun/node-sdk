@@ -141,11 +141,20 @@ UPYUN.prototype.existsFile = function(remotePath, callback) {
 };
 
 UPYUN.prototype.uploadFile = function(remotePath, localFile, type, checksum, opts, callback) {
+    if(typeof arguments[arguments.length - 1] !== 'function') {
+        throw new Error('No callback specified.');
+    };
+    var callback = arguments[arguments.length - 1];
     var isFile = fs.existsSync(localFile);
     var _self = this;
     opts = opts || {};
+    
+    // TODO: default type
     opts['Content-Type'] = type;
     var contentLength = 0;
+    checksum = checksum || true;
+
+    // TODO: optimize logical
     if(isFile && checksum === true) {
         contentLength = fs.statSync(localFile).size;
         utils.md5sumFile(localFile, function(err, result) {

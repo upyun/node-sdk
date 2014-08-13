@@ -14,6 +14,17 @@ describe('utils: ', function() {
         })
     })
 
+    describe('.setConf(key, value)', function() {
+        it('should get bucket name', function() {
+            upyun.setConf('userAgent', 'TESTUA/v0.1.0');
+            upyun.getConf('userAgent').should.be.exactly('TESTUA/v0.1.0');
+        })
+
+        it('should return nothing', function() {
+            (upyun.getConf('null') === undefined).should.be.true;
+        })
+    })
+
     describe('.setEndpoint(ep)', function() {
         it('should set endpoint', function() {
             upyun.setEndpoint();

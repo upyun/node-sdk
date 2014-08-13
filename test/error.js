@@ -14,4 +14,20 @@ describe('Error handle', function() {
             })
         })
     })
+
+    describe('No callback function', function() {
+        it('should throw error', function(done) {
+            (function() {
+                upyun.listDir('');
+            }).should.throw();
+            done();
+        });
+
+        it('should throw error', function(done) {
+            (function() {
+                upyun.uploadFile('/errortest', 'error error', 'text/plain', true);
+            }).should.throw();
+            done();
+        });
+    })
 });

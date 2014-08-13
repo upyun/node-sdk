@@ -55,6 +55,16 @@ describe('REST API: ', function() {
         })
     });
 
+    describe('uploadFile(remotePath, localFile, type, checksum, [opts], callback)', function() {
+        it('should return the uploaded file\'s info', function(done) {
+            upyun.uploadFile('/test' + tempstr + 2, 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Id molestias ut quisquam, dolores blanditiis nobis labore eum, accusantium dolorem laboriosam est modi sit quam libero aliquam nam corporis nihil rerum.', 'text/plain', true, function(err, result) {
+                if(err) throw err;
+                result.data.result.should.have.property('location');
+                done();
+            });
+        })
+    });
+
     describe('existsFile(remotePath, callback)', function() {
         it('should return 200', function(done) {
             upyun.existsFile('/test' + tempstr, function(err, result) {

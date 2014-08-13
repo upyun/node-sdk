@@ -21,5 +21,12 @@
   "bugs": {
     "url": "https://github.com/lisposter/node-upyun/issues"
   },
-  "homepage": "https://github.com/lisposter/node-upyun"
+  "homepage": "https://github.com/lisposter/node-upyun",
+  "devDependencies": {
+    "co": "~3.0.2",
+    "mocha": "~1.16.2",
+    "should": "~4.0.4",
+    "istanbul-harmony": "~0.2.9",
+    "thunkify": "^2.0.0"
+  }
 }

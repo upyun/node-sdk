@@ -29,7 +29,7 @@ function request(options, localFile, callback) {
             // TODO: more error handles
             if(res.statusCode > 400) {
                 try {
-                    err = JSON.parse(resData);
+                    err = JSON.parse(resData || '{}');
                 }
                 catch(e) {
                     return callback(null, e);
@@ -47,8 +47,10 @@ function request(options, localFile, callback) {
                     data: resData
                 });
             }
-            
         });
+        res.on('error', function(e) {
+            callback(e);
+        })
     });
 
     if(localFile && fs.existsSync(localFile)) {
@@ -89,7 +91,7 @@ UPYUN.prototype.getUsage = function(callback) {
     var options = utils.genReqOpts(this, 'GET', this._conf.bucket + '?usage=true');
     request(options, null, function(err, result) {
         if(err) return callback(err);
-        callback(null, result);
+        callback(null, utils.parseRes(result));
     });
 };
 
@@ -110,7 +112,7 @@ UPYUN.prototype.listDir = function(remotePath, limit, order, iter, callback) {
 
     request(options, null, function(err, result) {
         if(err) return callback(err);
-        callback(null, result);
+        callback(null, utils.parseRes(result));
     });
 };
 
@@ -118,7 +120,7 @@ UPYUN.prototype.createDir = function(remotePath, callback) {
     var options = utils.genReqOpts(this, 'PUT', this._conf.bucket + remotePath, 0, { "X-Type": "folder" });
     request(options, null, function(err, result) {
         if (err) return callback(err);
-        callback(null, result);
+        callback(null, utils.parseRes(result));
     });
 };
 
@@ -126,7 +128,7 @@ UPYUN.prototype.removeDir = function(remotePath, callback) {
     var options = utils.genReqOpts(this, 'DELETE', this._conf.bucket + remotePath + '?type=folder');
     request(options, null, function(err, result) {
         if (err) return callback(err);
-        callback(null, result);
+        callback(null, utils.parseRes(result));
     });
 };
 
@@ -165,7 +167,7 @@ UPYUN.prototype.uploadFile = function(remotePath, localFile, type, checksum, opt
 
         request(options, localFile, function(err, result) {
             if(err) return callback(err);
-            callback(null, result);
+            callback(null, utils.parseRes(result));
         });
     }
 };
@@ -184,7 +186,7 @@ UPYUN.prototype.removeFile = function(remotePath, callback) {
 
     request(options, null, function(err, result) {
         if(err) return callback(err);
-        callback(null, result);
+        callback(null, utils.parseRes(result));
     });
 };
 

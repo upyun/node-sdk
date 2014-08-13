@@ -18,6 +18,55 @@ upyun.getUsage(function(err, result) {
 })
 ```
 
+# Response
+In this SDK, every api will return a response in the format:
+
+#### Normal
+
+```js
+{
+    statusCode: 200,    // http stats code
+    headers: {
+        server: 'nginx/1.1.19',
+        date: 'Wed, 13 Aug 2014 02:15:27 GMT',
+        'content-type': 'application/json',
+        'content-length': '24',
+        connection: 'close'
+    },                  // response header
+    data: {
+        space: 2501,
+        files: 1
+    }                   // response body
+}
+```
+
+#### Error catch
+When an error occured, the error will be catched, and returned in the response
+
+```js
+{
+    statusCode: 401,    // http stats code
+    error: {
+        error_code: 40104,
+        request: 'GET /imgtest',
+        message: 'Signature error, (signature = md5(METHOD&PATH&DATE&CONTENT_LENGTH&MD5(PASSWORD))).'
+    },                  // error message
+    headers: {
+        server: 'nginx/1.1.19',
+        date: 'Wed, 13 Aug 2014 02:19:07 GMT',
+        'content-type': 'application/json',
+        'content-length': '145',
+        connection: 'close',
+        'www-authenticate': 'Basic realm="UpYun"'
+    }                   // response header
+}
+```
+
+The different between these two responses is the `error` and `body`.
+
+All responses contain http status code and raw response header for futher usage.
+
+
 # Docs
 ## API
 * [`getUsage`](#getUsage)

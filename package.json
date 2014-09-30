@@ -1,7 +1,7 @@
 {
-  "name": "node-upyun",
-  "version": "0.1.0",
-  "description": "official upyun sdk for node.js (with upyun api v2.0)",
+  "name": "upyun",
+  "version": "1.0.0",
+  "description": "official upyun sdk for node.js",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -23,10 +23,11 @@
   },
   "homepage": "https://github.com/lisposter/node-upyun",
   "devDependencies": {
-    "co": "~3.0.2",
     "mocha": "~1.16.2",
     "should": "~4.0.4",
-    "istanbul-harmony": "~0.2.9",
-    "thunkify": "^2.0.0"
+    "istanbul": "^0.3.2"
+  },
+  "dependencies": {
+    "upyun-legacy": "~0.2.1"
   }
 }

@@ -1,17 +1,41 @@
 # node-upyun
-official upyun sdk for node.js (with upyun api v2.0)
+[![NPM version](https://img.shields.io/npm/v/upyun.svg?style=flat)](https://www.npmjs.org/package/upyun)
+[![Build status](https://img.shields.io/travis/lisposter/node-upyun.svg?style=flat)](https://travis-ci.org/lisposter/node-upyun)
+
+official upyun sdk for node.js
+
+__Currently only works with `legacy` API(the current online API)__
 
 # Install
-__NOT AVAILABLE NOW__
 ```sh
 $ npm install upyun --save
 ```
+
+# Init
+```js
+var upyun = new UPYUN('bucket', 'operator', 'password', 'endpoint', 'apiVersion');
+```
+
+__Arguments__
+
+* `bucket`: your upyun bucket's name.
+* `operator`: operator which is granted permisson to `bucket`
+* `password`: passowrd for the operator which is granted permisson to `bucket`
+* `endpoint` The value can be these(leave blank to let sdk auto select the best one):
+  * `ctcc` or `v1`: China Telecom
+  * `cucc` or `v2`: China Unicom
+  * `cmcc` or `v3` China Mobile
+  * `v0` or any other string: Will use `v0.api.upyun.com` (auto detect routing)
+* `apiVersion`: API version.
+  * `'legacy'`: current online api.(currently, it is the default)
+    * when you choose `legacy`, it make an instance by [upyun-legacy](https://www.npmjs.org/package/upyun-legacy), they have the same methods name as the `latest` version. But the response data may not has the same format. More detail at [upyun-legacy/README.md](https://github.com/lisposter/node-upyun-legacy/blob/master/README.md)
+  * `'latest'`: the bleeding-edge.(__Not available now.__)
 
 # Example 
 ```js
 var UPYUN = require('upyun');
 
-var upyun = new UPYUN('testbucket', 'operatername', 'operaterpwd', 'v0');
+var upyun = new UPYUN('testbucket', 'operatername', 'operaterpwd', 'ctcc', 'legacy');
 
 upyun.getUsage(function(err, result) {
     //...
@@ -143,11 +167,13 @@ __Arguments__
 ---------------------------------------
 
 <a name="downloadFile" />
-### downloadFile(remotePath, callback)
+### downloadFile(remotePath, [localPath], callback)
 Download a file from UPYUN bucket.
 
 __Arguments__
 * `remotePath` The file's path in your UPYUN bucket.
+* `localPath` Where the file will save to. If no `localPath`, the file's content will output directly in the response body.
+
 
 ---------------------------------------
 
@@ -174,12 +200,12 @@ __Arguments__
 
 # Note
 
-The original owner of [`upyun npm package`](https://www.npmjs.org/package/upyun) was [James Chen](http://ashchan.com) 
+The previous owner of [`upyun npm package`](https://www.npmjs.org/package/upyun) was [James Chen](http://ashchan.com) 
 
-After consultation with James, this package has been transfered to official upyun dev. team.
+After consultation with James, this package has been transfered to official upyun develop team.
 
-Any futher update and maintenance will conducted by upyun dev. team and subsequent versions will not be associated with the original project.
+Any futher update and maintenance will conducted by upyun develop team and subsequent versions will not be associated with the original project.
 
 In npm registry, `"upyun": "<=0.0.3"` were published as [node-upyun](https://github.com/ashchan/node-upyun) by [James Chen](http://ashchan.com).
 
-__Thanks to  [James Chen](http://ashchan.com)  for his contribution to upyun.__
+__Thanks to  [James Chen](http://ashchan.com)  for his contribution to UPYUN.__

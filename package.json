@@ -1,6 +1,6 @@
 {
   "name": "upyun",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "official upyun sdk for node.js",
   "main": "index.js",
   "scripts": {
@@ -14,7 +14,8 @@
     "upyun",
     "sdk",
     "cdn",
-    "cloudstorage"
+    "cloud",
+    "storage"
   ],
   "author": "Leigh Zhu",
   "license": "MIT",

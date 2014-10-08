@@ -15,7 +15,7 @@ $ npm install upyun --save
 
 # Init
 ```js
-var upyun = new UPYUN('bucket', 'operator', 'password', 'endpoint', 'apiVersion');
+var upyun = new UPYUN(bucket, operator, password, endpoint, apiVersion);
 ```
 
 __Arguments__

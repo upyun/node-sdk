@@ -4,6 +4,8 @@
 
 official upyun sdk for node.js
 
+[中文说明](https://github.com/lisposter/node-upyun/wiki/%E4%B8%AD%E6%96%87%E8%AF%B4%E6%98%8E)
+
 __Currently only works with `legacy` API(the current online API)__
 
 # Install
@@ -113,6 +115,19 @@ All responses contain http status code and raw response header for futher usage.
 ### getUsage(callback)
 To get how many quota has been used.(Unit:`Byte`)
 
+__Response__
+
+```js
+ {
+     statusCode: 200,
+     headers: { ... },
+     data: {
+         space: 21754,
+         files: 50
+     }
+ }
+```
+
 ---------------------------------------
 
 <a name="" />
@@ -124,6 +139,24 @@ __Arguments__
 * `limit` Specifies the maximum number of file list output per request.
 * `order` Sort the file list by 'last_modified' as `asc` or `desc`.(Default: `asc`)
 * `iter` Specifies the start of iteration.
+
+__Response__
+
+```js
+{
+    statusCode: 200,
+    headers: {...
+    },
+    data: {
+        "files": [{
+            "name": "test",
+            "type": "folder",
+            "last_modified": 1412046146
+        }],
+        "iter": "g2gCZAAEbmV4dGQAA2VvZg"
+    }
+}
+```
 
 ---------------------------------------
 

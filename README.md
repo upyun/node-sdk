@@ -1,10 +1,10 @@
 # node-upyun
 [![NPM version](https://img.shields.io/npm/v/upyun.svg?style=flat)](https://www.npmjs.org/package/upyun)
-[![Build status](https://img.shields.io/travis/lisposter/node-upyun.svg?style=flat)](https://travis-ci.org/lisposter/node-upyun)
+[![Build status](https://img.shields.io/travis/upyun/node-upyun.svg?style=flat)](https://travis-ci.org/upyun/node-upyun)
 
 official upyun sdk for node.js
 
-[中文说明](https://github.com/lisposter/node-upyun/wiki/%E4%B8%AD%E6%96%87%E8%AF%B4%E6%98%8E)
+[中文说明](https://github.com/upyun/node-upyun/wiki/%E4%B8%AD%E6%96%87%E8%AF%B4%E6%98%8E)
 
 __Currently only works with `legacy` API(the current online API)__
 

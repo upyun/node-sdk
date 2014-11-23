@@ -1,6 +1,6 @@
 {
   "name": "upyun",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "official upyun sdk for node.js",
   "main": "index.js",
   "scripts": {
@@ -29,6 +29,6 @@
     "istanbul": "^0.3.2"
   },
   "dependencies": {
-    "upyun-legacy": "~0.2.1"
+    "upyun-legacy": "~0.3.0"
   }
 }

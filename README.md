@@ -1,6 +1,7 @@
 # node-upyun
-[![NPM version](https://img.shields.io/npm/v/upyun.svg?style=flat)](https://www.npmjs.org/package/upyun)
-[![Build status](https://img.shields.io/travis/upyun/node-upyun.svg?style=flat)](https://travis-ci.org/upyun/node-upyun)
+[![NPM version](https://img.shields.io/npm/v/upyun.svg?style=flat-square)](https://www.npmjs.org/package/upyun)
+[![NPM downloads](https://img.shields.io/npm/dm/upyun.svg?style=flat-square)](https://www.npmjs.org/package/upyun)
+[![Build status](https://img.shields.io/travis/upyun/node-upyun.svg?style=flat-square)](https://travis-ci.org/upyun/node-upyun)
 
 official upyun sdk for node.js
 

@@ -1,3 +1,7 @@
+# v1.1.1 / 2014.11.26
+
+* deps: upyun-legacy@0.4.0: fix result when listing a empty dir
+
 # v1.1.0 / 2014.11.23
 
 * deps: upyun-legacy@0.3.0: add request_id in error output

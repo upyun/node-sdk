@@ -8,6 +8,7 @@ test:
 		--reporter spec \
 		--slow 5s \
 		--timeout 30000 \
+		$(TESTS) \
 		--bail
 
 test-cov:

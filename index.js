@@ -2,15 +2,16 @@
 var upyunDeprecated = require('upyun-legacy');
 var rest = require('./upyun/rest.js');
 
-module.exports = exports.UPYUN = exports.UpYun = function(bucket, operator, password, endpoint, apiVersion) {
-    var client = null;
-    if(apiVersion == 'v2') {
-        return new rest(bucket, operator, password, endpoint);
-    } else {
-        client = new upyunDeprecated(bucket, operator, password, endpoint);
-    }
+module.exports = exports.UPYUN = exports.UpYun = function(bucket, operator, password, endpoint, opts) {
+  var client = null;
 
-    client._apiVersion = apiVersion;
+  if (opts && opts.apiVersion == 'v2') {
+    client = new rest(bucket, operator, password, endpoint, opts);
+  } else {
+    client = new upyunDeprecated(bucket, operator, password, endpoint);
+  }
 
-    return client;
-}
+  client._apiVersion = opts.apiVersion;
+
+  return client;
+};

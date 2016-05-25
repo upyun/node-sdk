@@ -1,38 +1,37 @@
 'use strict';
-var UPYUN = require('..');
+var UpYun = require('../');
 var should = require('should');
 
-var upyun = new UPYUN('travis', 'travisci', 'testtest', 'v3', 'latest');
+var upyun = new UpYun('travis', 'travisci', 'testtest', 'v0.api.upyun.com');
 var tempstr = '/' + Math.random().toString().slice(-8);
 
 describe('REST API: ', function() {
 
-    describe('getUsage(callback)', function() {
+    describe('usage(callback)', function() {
         it('should return a result contains space and file', function(done) {
-            upyun.getUsage(function(err, result) {
-                result.data.should.have.property('space');
-                result.data.should.have.property('files');
+            upyun.usage(function(err, result) {
+                result.data.should.be.a.Number;
                 done();
             });
         });
     });
 
-    describe('listDir(remotePath, callback)', function() {
+    describe('listDir(remotePath, limit, order, iter, callback)', function() {
         it('should return a result contains files', function(done) {
-            upyun.listDir('', function(err, result) {
-                result.data.should.have.property('files');
+            upyun.listDir('/', 100, 'asc', null, function(err, result) {
+                result.statusCode.should.be.exactly(200);
                 done();
             });
         });
     });
 
-    describe('createDir(remotePath, callback)', function() {
-        it('should return success code 201', function(done) {
-            upyun.createDir(tempstr, function(err, result) {
+    describe('makeDir(remotePath, callback)', function() {
+        it('should return success code 200', function(done) {
+            upyun.makeDir(tempstr, function(err, result) {
                 if(err) {
                     throw err;
                 }
-                result.statusCode.should.be.exactly(201);
+                result.statusCode.should.be.exactly(200);
                 done();
             });
         });
@@ -44,39 +43,28 @@ describe('REST API: ', function() {
                 if(err) {
                     throw err;
                 }
-                result.statusCode.should.be.exactly(204);
+                result.statusCode.should.be.exactly(200);
                 done();
             });
         });
     });
 
-    describe('uploadFile(remotePath, localFile, type, checksum, [opts], callback)', function() {
+    describe('putFile(remotePath, localFile, type, checksum, [opts], callback)', function() {
         it('should return the uploaded file\'s info', function(done) {
-            upyun.uploadFile('/test' + tempstr, './LICENSE', 'text/plain', true, function(err, result) {
+            upyun.putFile('/test' + tempstr, './index.js', 'text/plain', true, null, function(err, result) {
                 if(err) {
                     throw err;
                 }
-                result.data.result.should.have.property('location');
+                result.statusCode.should.be.exactly(200);
+                //result.data.result.should.have.property('');
                 done();
             });
         });
     });
 
-    describe('uploadFile(remotePath, localFile, type, checksum, [opts], callback)', function() {
-        it('should return the uploaded file\'s info', function(done) {
-            upyun.uploadFile('/test' + tempstr + 2, 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Id molestias ut quisquam, dolores blanditiis nobis labore eum, accusantium dolorem laboriosam est modi sit quam libero aliquam nam corporis nihil rerum.', 'text/plain', true, function(err, result) {
-                if(err) {
-                    throw err;
-                }
-                result.data.result.should.have.property('location');
-                done();
-            });
-        });
-    });
-
-    describe('existsFile(remotePath, callback)', function() {
+    describe('headFile(remotePath, callback)', function() {
         it('should return 200', function(done) {
-            upyun.existsFile('/test' + tempstr, function(err, result) {
+            upyun.headFile('/test' + tempstr, function(err, result) {
                 if(err) {
                     throw err;
                 }
@@ -86,25 +74,26 @@ describe('REST API: ', function() {
         });
     });
 
-    describe('downloadFile(remotePath, callback)', function() {
+    describe('getFile(remotePath, null, callback)', function() {
         it('should return file\'s content', function(done) {
-            upyun.downloadFile('/test' + tempstr, function(err, result) {
+            upyun.getFile('/test' + tempstr, null, function(err, result) {
                 if(err) {
                     throw err;
                 }
-                result.data.should.match(/MIT/);
+                result.statusCode.should.be.exactly(200);
+                result.data.should.match(/\'use strict\'/);
                 done();
             });
         });
     });
 
-    describe('removeFile(remotePath, callback)', function() {
+    describe('deleteFile(remotePath, callback)', function() {
         it('should return 200', function(done) {
-            upyun.removeFile('/test' + tempstr, function(err, result) {
+            upyun.deleteFile('/test' + tempstr, function(err, result) {
                 if(err) {
                     throw err;
                 }
-                result.statusCode.should.be.exactly(204);
+                result.statusCode.should.be.exactly(200);
                 done();
             });
         });

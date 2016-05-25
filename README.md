@@ -1,245 +1,234 @@
-# node-upyun
-[![NPM version](https://img.shields.io/npm/v/upyun.svg?style=flat-square)](https://www.npmjs.org/package/upyun)
-[![NPM downloads](https://img.shields.io/npm/dm/upyun.svg?style=flat-square)](https://www.npmjs.org/package/upyun)
-[![Build status](https://img.shields.io/travis/upyun/node-upyun.svg?style=flat-square)](https://travis-ci.org/upyun/node-upyun)
+# UPYUN Node SDK
+[![NPM version](https://img.shields.io/npm/v/upyun.svg?style=flat)](https://www.npmjs.org/package/upyun)
+[![Build status](https://img.shields.io/travis/upyun/node-upyun.svg?style=flat)](https://travis-ci.org/upyun/node-sdk)
 
-official upyun sdk for node.js
+UPYUN Node SDK, 集成：
 
-[中文说明](https://github.com/upyun/node-upyun/wiki/%E4%B8%AD%E6%96%87%E8%AF%B4%E6%98%8E)
+* [UPYUN HTTP REST 接口](http://docs.upyun.com/api/rest_api/)
+* [UPYUN HTTP FORM 接口](http://docs.upyun.com/api/form_api/)
+* [UPYUN 缓存刷新接口](http://docs.upyun.com/api/purge/)
+* [UPYUN 分块上传接口](http://docs.upyun.com/api/multipart_upload/)
+* [UPYUN 视频处理接口](http://docs.upyun.com/api/av_pretreatment/)
 
-__Currently only works with `legacy` API(the current online API)__
-
-# Install
-```sh
+# 安装
+```
 $ npm install upyun --save
 ```
 
-# Init
-```js
-var upyun = new UPYUN(bucket, operator, password, endpoint, apiVersion);
+# 初始化
+
+```
+var upyun = new UpYun(bucket, operator, password [, endpoint]);
 ```
 
-__Arguments__
+__参数__
 
-* `bucket`: your upyun bucket's name.
-* `operator`: operator which is granted permisson to `bucket`
-* `password`: passowrd for the operator which is granted permisson to `bucket`
-* `endpoint` The value can be these(leave blank to let sdk auto select the best one):
-  * `ctcc` or `v1`: China Telecom
-  * `cucc` or `v2`: China Unicom
-  * `cmcc` or `v3` China Mobile
-  * `v0` or any other string: Will use `v0.api.upyun.com` (auto detect routing)
-* `apiVersion`: API version.
-  * `'legacy'`: current online api.(currently, it is the default)
-    * when you choose `legacy`, it make an instance by [upyun-legacy](https://www.npmjs.org/package/upyun-legacy), they have the same methods name as the `latest` version. But the response data may not has the same format. More detail at [upyun-legacy/README.md](https://github.com/lisposter/node-upyun-legacy/blob/master/README.md)
-  * `'latest'`: the bleeding-edge.(__Not available now.__)
+* `bucket`: 你要使用的 upyun 空间名字.
+* `operator`: 拥有 `bucket` 授权的操作员
+* `password`: 拥有 `bucket` 授权的操作员的密码
+* `endpoint` API 接入点，可以刷是如下值:
+  * `v0.api.upyun.com` : 自动选择合适的线路
+  * `v1.api.upyun.com` : 电信线路
+  * `v2.api.upyun.com` : 联通（网通）线路
+  * `v3.api.upyun.com` : 移动（铁通）线路
 
-# Example 
-```js
-var UPYUN = require('upyun');
+# 示例
 
-var upyun = new UPYUN('testbucket', 'operatername', 'operaterpwd', 'ctcc', 'legacy');
-
-upyun.getUsage(function(err, result) {
+```
+var UpYun = require('upyun');
+var upyun = new UpYun('testbucket', 'operatername', 'operaterpwd', 'v0.api.upyun.com');
+upyun.usage(function(err, result) {
     //...
 })
 ```
 
-# Response
-In this SDK, every api will return a response in the format:
+# 响应结果
 
-#### Normal
+SDK 各 API 方法会按以下的统一格式返回数据：
 
-```js
+#### 成功
+
+```
 {
-    statusCode: 200,    // http stats code
-    headers: {
-        server: 'nginx/1.1.19',
-        date: 'Wed, 13 Aug 2014 02:15:27 GMT',
+    'statusCode': 200,    // HTTP 状态码
+    'headers': {
+        'server': 'vivi/0.6',
+        'date': 'Wed, 13 Aug 2014 02:15:27 GMT',
         'content-type': 'application/json',
-        'content-length': '24',
-        connection: 'close'
-    },                  // response header
-    data: {
-        space: 2501,
-        files: 1
-    }                   // response body
+        'content-length': '24'
+    },                  // API 响应头部
+    'data': <响应体>
 }
 ```
 
-#### Error catch
-When an error occured, the error will be catched, and returned in the response
+> 注：如果请求出错，则 `data` 里为具体的错误码和错误描述。如：
 
-```js
+```
 {
-    statusCode: 401,    // http stats code
-    error: {
-        error_code: 40104,
-        request: 'GET /imgtest',
-        message: 'Signature error, (signature = md5(METHOD&PATH&DATE&CONTENT_LENGTH&MD5(PASSWORD))).'
-    },                  // error message
-    headers: {
-        server: 'nginx/1.1.19',
-        date: 'Wed, 13 Aug 2014 02:19:07 GMT',
+    'statusCode': 401,    // HTTP 状态码
+    'headers': {          // API 响应头部
+        'server': 'vivi/0.6',
+        'date': 'Wed, 13 Aug 2014 02:19:07 GMT',
         'content-type': 'application/json',
-        'content-length': '145',
-        connection: 'close',
-        'www-authenticate': 'Basic realm="UpYun"'
-    }                   // response header
+        'content-length': '39'
+    },
+    'data': {             // 错误信息
+        'code': 40400001,
+        'msg': 'file not found'
+    }
 }
 ```
 
-The different between these two responses is the `error` and `body`.
-
-All responses contain http status code and raw response header for futher usage.
-
-
-# Docs
-## API
-* [`getUsage`](#getUsage)
-* [`listDir`](#listDir)
-* [`createDir`](#createDir)
-* [`removeDir`](#removeDir)
-* [`uploadFile`](#uploadFile)
-* [`existsFile`](#existsFile)
-* [`downloadFile`](#downloadFile)
-* [`removeFile`](#removeFile)
-
-## Utils
-
-* [`setEndpoint`](#setEndpoint)
+详细细错误码及说明请参考 [API 错误码表](http://docs.upyun.com/api/errno/)。
 
 
 # API
 
-<a name="getUsage" />
-### getUsage(callback)
-To get how many quota has been used.(Unit:`Byte`)
+<a name="usage" />
+### usage(callback)
 
-__Response__
+获取空间使用状况.(单位:`byte`)
 
-```js
+__响应__
+
+```
  {
      statusCode: 200,
      headers: { ... },
-     data: {
-         space: 21754,
-         files: 50
-     }
+     data: 21754
  }
 ```
 
 ---------------------------------------
 
-<a name="" />
-### listDir(remotePath, [limit], [order], [iter], callback)
-Get the file list of that dir. The response contains each item's type(file or dir), size(unit: `Byte`), last modify time.
+<a name="listdir" />
+### listDir(remotePath, limit, order, iter, callback)
 
-__Arguments__
-* `remote_dir_path` The dir path which you want to traverse.
-* `limit` Specifies the maximum number of file list output per request.
-* `order` Sort the file list by 'last_modified' as `asc` or `desc`.(Default: `asc`)
-* `iter` Specifies the start of iteration.
+遍历指定目录. 
 
-__Response__
+__参数__
 
-```js
+* `remotePath` 欲遍历的目录
+* `limit` 限定每次请求的列表最大数目
+* `order` 以 `last_modified` 的值正序或者倒序排列 `asc`(正序) 或 `desc`(倒序).(Default: `asc`)
+* `iter` 遍历的起点（当指定 `limit` 小于实际文件数时，在第二次请求时候，指定此参数，即可继续上次的遍历）
+
+__响应__
+
+```
 {
     statusCode: 200,
-    headers: {...
+    headers: {
+        'x-upyun-list-iter': 'g2gCZAAEbmV4dGQAA2VvZg'
     },
-    data: {
-        "files": [{
-            "name": "test",
-            "type": "folder",
-            "last_modified": 1412046146
-        }],
-        "iter": "g2gCZAAEbmV4dGQAA2VvZg"
-    }
+    data: 'foo.jpg\tN\t4237\t1415096225\nbar\tF\t423404\t1415096260'
 }
 ```
 
 ---------------------------------------
 
-<a name="createDir" />
-### createDir(remotePath, callback)
-Create a new dir in UPYUN bucket.
+<a name="makeDir" />
+### makeDir(remotePath, callback)
 
-__Arguments__
-* `remotePath` The dir path which you want to create.
+创建文件夹
+
+__参数__
+
+* `remotePath` 欲创建的目录路径
 
 ---------------------------------------
 
 <a name="removeDir" />
 ### removeDir(remotePath, callback)
-Delete a dir
 
-* `remotePath` The dir path which you want to remove.
+删除文件夹
 
----------------------------------------
-
-<a name="uploadFile" />
-### uploadFile(remotePath, localFile, type, checksum, [opts], callback)
-Upload a file into UPYUN bucket.
-
-__Arguments__
-* `remotePath` Where the file will be stored in your UPYUN bucket.
-* `localFile` The file you want to upload. It can be a `path` string or the file's raw data.
-* `type` Specifies the file's content-type.
-* `checksum` Set `true` to force SDK send a md5 of local file to UPYUN. Or set a md5value string by yourself.
-* `opts` The additional http request headers(JavaScript Object). More detail in [Official Docs](http://docs.upyun.com/api/rest_api/#_4)
+* `remotePath` 欲移除的目录路径
 
 ---------------------------------------
 
-<a name="existsFile" />
-### existsFile(remotePath, callback)
-`HEAD` a path to detect if there is an file.
+<a name="putFile" />
+### putFile(remotePath, localFile, type, checksum, opts, callback)
 
-__Arguments__
-* `remotePath` The file's path in your UPYUN bucket.
+上传文件
+
+__参数__
+
+* `remotePath` 文件存放路径
+* `localFile` 欲上传的文件，可以是文件的本地路径或者文件本身的内容
+* `type` 指定文件的 `Content-Type`, 推荐传 `''`, 这时服务器会自动判断文件类型
+* `checksum` 为 `true` 时 SDK 会计算文件的 md5 值并将其传于 API 校验
+* `opts` 其他请求头部参数（以 JS 对象格式传入，常用于图片处理等需求）. 更多请参考 [官方 API 文档](http://docs.upyun.com/api/rest_api/#_5)
+
+__响应__
+
+```
+{
+    statusCode: 200,
+    headers: {...
+    },
+    data: ''
+}
+```
 
 ---------------------------------------
 
-<a name="downloadFile" />
-### downloadFile(remotePath, [localPath], callback)
-Download a file from UPYUN bucket.
+<a name="headFile" />
+### headFile(remotePath, callback)
 
-__Arguments__
-* `remotePath` The file's path in your UPYUN bucket.
-* `localPath` Where the file will save to. If no `localPath`, the file's content will output directly in the response body.
+`HEAD` 请求检测文件是否存在
+
+__参数__
+
+* `remotePath` 文件在 upyun 空间的路径
+
+---------------------------------------
+
+<a name="getFile" />
+### getFile(remotePath, localPath, callback)
+
+下载文件
+
+__参数__
+
+* `remotePath` 文件在 upyun 空间的路径
+* `localPath` 文件在本地存放路径， 如果 `localPath` 为 `null`，文件的内容将会直接在响应的主体中返回
 
 
 ---------------------------------------
 
-<a name="removeFile" />
-### removeFile(remotePath, callback)
-Delete a file from UPYUN bucket.
+<a name="deleteFile" />
+### deleteFile(remotePath, callback)
 
-__Arguments__
-* `remotePath` The file's path in your UPYUN bucket.
+删除文件
 
-# Utils
+__参数__
+
+* `remotePath` 文件在 upyun 空间的路径
+
 
 <a name="setEndpoint" />
 ### setEndpoint(endpoint)
-Use this method to set api endpoint manually.
 
-__Arguments__
-* `endpoint` The value can be these(leave blank to let sdk auto select the best one):
-  * `ctcc` or `v1`: China Telecom
-  * `cucc` or `v2`: China Unicom
-  * `cmcc` or `v3` China Mobile
-  * `v0` or any other string: Will use `v0.api.upyun.com` (auto detect routing)
+切换 API 接入点
+
+__参数__
+
+* `endpoint` 接入点
+  * `v0.api.upyun.com` : 自动选择合适的线路
+  * `v1.api.upyun.com` : 电信线路
+  * `v2.api.upyun.com` : 联通（网通）线路
+  * `v3.api.upyun.com` : 移动（铁通）线路
 
 
-# Note
+# 备注
 
-The previous owner of [`upyun npm package`](https://www.npmjs.org/package/upyun) was [James Chen](http://ashchan.com) 
+[upyun npm package](https://www.npmjs.org/package/upyun) 曾为 [James Chen](http://ashchan.com) 所有。
 
-After consultation with James, this package has been transfered to official upyun develop team.
+经过与其的交流协商，James 已经将此 npm 包转由 UPYUN 开发团队管理和维护。
 
-Any futher update and maintenance will conducted by upyun develop team and subsequent versions will not be associated with the original project.
+后续的代码和版本更新，将于原有的项目无任何直接关系。
 
-In npm registry, `"upyun": "<=0.0.3"` were published as [node-upyun](https://github.com/ashchan/node-upyun) by [James Chen](http://ashchan.com).
+在 npm 上, `"upyun": "<=0.0.3"` 是由 [James Chen](http://ashchan.com) 曾开发的 [node-upyun](https://github.com/ashchan/node-upyun) 项目.
 
-__Thanks to  [James Chen](http://ashchan.com)  for his contribution to UPYUN.__
+__非常感谢  [James Chen](http://ashchan.com) 对 upyun 的支持和贡献__

@@ -33,7 +33,7 @@ __参数__
   * `v3.api.upyun.com` : 移动（铁通）线路
 * `apiVersion` 如果不指定，则使用旧版 API，新版 API 可以指定为 `v2`:
 
-> 注：旧版 API 已不再更新，请指定 apiVersion 为 `v2` 使用新版 API。
+> **注：旧版 API 已不再更新，请指定 apiVersion 为 `v2` 使用新版 API。**
 
 # 示例
 

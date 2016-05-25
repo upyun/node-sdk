@@ -39,7 +39,7 @@ __参数__
 
 ```
 var UpYun = require('upyun');
-var upyun = new UpYun('testbucket', 'operatername', 'operaterpwd', 'v0.api.upyun.com', 'v2');
+var upyun = new UpYun('testbucket', 'operatername', 'operaterpwd', 'v0.api.upyun.com', 2);
 upyun.usage(function(err, result) {
     //...
 })

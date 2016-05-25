@@ -31,15 +31,15 @@ __参数__
   * `v1.api.upyun.com` : 电信线路
   * `v2.api.upyun.com` : 联通（网通）线路
   * `v3.api.upyun.com` : 移动（铁通）线路
-* `apiVersion` 如果不指定，则使用旧版 API，新版 API 可以指定为 `2`:
+* `apiVersion` 如果不指定，则使用旧版 API，新版 API 可以指定为 `v2`:
 
-> 注：旧版 API 已不再更新，请指定 apiVersion 为 `2` 使用新版 API。
+> 注：旧版 API 已不再更新，请指定 apiVersion 为 `v2` 使用新版 API。
 
 # 示例
 
 ```
 var UpYun = require('upyun');
-var upyun = new UpYun('testbucket', 'operatername', 'operaterpwd', 'v0.api.upyun.com', 2);
+var upyun = new UpYun('testbucket', 'operatername', 'operaterpwd', 'v0.api.upyun.com', 'v2');
 upyun.usage(function(err, result) {
     //...
 })

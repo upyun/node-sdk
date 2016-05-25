@@ -2,7 +2,7 @@
 var UpYun = require('../');
 var should = require('should');
 
-var upyun = new UpYun('travis', 'travisci', 'testtest', 'v0.api.upyun.com', 2);
+var upyun = new UpYun('travis', 'travisci', 'testtest', 'v0.api.upyun.com', 'v2');
 var tempstr = '/' + Math.random().toString().slice(-8);
 
 describe('REST API: ', function() {

@@ -1,11 +1,16 @@
 'use strict';
 var upyunDeprecated = require('upyun-legacy');
-var upyun = require('./upyun/api.js');
+var rest = require('./upyun/rest.js');
+var form = require('./upyun/form.js');
 
 module.exports = exports.UPYUN = exports.UpYun = function(bucket, operator, password, endpoint, apiVersion) {
+    if(arguments.length <= 2) {
+        return new form(bucket, operator);
+    }
+
     var client = null;
     if(apiVersion == 'v2') {
-        return new upyun(bucket, operator, password, endpoint);
+        return new rest(bucket, operator, password, endpoint);
     } else {
         client = new upyunDeprecated(bucket, operator, password, endpoint);
     }

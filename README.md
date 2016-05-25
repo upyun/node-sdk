@@ -6,9 +6,7 @@ UPYUN Node SDK, 集成：
 
 * [UPYUN HTTP REST 接口](http://docs.upyun.com/api/rest_api/)
 * [UPYUN HTTP FORM 接口](http://docs.upyun.com/api/form_api/)
-* [UPYUN 缓存刷新接口](http://docs.upyun.com/api/purge/)
 * [UPYUN 分块上传接口](http://docs.upyun.com/api/multipart_upload/)
-* [UPYUN 视频处理接口](http://docs.upyun.com/api/av_pretreatment/)
 
 # 安装
 ```

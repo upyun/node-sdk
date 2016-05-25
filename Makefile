@@ -4,7 +4,7 @@ test:
 	@NODE_ENV=test ./node_modules/.bin/mocha \
 		--require should \
 		--reporter spec \
-		--timeout 30000 \
+		--timeout 50000 \
 		$(TESTS)
 
 test-travis:

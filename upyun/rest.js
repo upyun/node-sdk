@@ -90,7 +90,7 @@ UpYun.prototype.putFile = function(remotePath, localFile, type, checksum,
     opts = opts || {};
 
     if(!fs.existsSync(localFile)) {
-        callback("can not find local file " + localFile)
+        return callback("can not find local file " + localFile)
     }
 
     if(type) {

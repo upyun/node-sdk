@@ -35,6 +35,8 @@
   ],
   "devDependencies": {
     "mocha": "*",
+    "urllib": "*",
+    "formstream": "*",
     "should": "*"
   }
 }

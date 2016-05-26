@@ -63,9 +63,11 @@ Form.prototype.putFile = function(localFile, opts, signer, callback) {
     form.field('signature', signature);
     form.file('file', localFile);
 
+    var headers = form.headers();
+    headers['User-Agent'] = 'UPYUN Node SDK v' + this._conf.version;
     var req = urllib.request(this._conf.endpoint + '/' + this._conf.bucket + '/', {
         method: 'POST',
-        headers: form.headers(),
+        headers: headers,
         dataType: 'json',
         stream: form
     }, function (err, data, res) {

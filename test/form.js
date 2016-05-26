@@ -1,6 +1,6 @@
 'use strict';
 var utils = require('../upyun/utils');
-var form = require('../');
+var form = require('../upyun/form');
 var should = require('should');
 
 var secret = process.env.UPYUN_SECRET;

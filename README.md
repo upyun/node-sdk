@@ -18,7 +18,7 @@ $ npm install upyun --save
 ## 初始化
 
 ```
-var upyun = new UpYun(bucket, operator, password [, endpoint], [, apiVersion]);
+var upyun = new UpYun(bucket, operator, password [, endpoint], [, options]);
 ```
 
 __参数__
@@ -31,9 +31,11 @@ __参数__
   * `v1.api.upyun.com` : 电信线路
   * `v2.api.upyun.com` : 联通（网通）线路
   * `v3.api.upyun.com` : 移动（铁通）线路
-* `apiVersion` 如果不指定，则使用旧版 API，新版 API 可以指定为 `v2`:
+* `options`
+  * `options.apiVersion` 如果不指定，则使用旧版 API，新版 API 可以指定为 `v2`:
+  * `options.secret` 如果指定，则可以使用 form 上传:
 
-> **注：旧版 API 已不再更新，请指定 apiVersion 为 `v2` 使用新版 API。**
+> **注：旧版 API 已不再更新，请指定 options.apiVersion 为 `v2` 使用新版 API。**
 
 ## 示例
 

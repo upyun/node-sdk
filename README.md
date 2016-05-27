@@ -6,16 +6,14 @@ UPYUN Node SDK, 集成：
 
 * [UPYUN HTTP REST 接口](http://docs.upyun.com/api/rest_api/)
 * [UPYUN HTTP FORM 接口](http://docs.upyun.com/api/form_api/)
-* [UPYUN 分块上传接口](http://docs.upyun.com/api/multipart_upload/)
 
 # 安装
 ```
 $ npm install upyun --save
 ```
 
-# REST API
 
-## 初始化
+# 初始化
 
 ```
 var upyun = new UpYun(bucket, operator, password [, endpoint], [, options]);
@@ -37,21 +35,22 @@ __参数__
 
 > **注：旧版 API 已不再更新，请指定 options.apiVersion 为 `v2` 使用新版 API。**
 
-## 示例
+# 示例
 
 ```
 var UpYun = require('upyun');
-var upyun = new UpYun('testbucket', 'operatername', 'operaterpwd', 'v0.api.upyun.com', 'v2');
+var upyun = new UpYun('testbucket', 'operatername', 'operaterpwd', 'v0.api.upyun.com', {
+    apiVersion: 'v2',
+    secret: 'yoursecret'
+});
 upyun.usage(function(err, result) {
     //...
 })
 ```
 
-## 响应结果
+# 响应结果
 
 SDK 各 API 方法会按以下的统一格式返回数据：
-
-#### 成功
 
 ```
 {
@@ -87,7 +86,7 @@ SDK 各 API 方法会按以下的统一格式返回数据：
 详细细错误码及说明请参考 [API 错误码表](http://docs.upyun.com/api/errno/)。
 
 
-## API
+# API
 
 <a name="usage" />
 ### usage(callback)
@@ -161,7 +160,7 @@ __参数__
 
 * `remotePath` 文件存放路径
 * `localFile` 欲上传的文件，文件的本地路径
-* `type` 指定文件的 `Content-Type`, 推荐传 `''`, 这时服务器会自动判断文件类型
+* `type` 指定文件的 `Content-Type`, 如果传 `null`, 这时服务器会自动判断文件类型
 * `checksum` 为 `true` 时 SDK 会计算文件的 md5 值并将其传于 API 校验
 * `opts` 其他请求头部参数（以 JS 对象格式传入，常用于图片处理等需求）. 更多请参考 [官方 API 文档](http://docs.upyun.com/api/rest_api/#_5)
 
@@ -225,49 +224,11 @@ __参数__
   * `v2.api.upyun.com` : 联通（网通）线路
   * `v3.api.upyun.com` : 移动（铁通）线路
 
-## Form API
-
-## 初始化
-
-```
-var Form = require("upyun/form');
-var form = new Form(bucket [, endpoint]);
-```
-
-__参数__
-
-* `bucket`: 你要使用的 upyun 空间名字.
-* `endpoint` API 接入点，可以刷是如下值:
-  * `v0.api.upyun.com` : 自动选择合适的线路
-  * `v1.api.upyun.com` : 电信线路
-  * `v2.api.upyun.com` : 联通（网通）线路
-  * `v3.api.upyun.com` : 移动（铁通）线路
-
-## 示例
-
-```
-var Form = require("upyun/form');
-var form = new Form('testbucket', 'v0.api.upyun.com');
-var opts = {
-    'save-key': '/test' + tempstr,
-    'Content-Type': 'image/jpg',
-}
-form.putFile('/path/to/local/file.jpg', opts,
-    function(policy){
-        return utils.md5sum(policy + '&' + <your secret>);
-    },
-    function(err, result) {
-        consule.log(result);
-    }
-)
-```
-
-## API
 
 <a name="formPutFile" />
-### putFile(localFile, opts, signer, callback)
+### formPutFile(localFile, opts, signer, callback)
 
-上传文件
+表单上传文件
 
 __参数__
 
@@ -286,6 +247,23 @@ __响应__
         ...
     }
 }
+```
+
+__示例__
+
+```
+var opts = {
+    'save-key': '/test' + tempstr,
+    'Content-Type': 'image/jpg',
+}
+upyun.formPutFile('/path/to/local/file.jpg', opts,
+    function(policy){
+        return utils.md5sum(policy + '&' + <your secret>);
+    },
+    function(err, result) {
+        consule.log(result);
+    }
+)
 ```
 
 

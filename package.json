@@ -34,9 +34,13 @@
     }
   ],
   "devDependencies": {
-    "mocha": "*",
-    "urllib": "*",
-    "formstream": "*",
-    "should": "*"
+    "istanbul": "^0.4.3",
+    "mocha": "^2.5.3",
+    "should": "^9.0.2"
+  },
+  "dependencies": {
+    "formstream": "^1.0.0",
+    "upyun-legacy": "^0.4.5",
+    "urllib": "^2.9.1"
   }
 }

@@ -1,26 +1,17 @@
 'use strict';
-var upyunV1 = require('upyun-legacy');
-var upyunV2 = require('./lib/api.js');
+var upyunDeprecated = require('upyun-legacy');
+var upyun = require('./upyun/api.js');
 
-module.exports = exports.UPYUN = function(bucket, operator, password, endpoint, apiVersion) {
-    // wait for the latest api online
-    apiVersion = apiVersion || 'legacy';
+module.exports = exports.UPYUN = exports.UpYun = function(bucket, operator, password, endpoint, opts) {
+  var client = null;
 
-    var client = null;
+  if (opts && opts.apiVersion == 'v2') {
+    client = new upyun(bucket, operator, password, endpoint, opts);
+  } else {
+    client = new upyunDeprecated(bucket, operator, password, endpoint);
+  }
 
-    switch(apiVersion.toLowerCase()) {
-        case 'legacy':
-            client =  new upyunV1(bucket, operator, password, endpoint);
-            break;
-        case 'latest':
-            client =  new upyunV2(bucket, operator, password, endpoint);
-            break;
-        default:
-            client =  new upyunV1(bucket, operator, password, endpoint);
-            break;
-    }
+  client._apiVersion = opts.apiVersion;
 
-    client._apiVersion = apiVersion;
-
-    return client;
+  return client;
 };

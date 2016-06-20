@@ -1,6 +1,6 @@
 {
   "name": "upyun",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "UPYUN node sdk",
   "main": "index.js",
   "scripts": {
@@ -31,6 +31,10 @@
     {
       "name": "Leigh",
       "email": "i@zhuli.me"
+    },
+    {
+      "name": "kaidiren",
+      "email": "kaidiren@gmail.com"
     }
   ],
   "devDependencies": {

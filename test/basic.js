@@ -33,6 +33,13 @@ describe('REST API: ', function() {
         done();
       });
     });
+
+    it('should return a result contains files and can prefix with /', function(done) {
+      upyun.listDir('', 100, 'asc', null, function(err, result) {
+        result.statusCode.should.be.exactly(200);
+        done();
+      });
+    });
   });
 
   describe('makeDir(remotePath, callback)', function() {

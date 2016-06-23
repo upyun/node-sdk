@@ -150,9 +150,17 @@ utils.makeSign = function(method, uri, date, length, password, operator) {
 utils.genReqOpts = function(thisArg, method, remotePath, length, custom) {
   var headers = custom || {};
   var date = (new Date()).toGMTString();
+
   if (remotePath.indexOf('/') !== 0) {
     remotePath = '/' + remotePath;
   }
+
+  // preifx remotePath sub dir with '/' if not exists
+  var t = remotePath.split(thisArg._conf.bucket);
+  if (t.length >= 2 && t[1] !== undefined && t[1].indexOf('/') !== 0) {
+    t[1] = '/' + t[1];
+  }
+  remotePath = t.join(thisArg._conf.bucket);
 
   var contentLength = length || 0;
   headers['Content-Length'] = contentLength;

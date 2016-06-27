@@ -267,6 +267,32 @@ upyun.formPutFile('/path/to/local/file.jpg', opts,
 ```
 
 
+
+<a name="tools" />
+# tools
+
+* tools.md5sum(string)
+* tools.md5sumFile(file_path, callback)
+* tools.makeSign(method, uri, date, length, password, operator)
+* tools.policy(opts)
+* tools.signature(policy, secret)
+
+__示例__
+
+```
+var tools = require('upyun/tools');
+
+tools.md5sum('123456');
+
+tools.md5sumFile('./a.txt', function(err, md5_value) {
+    console.log(md5_value)
+})
+
+tools.makeSign(method, uri, date, length, password, operator)
+
+tools.signature(policy, secret)
+```
+
 # 备注
 
 [upyun npm package](https://www.npmjs.org/package/upyun) 曾为 [James Chen](http://ashchan.com) 所有。

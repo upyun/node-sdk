@@ -216,7 +216,10 @@ utils.request = function(options, fileToUpload, fileDownloadTo, callback) {
     }
   });
 
-  if (fileToUpload && fs.existsSync(fileToUpload)) {
+  if (fileToUpload instanceof Buffer) {
+    req.write(fileToUpload);
+    req.end();
+  } else if (fileToUpload && fs.existsSync(fileToUpload)) {
     var rs = fs.createReadStream(fileToUpload);
     rs.pipe(req, {
       end: false
@@ -224,9 +227,6 @@ utils.request = function(options, fileToUpload, fileDownloadTo, callback) {
     rs.on('close', function() {
       req.end();
     });
-  } else if (fileToUpload) {
-    req.write(fileToUpload);
-    req.end();
   } else {
     req.end();
   }

@@ -95,9 +95,10 @@ UpYun.prototype.putFile = function(remotePath, localFile, type, checksum,
   }
 
   var _self = this;
+  var isBuffer = localFile instanceof Buffer;
   opts = opts || {};
 
-  if (!fs.existsSync(localFile)) {
+  if (!isBuffer && !fs.existsSync(localFile)) {
     return callback("can not find local file " + localFile);
   }
 
@@ -105,13 +106,23 @@ UpYun.prototype.putFile = function(remotePath, localFile, type, checksum,
     opts['Content-Type'] = type;
   }
 
-  var contentLength = fs.statSync(localFile).size;
+  var contentLength;
+  if (isBuffer) {
+    contentLength = localFile.length;
+  } else {
+    contentLength = fs.statSync(localFile).size;
+  }
 
   if (checksum) {
-    utils.md5sumFile(localFile, function(err, result) {
-      opts['Content-MD5'] = result;
+    if (isBuffer) {
+      opts['Content-MD5'] = utils.md5sum(localFile);
       _upload(contentLength, opts);
-    });
+    } else {
+      utils.md5sumFile(localFile, function(err, result) {
+        opts['Content-MD5'] = result;
+        _upload(contentLength, opts);
+      });
+    }
   } else {
     _upload(contentLength, opts);
   }
@@ -170,7 +181,9 @@ UpYun.prototype.formPutFile = function(localFile, opts, signer, callback) {
 
   if (!this._conf.secret) return callback(new Error('please config secret.'));
 
-  if (!fs.existsSync(localFile)) {
+  var isBuffer = localFile instanceof Buffer;
+
+  if (!isBuffer && !fs.existsSync(localFile)) {
     return callback("can not find local file " + localFile);
   }
 
@@ -200,7 +213,11 @@ UpYun.prototype.formPutFile = function(localFile, opts, signer, callback) {
   var form = formstream();
   form.field('policy', policy);
   form.field('signature', signature);
-  form.file('file', localFile);
+  if (isBuffer) {
+    form.buffer('file', localFile, 'file');
+  } else {
+    form.file('file', localFile);
+  }
 
   var headers = form.headers();
   headers['User-Agent'] = 'UPYUN Node SDK v' + this._conf.version;

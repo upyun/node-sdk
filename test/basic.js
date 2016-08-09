@@ -119,7 +119,7 @@ describe('REST API: ', function() {
   describe('formPutFile(localFile, opts, callback)', function() {
     it('should return the uploaded file\'s info', function(done) {
       var opts = {
-        'save-key': '/test' + tempstr,
+        'save-key': '/test' + tempstr + 'diff',
         'Content-Type': 'image/jpg'
       };
       upyun.formPutFile('./test/cat.jpg', opts,

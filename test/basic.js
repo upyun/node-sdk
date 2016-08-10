@@ -1,5 +1,6 @@
 'use strict';
 require('should');
+var fs = require('fs');
 var UpYun = require('../');
 var utils = require('../upyun/utils');
 
@@ -67,13 +68,22 @@ describe('REST API: ', function() {
   });
 
   describe('putFile(remotePath, localFile, type, checksum, [opts], callback)', function() {
-    it('should return the uploaded file\'s info', function(done) {
+    it('should return the uploaded file\'s info success with localfile', function(done) {
       upyun.putFile('/test' + tempstr, './index.js', 'text/plain', true, null, function(err, result) {
         if (err) {
           throw err;
         }
         result.statusCode.should.be.exactly(200);
-        //result.data.result.should.have.property('');
+        done();
+      });
+    });
+
+    it('should return the uploaded file\'s info success with buffer', function(done) {
+      upyun.putFile('/test' + tempstr + 'buffer', fs.readFileSync('./index.js'), 'text/plain', true, null, function(err, result) {
+        if (err) {
+          throw err;
+        }
+        result.statusCode.should.be.exactly(200);
         done();
       });
     });
@@ -117,12 +127,33 @@ describe('REST API: ', function() {
   });
 
   describe('formPutFile(localFile, opts, callback)', function() {
-    it('should return the uploaded file\'s info', function(done) {
+    it('should return the uploaded file\'s info sucesss with localfile', function(done) {
       var opts = {
         'save-key': '/test' + tempstr + 'diff',
         'Content-Type': 'image/jpg'
       };
       upyun.formPutFile('./test/cat.jpg', opts,
+        function(policy) {
+          return utils.md5sum(policy + '&' + secret);
+        },
+        function(err, result) {
+          if (err) {
+            throw err;
+          }
+          result.statusCode.should.be.exactly(200);
+          result.data.should.have.property('image-type');
+          result.headers.should.have.property('x-upyun-width');
+          done();
+        }
+      );
+    });
+
+    it('should return the uploaded file\'s info sucesss with buffer', function(done) {
+      var opts = {
+        'save-key': '/test' + tempstr + 'diff' + 'buffer',
+        'Content-Type': 'image/jpg'
+      };
+      upyun.formPutFile(fs.readFileSync('./test/cat.jpg'), opts,
         function(policy) {
           return utils.md5sum(policy + '&' + secret);
         },

@@ -159,7 +159,7 @@ __参数__
 __参数__
 
 * `remotePath` 文件存放路径
-* `localFile` 欲上传的文件，文件的本地路径
+* `localFile` 欲上传的文件，文件的本地路径 或者文件对应的 buffer
 * `type` 指定文件的 `Content-Type`, 如果传 `null`, 这时服务器会自动判断文件类型
 * `checksum` 为 `true` 时 SDK 会计算文件的 md5 值并将其传于 API 校验
 * `opts` 其他请求头部参数（以 JS 对象格式传入，常用于图片处理等需求）. 更多请参考 [官方 API 文档](http://docs.upyun.com/api/rest_api/#_5)
@@ -232,7 +232,7 @@ __参数__
 
 __参数__
 
-* `localFile` 欲上传的文件，文件的本地路径
+* `localFile` 欲上传的文件，文件的本地路径 或者 文件对应的 buffer
 * `opts` 其他请求头部参数（以 JS 对象格式传入，常用于图片处理等需求）. 更多请参考 [官方 API 文档](http://docs.upyun.com/api/form_api/#api_1)
 * `signer` 外部签名函数，该参数据接收 `policy` 参数，需要返回签名后的字符串。
 

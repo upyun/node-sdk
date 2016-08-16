@@ -143,7 +143,9 @@ utils.makeSign = function(method, uri, date, length, password, operator) {
   if (uri.indexOf('?') >= 0) {
     uri = uri.split('?')[0];
   }
+
   var sign = method + '&' + uri + '&' + date + '&' + length + '&' + utils.md5sum(password);
+
   return 'UpYun ' + operator + ':' + utils.md5sum(sign);
 };
 
@@ -161,6 +163,8 @@ utils.genReqOpts = function(thisArg, method, remotePath, length, custom) {
     t[1] = '/' + t[1];
   }
   remotePath = t.join(thisArg._conf.bucket);
+
+  remotePath = encodeURI(remotePath);
 
   var contentLength = length || 0;
   headers['Content-Length'] = contentLength;

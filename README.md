@@ -12,6 +12,11 @@ UPYUN Node SDK, 集成：
 $ npm install upyun --save
 ```
 
+# 测试
+执行测试用例需要将空间操作员信息写入环境变量，如下所示，请使用自己的空间配置信息替换
+```
+UPYUN_BUCKET=your_bucket_name UPYUN_SECRET=your_form_api_key UPYUN_PASSWORD=your_operator_password UPYUN_USERNAME=your_opertaor_name make test
+```
 
 # 初始化
 

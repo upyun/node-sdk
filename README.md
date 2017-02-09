@@ -231,7 +231,7 @@ __参数__
 
 
 <a name="formPutFile" />
-### formPutFile(localFile, opts, signer, callback)
+### formPutFile(localFile, opts, signer, [timeout], callback)
 
 表单上传文件
 
@@ -240,6 +240,7 @@ __参数__
 * `localFile` 欲上传的文件，文件的本地路径 或者 文件对应的 buffer
 * `opts` 其他请求头部参数（以 JS 对象格式传入，常用于图片处理等需求）. 更多请参考 [官方 API 文档](http://docs.upyun.com/api/form_api/#api_1)
 * `signer` 外部签名函数，该参数据接收 `policy` 参数，需要返回签名后的字符串。
+* `timeout` 请求超时时间 单位 ms 默认 5000
 
 __响应__
 
@@ -265,6 +266,7 @@ upyun.formPutFile('/path/to/local/file.jpg', opts,
     function(policy){
         return utils.md5sum(policy + '&' + <your secret>);
     },
+    5000,
     function(err, result) {
         consule.log(result);
     }

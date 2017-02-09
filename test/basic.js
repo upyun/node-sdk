@@ -159,6 +159,31 @@ describe('REST API: ', function() {
       );
     });
 
+    it('should return the uploaded file\'s info sucesss with localfile and timeout', function(done) {
+      var opts = {
+        'save-key': '/test' + tempstr + 'diff',
+        'Content-Type': 'image/jpg'
+      };
+
+      var timeout = 10000;
+
+      upyun.formPutFile('./test/cat.jpg', opts,
+        function(policy) {
+          return utils.md5sum(policy + '&' + secret);
+        },
+        timeout,
+        function(err, result) {
+          if (err) {
+            throw err;
+          }
+          result.statusCode.should.be.exactly(200);
+          result.data.should.have.property('image-type');
+          result.headers.should.have.property('x-upyun-width');
+          done();
+        }
+      );
+    });
+
     it('should return the uploaded file\'s info sucesss chinese code', function(done) {
       var opts = {
         'save-key': '/test' + tempstr + '中文 空格 字符',

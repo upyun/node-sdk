@@ -169,9 +169,13 @@ UpYun.prototype.deleteFile = function(remotePath, callback) {
   });
 };
 
-UpYun.prototype.formPutFile = function(localFile, opts, signer, callback) {
-  if (arguments.length != 4) {
-    throw new Error('formPutFile takes 4 arguments but only ' +
+UpYun.prototype.formPutFile = function(localFile, opts, signer, timeout, callback) {
+  if (arguments.length === 4) {
+    callback = timeout;
+    timeout = 5000;
+  }
+  if (arguments.length < 4) {
+    throw new Error('formPutFile takes at least 4 arguments but only ' +
       arguments.length + ' specified.');
   } else if (typeof arguments[arguments.length - 1] !== 'function') {
     throw new Error('No callback specified.');
@@ -234,7 +238,8 @@ UpYun.prototype.formPutFile = function(localFile, opts, signer, callback) {
     method: 'POST',
     headers: headers,
     dataType: 'json',
-    stream: form
+    stream: form,
+    timeout: timeout
   }, function(err, data, res) {
     if (err) {
       return callback(err);

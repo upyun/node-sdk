@@ -164,10 +164,7 @@ describe('REST API: ', function() {
         'save-key': '/test' + tempstr + '中文 空格 字符',
         'Content-Type': 'image/jpg'
       };
-      upyun.formPutFile('./test/cat.jpg', opts,
-        function(policy) {
-          return utils.md5sum(policy + '&' + secret);
-        },
+      upyun.formPutFile('./test/cat.jpg', opts, null,
         function(err, result) {
           if (err) {
             throw err;

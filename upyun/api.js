@@ -202,17 +202,26 @@ UpYun.prototype.formPutFile = function(localFile, opts, signer, callback) {
   var policy = utils.Base64.encode(JSON.stringify(opts));
   var signature;
 
+  var form = formstream();
+  form.field('policy', policy);
   if (signer) {
     signature = signer(policy);
+    form.field('signature', signature);
   } else if (this._conf.secret) {
-    signature = utils.md5sum(policy + '&' + this._conf.secret);
+    signature = utils.makeSign(
+      'POST',
+      '/' + this._conf.bucket + '/',
+      null,
+      this._conf.password,
+      this._conf.operator,
+      null,
+      policy
+    );
+    form.field('authorization', signature);
   } else {
     return callback('can not compute signature');
   }
 
-  var form = formstream();
-  form.field('policy', policy);
-  form.field('signature', signature);
   if (isBuffer) {
     form.buffer('file', localFile, 'file');
   } else {

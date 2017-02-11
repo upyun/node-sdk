@@ -128,6 +128,10 @@ utils.md5sum = function(data) {
   return md5.digest('hex');
 };
 
+utils.sha1 = function(str, secret) {
+  return crypto.createHmac('sha1', secret).update(str, 'utf8').digest().toString('base64');
+}
+
 utils.md5sumFile = function(fpath, callback) {
   var md5 = crypto.createHash('md5');
   var rs = fs.createReadStream(fpath);
@@ -139,14 +143,27 @@ utils.md5sumFile = function(fpath, callback) {
   });
 };
 
-utils.makeSign = function(method, uri, date, length, password, operator) {
+utils.makeSign = function(method, uri, date, password, operator, content_md5, policy) {
   if (uri.indexOf('?') >= 0) {
     uri = uri.split('?')[0];
   }
 
-  var sign = method + '&' + uri + '&' + date + '&' + length + '&' + utils.md5sum(password);
+  var str = method + '&' + uri;
+  if (date) {
+    str += '&' + date;
+  }
 
-  return 'UpYun ' + operator + ':' + utils.md5sum(sign);
+  if (policy) {
+    str += '&' + policy;
+  }
+
+  if (content_md5) {
+    str += '&' + content_md5;
+  }
+
+  var sign = utils.sha1(str, utils.md5sum(password));
+
+  return 'UpYun ' + operator + ':' + sign;
 };
 
 utils.genReqOpts = function(thisArg, method, remotePath, length, custom) {
@@ -169,7 +186,7 @@ utils.genReqOpts = function(thisArg, method, remotePath, length, custom) {
   var contentLength = length || 0;
   headers['Content-Length'] = contentLength;
   headers.Date = date;
-  headers.Authorization = utils.makeSign(method, remotePath, date, contentLength, thisArg._conf.password, thisArg._conf.operator);
+  headers.Authorization = utils.makeSign(method, remotePath, date, thisArg._conf.password, thisArg._conf.operator, headers['Content-MD5'] || null);
   headers.Host = thisArg._conf.endpoint;
   headers['User-Agent'] = 'UPYUN Node SDK v' + thisArg._conf.version;
 

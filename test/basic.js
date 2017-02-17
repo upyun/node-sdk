@@ -198,5 +198,26 @@ describe('REST API: ', function() {
         }
       );
     });
+
+    it('should convert amr to mp3 success when upload amr file', function(done) {
+      var options = {
+        'content-type': 'audio/amr',
+        'save-key': '/test' + tempstr + '.amr',
+        apps: [{
+          name: "naga",
+          type: "video",
+          avopts:  '/f/mp3',
+          return_info: true,
+          save_as: '/test/test.mp3',
+        }],
+      };
+      upyun.formPutFile('./test/example.amr', options, null, function(err, result) {
+        if (err) {
+          throw err;
+        }
+        result.statusCode.should.be.exactly(200);
+        done();
+      });
+    });
   });
 });

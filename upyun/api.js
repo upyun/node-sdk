@@ -171,7 +171,7 @@ UpYun.prototype.deleteFile = function(remotePath, callback) {
 
 UpYun.prototype.formPutFile = function(localFile, opts, signer, callback) {
   if (arguments.length != 4) {
-    throw new Error('putFile takes 4 arguments but only ' +
+    throw new Error('formPutFile takes 4 arguments but only ' +
       arguments.length + ' specified.');
   } else if (typeof arguments[arguments.length - 1] !== 'function') {
     throw new Error('No callback specified.');

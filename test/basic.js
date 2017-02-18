@@ -236,7 +236,7 @@ describe('REST API: ', function() {
           save_as: '/test/test.mp3',
         }],
       };
-      upyun.formPutFile('./test/example.amr', options, null, function(err, result) {
+      upyun.formPutFile('./test/example.amr', options, null, 10 * 1000, function(err, result) {
         if (err) {
           throw err;
         }

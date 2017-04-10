@@ -1,6 +1,6 @@
 # UPYUN Node SDK
 [![NPM version](https://img.shields.io/npm/v/upyun.svg?style=flat)](https://www.npmjs.org/package/upyun)
-[![Build status](https://img.shields.io/travis/upyun/node-upyun.svg?style=flat)](https://travis-ci.org/upyun/node-sdk)
+[![Build Status](https://travis-ci.org/upyun/node-sdk.svg?branch=master)](https://travis-ci.org/upyun/node-sdk)
 
 UPYUN Node SDK, 集成：
 

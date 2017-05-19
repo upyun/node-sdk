@@ -11,7 +11,5 @@ module.exports = exports.UPYUN = exports.UpYun = function(bucket, operator, pass
     client = new upyunDeprecated(bucket, operator, password, endpoint);
   }
 
-  client._apiVersion = opts.apiVersion;
-
   return client;
 };

@@ -4,7 +4,8 @@
   "description": "UPYUN node sdk",
   "main": "index.js",
   "scripts": {
-    "test": "make test"
+    "test:client": "./node_modules/.bin/karma start tests/karma.conf.js",
+    "test:server": "./node_modules/.bin/mocha --compilers js:babel-register tests/sign.js tests/index.js"
   },
   "repository": {
     "type": "git",
@@ -17,7 +18,7 @@
     "cloud",
     "storage"
   ],
-  "author": "jing.ye@upai.com",
+  "author": "Leigh",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/upyun/node-sdk/issues"
@@ -35,15 +36,33 @@
     {
       "name": "kaidiren",
       "email": "kaidiren@gmail.com"
+    },
+    {
+      "name": "Gaara",
+      "email": "sabakugaara@users.noreply.github.com"
     }
   ],
   "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-loader": "^7.0.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.4.0",
+    "babel-register": "^6.24.1",
+    "chai": "^3.5.0",
     "istanbul": "^0.4.3",
-    "mocha": "^2.5.3",
-    "should": "^9.0.2"
+    "karma": "^1.7.0",
+    "karma-chrome-launcher": "^2.1.1",
+    "karma-mocha": "^1.3.0",
+    "karma-webpack": "^2.0.3",
+    "mocha": "^3.4.1",
+    "should": "^9.0.2",
+    "webpack": "^2.5.1"
   },
   "dependencies": {
+    "axios": "^0.16.1",
     "formstream": "^1.0.0",
+    "hmacsha1": "^1.0.0",
+    "md5": "^2.2.1",
     "upyun-legacy": "^0.4.5",
     "urllib": "^2.9.1"
   }

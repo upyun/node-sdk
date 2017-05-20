@@ -30,7 +30,7 @@ export default class Upyun {
       config.headers.common = sign.getHeaderSign(this.config, method, path)
       return config
     }, error => {
-      throw new Error('request upyun failed: ' + error.message)
+      throw new Error('upyun - request failed: ' + error.message)
     })
 
     this.req.interceptors.response.use(
@@ -38,7 +38,7 @@ export default class Upyun {
       error => {
         const {response} = error
         if (response.status !== 404) {
-          throw new Error('upyun response error: ' + response.data.code + ' ' + response.data.message)
+          throw new Error('upyun - response error: ' + response.data.code + ' ' + response.data.message)
         } else {
           return response
         }
@@ -137,7 +137,7 @@ export default class Upyun {
     return status === 200
   }
 
-  async headFile (remotePath, callback) {
+  async headFile (remotePath) {
     const {headers, status} = await this.req.head(remotePath)
 
     if (status === 404) {
@@ -166,5 +166,33 @@ export default class Upyun {
 
   async deleteDir (remotePath) {
     return await this.deleteFile(remotePath)
+  }
+
+  async getFile (remotePath, saveStream = null) {
+    if (saveStream && typeof window !== 'undefined') {
+      throw new Error('upyun - save as stream are only available on the server side.')
+    }
+
+    const response = await this.req({
+      method: 'GET',
+      url: remotePath,
+      responseType: saveStream ? 'stream' : null
+    })
+
+    if (response.status === 404) {
+      return false
+    }
+
+    if (!saveStream) {
+      return response.data
+    }
+
+    const stream = response.data.pipe(saveStream)
+
+    return new Promise((resolve, reject) => {
+      stream.on('finish', () => resolve(stream))
+
+      stream.on('error', reject)
+    })
   }
 }

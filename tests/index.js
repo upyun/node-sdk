@@ -118,4 +118,30 @@ describe('index', () => {
       expect(result).to.equal(true)
     })
   })
+
+  describe('#getFile', () => {
+    let filePath = '/getFile.txt'
+    before(async () => {
+      await client.putFile(filePath, 'Dictum accumsan, convallis accumsan.')
+    })
+
+    it('should get file content success', async () => {
+      let result = await client.getFile(filePath)
+      expect(result).to.equal('Dictum accumsan, convallis accumsan.')
+    })
+
+    it('should pipe file content to stream success', async () => {
+      if (typeof window === 'undefined') {
+        const fs = require('fs')
+        await client.getFile(filePath, fs.createWriteStream('./tests/fixtures/getFile.txt'))
+        let result = fs.readFileSync('./tests/fixtures/getFile.txt', 'utf-8')
+        expect(result).to.equal('Dictum accumsan, convallis accumsan.')
+      }
+    })
+
+    it('should get false when remote file not exist', async () => {
+      let result = await client.getFile('/not-exists-path')
+      expect(result).to.equal(false)
+    })
+  })
 })

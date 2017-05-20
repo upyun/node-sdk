@@ -2,9 +2,6 @@ import axios from 'axios'
 import sign from './sign'
 import md5 from 'md5'
 
-
-// TODO 统一路径前后缀处理
-
 export default class Upyun {
   constructor ({bucket, operator, password}) {
     if (!bucket || !operator || !password) {
@@ -19,6 +16,7 @@ export default class Upyun {
       operator,
       password
     })
+    // TODO path slash
     this.req = axios.create({
       baseURL: this.config.protocol + '://' + this.config.endpoint + '/' + bucket
     })
@@ -63,9 +61,14 @@ export default class Upyun {
       requestHeaders['x-list-iter'] = iter
     }
 
-    const {data, headers} = await this.req.get(path, {
+    const {data, headers, status} = await this.req.get(path, {
       headers: requestHeaders
     })
+
+    if (status === 404) {
+      return false
+    }
+
     const next = headers['x-upyun-list-iter']
     if (!data) {
       return {
@@ -80,8 +83,8 @@ export default class Upyun {
       return {
         name,
         type,
-        size,
-        time
+        size: parseInt(size),
+        time: parseInt(time)
       }
     })
 
@@ -92,13 +95,12 @@ export default class Upyun {
   }
 
   /**
-   * localFile 不支持文件路径
+   * @param localFile: file content, available type is Stream | String | Buffer for server; File | String for client
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/send
+   * @see https://github.com/mzabriskie/axios/blob/master/lib/adapters/http.js#L32
    */
   async putFile (remotePath, localFile, options = {}) {
-    // 服务端 axios 支持 stream string buffer https://github.com/mzabriskie/axios/blob/master/lib/adapters/http.js#L32
-    // stream 的情况下不会设置 content-length
-    // 客户端 axios 支持 xhr 默认支持的格式 https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/send
-    // TODO type check
+    // TODO type validate
     let path = encodeURI(remotePath)
     const keys = ['Content-MD5', 'Content-Length', 'Content-Type', 'Content-Secret', 'x-upyun-meta-x', 'x-gmkerl-thumb']
     let headers = {}
@@ -197,7 +199,6 @@ export default class Upyun {
   }
 
   async updateMetadata (remotePath, metas, operate = 'merge') {
-
     let metaHeaders = {}
     for (let key in metas) {
       if (!isMeta(key)) {

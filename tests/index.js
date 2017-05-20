@@ -35,7 +35,7 @@ describe('index', () => {
     })
   })
 
-  describe('#putFile', () => {
+  xdescribe('#putFile', () => {
     it('should upload string success', async () => {
       let data = await client.putFile('/text.txt', 'Augue et arcu blandit tincidunt. Pellentesque.')
 
@@ -58,6 +58,41 @@ describe('index', () => {
         height: 333,
         'file-type': 'JPEG'
       })
+    })
+  })
+
+  describe('#makeDir', () => {
+    it('should create dir success', async () => {
+      let data = await client.makeDir('/testdir2')
+
+      expect(data).to.equal(true)
+    })
+  })
+
+  describe('#headFile', () => {
+    let filePath = '/headFile.txt'
+    let dirPath = '/headDir'
+    before(async () => {
+      await client.putFile(filePath, 'Dictum accumsan, convallis accumsan, cursus sit amet, ipsum. In pharetra sagittis.')
+      await client.makeDir(dirPath)
+    })
+
+    it('should get file info success', async () => {
+      let result = await client.headFile(filePath)
+      expect(result['type']).to.equal('file')
+      expect(result['size']).to.equal(82)
+      expect(result).to.have.property('date')
+    })
+
+    it('should get dir info success', async () => {
+      let result = await client.headFile(dirPath)
+      expect(result['type']).to.equal('folder')
+      expect(result).to.have.property('date')
+    })
+
+    it('should get false when file not exist', async () => {
+      let result = await client.headFile('/not-exist-path2333')
+      expect(result).to.equal(false)
     })
   })
 })

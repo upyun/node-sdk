@@ -22,22 +22,42 @@ export default class Upyun {
     this.req = axios.create({
       baseURL: this.config.protocol + '://' + this.config.endpoint + '/' + bucket
     })
+
+    this.req.interceptors.request.use(config => {
+      let method = config.method.toUpperCase()
+      let path = config.url.substring(config.baseURL.length)
+
+      config.headers.common = sign.getHeaderSign(this.config, method, path)
+      return config
+    }, error => {
+      throw new Error('request upyun failed: ' + error.message)
+    })
+
+    this.req.interceptors.response.use(
+      response => response,
+      error => {
+        const {response} = error
+        if (response.status !== 404) {
+          throw new Error('upyun response error: ' + response.data.code + ' ' + response.data.message)
+        } else {
+          return response
+        }
+      }
+    )
   }
 
   async usage (path = '/') {
     path = encodeURI(path + '?usage')
-    const {data} = await this.req.get(path, {
-      headers: sign.getHeaderSign(this.config, 'GET', path)
-    })
+    const {data} = await this.req.get(path)
     return data
   }
 
   async listDir (path = '/', {limit = 100, order = 'asc', iter = ''} = {}) {
     path = encodeURI(path)
-    const requestHeaders = Object.assign({
+    const requestHeaders = {
       'x-list-limit': limit,
       'x-list-order': order
-    }, sign.getHeaderSign(this.config, 'GET', path))
+    }
 
     if (iter) {
       requestHeaders['x-list-iter'] = iter
@@ -88,7 +108,6 @@ export default class Upyun {
       }
     })
 
-    Object.assign(headers, sign.getHeaderSign(this.config, 'PUT', path))
     const {headers: responseHeaders, status} = await this.req.put(path, localFile, {
       headers
     })
@@ -109,5 +128,33 @@ export default class Upyun {
     } else {
       return false
     }
+  }
+
+  async makeDir (remotePath) {
+    const {status} = await this.req.post(remotePath, null, {
+      headers: { folder: 'true' }
+    })
+    return status === 200
+  }
+
+  async headFile (remotePath, callback) {
+    const {headers, status} = await this.req.head(remotePath)
+
+    if (status === 404) {
+      return false
+    }
+
+    let params = ['x-upyun-file-type', 'x-upyun-file-size', 'x-upyun-file-date', 'Content-Md5']
+    let result = {}
+    params.forEach(item => {
+      let key = item.split('x-upyun-file-')[1]
+      if (headers[item]) {
+        result[key] = headers[item]
+        if (key === 'size' || key === 'date') {
+          result[key] = parseInt(result[key], 10)
+        }
+      }
+    })
+    return result
   }
 }

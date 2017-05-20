@@ -195,4 +195,45 @@ export default class Upyun {
       stream.on('error', reject)
     })
   }
+
+  async updateMetadata (remotePath, metas, operate = 'merge') {
+
+    let metaHeaders = {}
+    for (let key in metas) {
+      if (!isMeta(key)) {
+        metaHeaders['x-upyun-meta-' + key] = metas[key]
+      } else {
+        metaHeaders[key] = metas
+      }
+    }
+    const {status} = await this.req.patch(
+      remotePath + '?metadata=' + operate,
+      null,
+      { headers: metaHeaders }
+    )
+
+    return status === 200
+  }
+
+  // be careful: this will download the entire file
+  async getMetadata (remotePath) {
+    const {headers, status} = await this.req.get(remotePath)
+
+    if (status !== 200) {
+      return false
+    }
+
+    let result = {}
+    for (let key in headers) {
+      if (isMeta(key)) {
+        result[key] = headers[key]
+      }
+    }
+
+    return result
+  }
+}
+
+function isMeta (key) {
+  return key.indexOf('x-upyun-meta-') === 0
 }

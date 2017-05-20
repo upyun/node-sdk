@@ -144,4 +144,22 @@ describe('index', () => {
       expect(result).to.equal(false)
     })
   })
+
+  describe('#updateMetadata', () => {
+    let filePath = '/meta.txt'
+    before(async () => {
+      await client.putFile(filePath, 'Dictum accumsan, convallis accumsan.')
+    })
+
+    it('should update metadata success', async () => {
+      let result = await client.updateMetadata(filePath, {
+        'foo': 'bar'
+      })
+
+      expect(result).to.equal(true)
+
+      let metas = await client.getMetadata(filePath)
+      expect(metas['x-upyun-meta-foo']).to.equal('bar')
+    })
+  })
 })

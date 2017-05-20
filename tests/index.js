@@ -95,4 +95,27 @@ describe('index', () => {
       expect(result).to.equal(false)
     })
   })
+
+  describe('#deleteFile', () => {
+    let filePath = '/headFile.txt'
+
+    it('should delete success', async () => {
+      let result = await client.deleteFile(filePath)
+      expect(result).to.equal(true)
+    })
+
+    it('should get false when file not exist', async () => {
+      let result = await client.deleteFile('/not-exist-path2333')
+      expect(result).to.equal(false)
+    })
+  })
+
+  describe('#deleteDir', () => {
+    let dirPath = '/headDir'
+
+    it('should delete success', async () => {
+      let result = await client.deleteDir(dirPath)
+      expect(result).to.equal(true)
+    })
+  })
 })

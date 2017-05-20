@@ -12,30 +12,14 @@ const client = new Upyun({
 })
 
 describe('index', () => {
-  xit('should get usage success', async () => {
-    let data = await client.usage()
-    // TODO
-    expect(data).to.equal(56011)
-  })
-
-  describe('#listDir', () => {
-    xit('should get dir list success', async () => {
-      let data = await client.listDir()
-
-      expect(data.files).to.deep.equal([{
-        name: 'aa.txt',
-        size: '6',
-        time: '1495177200',
-        type: 'N'
-      }])
-    })
-
-    xit('should list not exist dir path success', async () => {
-
+  describe('#usage', () => {
+    it('should get usage success', async () => {
+      let data = await client.usage()
+      expect(data >= 0).to.equal(true)
     })
   })
 
-  xdescribe('#putFile', () => {
+  describe('#putFile', () => {
     it('should upload string success', async () => {
       let data = await client.putFile('/text.txt', 'Augue et arcu blandit tincidunt. Pellentesque.')
 
@@ -43,9 +27,9 @@ describe('index', () => {
     })
 
     it('should upload picture success', async () => {
-      // TODO internal support
-      // just need when upload stream for server side
+      // only use stream on server side
       let jpg = './tests/fixtures/cat.jpg'
+      // TODO better for length
       let options = {
         'Content-Length': fs.statSync(jpg).size
       }
@@ -60,6 +44,32 @@ describe('index', () => {
       })
     })
   })
+
+  describe('#listDir', () => {
+    before(async () => {
+      await client.putFile('/text.txt', 'Augue et arcu blandit tincidunt. Pellentesque.')
+    })
+
+    it('should get dir list success', async () => {
+      let data = await client.listDir()
+
+      expect(data.files.length > 0).to.equal(true)
+
+      let file = data.files.find(ele => {
+        return ele.name === 'text.txt'
+      })
+      expect(file.name).to.equal('text.txt')
+      expect(file.size).to.equal(46)
+      expect(file.time > 0).to.equal(true)
+      expect(file.type).to.equal('N')
+    })
+
+    it('should list not exist dir path success', async () => {
+      let data = await client.listDir('/not-exist-dir')
+      expect(data).to.equal(false)
+    })
+  })
+
 
   describe('#makeDir', () => {
     it('should create dir success', async () => {
@@ -131,12 +141,9 @@ describe('index', () => {
     })
 
     it('should pipe file content to stream success', async () => {
-      if (typeof window === 'undefined') {
-        const fs = require('fs')
-        await client.getFile(filePath, fs.createWriteStream('./tests/fixtures/getFile.txt'))
-        let result = fs.readFileSync('./tests/fixtures/getFile.txt', 'utf-8')
-        expect(result).to.equal('Dictum accumsan, convallis accumsan.')
-      }
+      await client.getFile(filePath, fs.createWriteStream('./tests/fixtures/getFile.txt'))
+      let result = fs.readFileSync('./tests/fixtures/getFile.txt', 'utf-8')
+      expect(result).to.equal('Dictum accumsan, convallis accumsan.')
     })
 
     it('should get false when remote file not exist', async () => {

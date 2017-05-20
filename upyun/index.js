@@ -157,4 +157,14 @@ export default class Upyun {
     })
     return result
   }
+
+  async deleteFile (remotePath) {
+    const {status} = await this.req.delete(remotePath)
+
+    return status === 200
+  }
+
+  async deleteDir (remotePath) {
+    return await this.deleteFile(remotePath)
+  }
 }

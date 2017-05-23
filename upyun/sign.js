@@ -12,7 +12,7 @@ export function getHeaderSign (config, method, path, contentMd5 = null) {
   })
   return {
     'Authorization': sign,
-    'Date': date,
+    'X-Date': date,
     'User-Agent': 'Js-Sdk/' + pkg.version
   }
 }

@@ -53,6 +53,7 @@
     "karma": "^1.7.0",
     "karma-chrome-launcher": "^2.1.1",
     "karma-mocha": "^1.3.0",
+    "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^2.0.3",
     "mocha": "^3.4.1",
     "should": "^9.0.2",
@@ -65,5 +66,8 @@
     "md5": "^2.2.1",
     "upyun-legacy": "^0.4.5",
     "urllib": "^2.9.1"
+  },
+  "browser": {
+    "./upyun/utils.js": "./upyun/browser-utils.js"
   }
 }

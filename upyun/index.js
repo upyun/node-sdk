@@ -1,6 +1,7 @@
 import axios from 'axios'
 import sign from './sign'
 import md5 from 'md5'
+import utils from './utils'
 
 export default class Upyun {
   constructor ({bucket, operator, password}) {
@@ -35,6 +36,10 @@ export default class Upyun {
       response => response,
       error => {
         const {response} = error
+        if (typeof response === 'undefined') {
+          throw error
+        }
+
         if (response.status !== 404) {
           throw new Error('upyun - response error: ' + response.data.code + ' ' + response.data.message)
         } else {
@@ -232,6 +237,43 @@ export default class Upyun {
     }
 
     return result
+  }
+
+  async blockUpload (remotePath, localFile, options = {}) {
+    Object.assign(options, {
+      'x-upyun-multi-stage': 'initiate',
+      'x-upyun-multi-length': options['Content-Length'],
+      'x-upyun-multi-type': options['Content-Type']
+    })
+    delete options['Content-Length']
+    let {headers} = await this.req.put(remotePath, null, {
+      headers: options
+    })
+
+    let uuid = headers['x-upyun-multi-uuid']
+    let nextId = headers['x-upyun-next-part-id']
+
+    let block
+    do {
+      block = utils.readBlock(localFile, nextId)
+
+      let {headers} = await this.req.put(remotePath, block, {
+        headers: {
+          'x-upyun-multi-stage': 'upload',
+          'x-upyun-multi-uuid': uuid,
+          'x-upyun-part-id': nextId
+        }
+      })
+      nextId = headers['x-upyun-next-part-id']
+    } while (nextId !== '-1')
+
+    const {status} = await this.req.put(remotePath, null, {
+      headers: {
+        'x-upyun-multi-stage': 'complete',
+        'x-upyun-multi-uuid': uuid
+      }
+    })
+    return status === 204 || status === 201
   }
 }
 

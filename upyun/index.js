@@ -41,7 +41,7 @@ export default class Upyun {
         }
 
         if (response.status !== 404) {
-          throw new Error('upyun - response error: ' + response.data.code + ' ' + response.data.message)
+          throw new Error('upyun - response error: ' + response.data.code + ' ' + response.data.msg)
         } else {
           return response
         }
@@ -105,8 +105,8 @@ export default class Upyun {
    * @see https://github.com/mzabriskie/axios/blob/master/lib/adapters/http.js#L32
    */
   async putFile (remotePath, localFile, options = {}) {
-    // TODO type validate
     let path = encodeURI(remotePath)
+    // optional params
     const keys = ['Content-MD5', 'Content-Length', 'Content-Type', 'Content-Secret', 'x-upyun-meta-x', 'x-gmkerl-thumb']
     let headers = {}
     keys.forEach(key => {
@@ -239,13 +239,29 @@ export default class Upyun {
     return result
   }
 
-  async blockUpload (remotePath, localFile, options = {}) {
+  /**
+   * in browser: type of fileOrPath is File
+   * in server: type of fileOrPath is string: local file path
+   */
+  async blockUpload (remotePath, fileOrPath, options = {}) {
+    const isBrowser = typeof window !== 'undefined'
+
+    let fileSize
+    let contentType
+    if (isBrowser) {
+      fileSize = fileOrPath.size
+      contentType = fileOrPath.type
+    } else {
+      fileSize = await utils.getFileSizeAsync(fileOrPath)
+      contentType = utils.getContentType(fileOrPath)
+    }
+
     Object.assign(options, {
       'x-upyun-multi-stage': 'initiate',
-      'x-upyun-multi-length': options['Content-Length'],
-      'x-upyun-multi-type': options['Content-Type']
+      'x-upyun-multi-length': fileSize,
+      'x-upyun-multi-type': contentType
     })
-    delete options['Content-Length']
+
     let {headers} = await this.req.put(remotePath, null, {
       headers: options
     })
@@ -255,7 +271,10 @@ export default class Upyun {
 
     let block
     do {
-      block = utils.readBlock(localFile, nextId)
+      const blockSize = 1024 * 1024
+      const start = nextId * blockSize
+      const end = Math.min(start + blockSize, fileSize)
+      block = await utils.readBlockAsync(fileOrPath, start, end)
 
       let {headers} = await this.req.put(remotePath, block, {
         headers: {

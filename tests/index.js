@@ -1,6 +1,5 @@
 'use strict'
 
-import axios from 'axios'
 import { expect } from 'chai'
 import Upyun from '../upyun/index'
 import fs from 'fs'

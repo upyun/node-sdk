@@ -3,6 +3,7 @@
 import { expect } from 'chai'
 import Upyun from '../upyun/index'
 import fs from 'fs'
+import path from 'path'
 
 const client = new Upyun({
   bucket: 'sdkimg',
@@ -166,6 +167,13 @@ describe('index', () => {
 
       let metas = await client.getMetadata(filePath)
       expect(metas['x-upyun-meta-foo']).to.equal('bar')
+    })
+  })
+
+  describe('#blockUpload', () => {
+    it('should upload file success', async () => {
+      const result = await client.blockUpload('/testBlockUpload.jpg', path.join(__dirname, './fixtures/cat.jpg'))
+      expect(result).to.equal(true)
     })
   })
 })

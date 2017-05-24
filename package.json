@@ -65,9 +65,7 @@
     "form-data": "^2.1.4",
     "hmacsha1": "^1.0.0",
     "md5": "^2.2.1",
-    "mime-types": "^2.1.15",
-    "upyun-legacy": "^0.4.5",
-    "urllib": "^2.9.1"
+    "mime-types": "^2.1.15"
   },
   "browser": {
     "./upyun/utils.js": "./upyun/browser-utils.js",

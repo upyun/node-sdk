@@ -176,4 +176,30 @@ describe('index', () => {
       expect(result).to.equal(true)
     })
   })
+
+  describe('#formUpload', () => {
+    it('should upload file success', async () => {
+      const result = await client.formPutFile('/testFormUpload.jpg', fs.createReadStream(path.join(__dirname, './fixtures/cat.jpg')))
+      expect(result).to.equal(true)
+    })
+
+    it('should convert amr to mp3 success when upload amr file', async () => {
+      const options = {
+        'content-type': 'audio/amr',
+        apps: [{
+          name: 'naga',
+          type: 'video',
+          avopts: '/f/mp3',
+          return_info: true,
+          save_as: '/amr-mp3-test.mp3'
+        }]
+      }
+      const result = await client.formPutFile(
+        '/test.amr',
+        fs.createReadStream(path.join(__dirname, './fixtures/example.amr')),
+        options
+      )
+      expect(result).to.equal(true)
+    })
+  })
 })

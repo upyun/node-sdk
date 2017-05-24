@@ -107,10 +107,12 @@ export default class Upyun {
   async putFile (remotePath, localFile, options = {}) {
     let path = encodeURI(remotePath)
     // optional params
-    const keys = ['Content-MD5', 'Content-Length', 'Content-Type', 'Content-Secret', 'x-upyun-meta-x', 'x-gmkerl-thumb']
+    const keys = ['Content-MD5', 'Content-Length', 'Content-Type', 'Content-Secret', 'x-gmkerl-thumb']
     let headers = {}
     keys.forEach(key => {
       if (options[key]) {
+        headers[key] = options[key]
+      } else if (isMeta(key)) {
         headers[key] = options[key]
       }
     })

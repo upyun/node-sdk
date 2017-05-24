@@ -22,4 +22,13 @@ describe('index', () => {
       expect(result).to.equal(true)
     })
   })
+
+  describe('#formUpload', () => {
+    it('should upload file success', async () => {
+      const f = new Blob(['text'], {type: 'text/plain'})
+      f.name = 'testFormUpload.txt'
+      const result = await client.formPutFile('/testFormUpload.txt', f)
+      expect(result).to.equal(true)
+    })
+  })
 })

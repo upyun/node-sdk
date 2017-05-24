@@ -2,6 +2,7 @@ import axios from 'axios'
 import sign from './sign'
 import md5 from 'md5'
 import utils from './utils'
+import formUpload from './form-upload'
 
 export default class Upyun {
   constructor ({bucket, operator, password}) {
@@ -295,6 +296,11 @@ export default class Upyun {
       }
     })
     return status === 204 || status === 201
+  }
+
+  async formPutFile (remotePath, localFile, params = {}) {
+    const result = await formUpload(remotePath, localFile, this.config, params)
+    return result
   }
 }
 

@@ -61,7 +61,8 @@
   },
   "dependencies": {
     "axios": "^0.16.1",
-    "formstream": "^1.0.0",
+    "base-64": "^0.1.0",
+    "form-data": "^2.1.4",
     "hmacsha1": "^1.0.0",
     "md5": "^2.2.1",
     "mime-types": "^2.1.15",
@@ -69,6 +70,7 @@
     "urllib": "^2.9.1"
   },
   "browser": {
-    "./upyun/utils.js": "./upyun/browser-utils.js"
+    "./upyun/utils.js": "./upyun/browser-utils.js",
+    "./upyun/form-upload.js": "./upyun/browser-form-upload.js"
   }
 }

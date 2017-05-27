@@ -2,8 +2,8 @@
 
 import md5 from 'md5'
 import { expect } from 'chai'
-import sign from '../upyun/sign'
-import Bucket from '../upyun/bucket'
+import sign from '../../upyun/sign'
+import Bucket from '../../upyun/bucket'
 
 describe('sign', () => {
   const bucket = new Bucket('sdkimg', 'operator', 'password')

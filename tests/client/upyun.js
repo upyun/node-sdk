@@ -1,9 +1,9 @@
 'use strict'
 
 import { expect } from 'chai'
-import Upyun from '../upyun/index'
-import Bucket from '../upyun/bucket'
-import sign from '../upyun/sign'
+import Upyun from '../../upyun/upyun'
+import Bucket from '../../upyun/bucket'
+import sign from '../../upyun/sign'
 
 const bucket = new Bucket('sdkimg', 'tester', 'grjxv2mxELR3')
 function getHeaderSign (ignore, method, path) {

@@ -12,22 +12,18 @@ module.exports = function (config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'tests/sign.js',
-      'tests/browser-index.js'
+      'tests/client/*.js'
     ],
 
     // list of files to exclude
     exclude: [
-      '**/*.swp',
-      'tests/karma.conf.js',
-      'upyun/api.js',
-      'upyun/utils.js'
+      '**/*.swp'
     ],
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'tests/*.js': ['webpack', 'sourcemap'],
+      'tests/client/*.js': ['webpack', 'sourcemap'],
       'upyun/*.js': ['webpack', 'sourcemap']
     },
     webpack: {

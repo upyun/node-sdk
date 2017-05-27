@@ -1,10 +1,12 @@
 'use strict'
 
 import { expect } from 'chai'
-import Upyun from '../upyun/index'
-import Bucket from '../upyun/bucket'
+import Upyun from '../../upyun/upyun'
+import Bucket from '../../upyun/bucket'
 import fs from 'fs'
 import path from 'path'
+
+const fixtures = path.join(__dirname, '../fixtures')
 
 const client = new Upyun(new Bucket('sdkimg', 'tester', 'grjxv2mxELR3'))
 
@@ -25,7 +27,7 @@ describe('index', () => {
 
     it('should upload picture success', async () => {
       // only use stream on server side
-      let jpg = './tests/fixtures/cat.jpg'
+      let jpg = fixtures + '/cat.jpg'
       // TODO better for length
       let options = {
         'Content-Length': fs.statSync(jpg).size
@@ -138,8 +140,8 @@ describe('index', () => {
     })
 
     it('should pipe file content to stream success', async () => {
-      await client.getFile(filePath, fs.createWriteStream('./tests/fixtures/getFile.txt'))
-      let result = fs.readFileSync('./tests/fixtures/getFile.txt', 'utf-8')
+      await client.getFile(filePath, fs.createWriteStream(fixtures + '/getFile.txt'))
+      let result = fs.readFileSync(fixtures + '/getFile.txt', 'utf-8')
       expect(result).to.equal('Dictum accumsan, convallis accumsan.')
     })
 
@@ -169,14 +171,14 @@ describe('index', () => {
 
   describe('#blockUpload', () => {
     it('should upload file success', async () => {
-      const result = await client.blockUpload('/testBlockUpload.jpg', path.join(__dirname, './fixtures/cat.jpg'))
+      const result = await client.blockUpload('/testBlockUpload.jpg', fixtures + '/cat.jpg')
       expect(result).to.equal(true)
     })
   })
 
   describe('#formUpload', () => {
     it('should upload file success', async () => {
-      const result = await client.formPutFile('/testFormUpload.jpg', fs.createReadStream(path.join(__dirname, './fixtures/cat.jpg')))
+      const result = await client.formPutFile('/testFormUpload.jpg', fs.createReadStream(fixtures + '/cat.jpg'))
       expect(result).to.equal(true)
     })
 
@@ -193,7 +195,7 @@ describe('index', () => {
       }
       const result = await client.formPutFile(
         '/test.amr',
-        fs.createReadStream(path.join(__dirname, './fixtures/example.amr')),
+        fs.createReadStream(fixtures + '/example.amr'),
         options
       )
       expect(result).to.equal(true)

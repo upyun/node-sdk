@@ -1,53 +1,61 @@
-import axios from 'axios'
-import sign from './sign'
-import md5 from 'md5'
+import createReq from './create-req'
 import utils from './utils'
 import formUpload from './form-upload'
+import sign from './sign'
 
 export default class Upyun {
-  constructor ({bucket, operator, password}) {
-    if (!bucket || !operator || !password) {
-      throw new Error('must config bucket name or operator name or password')
+  /**
+   * @param {object} bucket - a instance of Bucket class
+   * @param {object} params - optional params
+   * @param {callback} getHeaderSign - callback function to get header sign
+   */
+  constructor (bucket, params = {}, getHeaderSign = null) {
+    const isBrowser = typeof window !== 'undefined'
+
+    if (typeof bucket.bucketName === 'undefined') {
+      throw new Error('upyun - must config bucketName')
     }
-    password = md5(password)
-    this.config = Object.assign({
-      endpoint: 'v0.api.upyun.com',
+    
+    if (typeof params === 'function') {
+      getHeaderSign = params
+      params = {}
+    }
+
+    if (typeof getHeaderSign !== 'function' && isBrowser) {
+      throw new Error('upyun - must config a callback function getHeaderSign in client side')
+    }
+
+    if (!isBrowser && (
+        typeof bucket.operatorName === 'undefined' ||
+        typeof bucket.password === 'undefined'
+      )) {
+      throw new Error('upyun - must config operateName and password in server side')
+    }
+    this.isBrowser = isBrowser
+
+    const config = Object.assign({
+      domain: 'v0.api.upyun.com',
       protocol: 'https'
-    }, {
-      bucket,
-      operator,
-      password
-    })
-    // TODO path slash
-    this.req = axios.create({
-      baseURL: this.config.protocol + '://' + this.config.endpoint + '/' + bucket
-    })
+    }, params)
+    this.endpoint = config.protocol + '://' + config.domain
 
-    this.req.interceptors.request.use(config => {
-      let method = config.method.toUpperCase()
-      let path = config.url.substring(config.baseURL.length)
+    this.req = createReq(this.endpoint, bucket, getHeaderSign || defaultGetHeaderSign)
+    this.bucket = bucket
+    if (!isBrowser)  {
+      this.setBodySignCallback(sign.getPolicyAndAuthorization)
+    }
+  }
 
-      config.headers.common = sign.getHeaderSign(this.config, method, path)
-      return config
-    }, error => {
-      throw new Error('upyun - request failed: ' + error.message)
-    })
+  setBucket (bucket) {
+    this.bucket = bucket
+    this.req.defaults.baseURL = this.endpoint + '/' + this.bucketName
+  }
 
-    this.req.interceptors.response.use(
-      response => response,
-      error => {
-        const {response} = error
-        if (typeof response === 'undefined') {
-          throw error
-        }
-
-        if (response.status !== 404) {
-          throw new Error('upyun - response error: ' + response.data.code + ' ' + response.data.msg)
-        } else {
-          return response
-        }
-      }
-    )
+  setBodySignCallback (getBodySign) {
+    if (typeof getBodySign !== 'function') {
+      throw new Error('upyun - getBodySign should be a function')
+    }
+    this.bodySignCallback = getBodySign
   }
 
   async usage (path = '/') {
@@ -108,6 +116,7 @@ export default class Upyun {
   async putFile (remotePath, localFile, options = {}) {
     let path = encodeURI(remotePath)
     // optional params
+    // TODO header params more better 
     const keys = ['Content-MD5', 'Content-Length', 'Content-Type', 'Content-Secret', 'x-gmkerl-thumb']
     let headers = {}
     keys.forEach(key => {
@@ -123,6 +132,7 @@ export default class Upyun {
     })
 
     if (status === 200) {
+      // TODO process prefix x-upyun
       let params = ['x-upyun-width', 'x-upyun-height', 'x-upyun-file-type', 'x-upyun-frames']
       let result = {}
       params.forEach(item => {
@@ -299,11 +309,23 @@ export default class Upyun {
   }
 
   async formPutFile (remotePath, localFile, params = {}) {
-    const result = await formUpload(remotePath, localFile, this.config, params)
+    if (typeof this.bodySignCallback !== 'function') {
+      throw new Error('upyun - must setBodySignCallback first!')
+    }
+
+    params['bucket'] = this.bucket.bucketName
+    params['save-key'] = remotePath
+    const bodySign = await this.bodySignCallback(this.bucket, params)
+    const result = await formUpload(this.endpoint + '/' + params['bucket'], localFile, bodySign)
     return result
   }
 }
 
 function isMeta (key) {
   return key.indexOf('x-upyun-meta-') === 0
+}
+
+function defaultGetHeaderSign (bucket, method, path) {
+  const headers = sign.getHeaderSign(bucket, method, path)
+  return Promise.resolve(headers)
 }

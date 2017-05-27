@@ -2,14 +2,11 @@
 
 import { expect } from 'chai'
 import Upyun from '../upyun/index'
+import Bucket from '../upyun/bucket'
 import fs from 'fs'
 import path from 'path'
 
-const client = new Upyun({
-  bucket: 'sdkimg',
-  operator: 'tester',
-  password: 'grjxv2mxELR3'
-})
+const client = new Upyun(new Bucket('sdkimg', 'tester', 'grjxv2mxELR3'))
 
 describe('index', () => {
   describe('#usage', () => {

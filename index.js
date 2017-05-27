@@ -1,15 +1,11 @@
-'use strict';
-var upyunDeprecated = require('upyun-legacy');
-var upyun = require('./upyun/api.js');
+'use strict'
 
-module.exports = exports.UPYUN = exports.UpYun = function(bucket, operator, password, endpoint, opts) {
-  var client = null;
+import upyun from './upyun/upyun'
+import sign from './upyun/sign'
+import bucket from './upyun/bucket'
 
-  if (opts && opts.apiVersion == 'v2') {
-    client = new upyun(bucket, operator, password, endpoint, opts);
-  } else {
-    client = new upyunDeprecated(bucket, operator, password, endpoint);
-  }
-
-  return client;
-};
+export default {
+  upyun,
+  sign,
+  bucket
+}

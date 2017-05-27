@@ -4,8 +4,9 @@
   "description": "UPYUN node sdk",
   "main": "index.js",
   "scripts": {
+    "test": "npm run test:server && npm run test:client",
     "test:client": "./node_modules/.bin/karma start tests/karma.conf.js",
-    "test:server": "./node_modules/.bin/mocha --compilers js:babel-register tests/sign.js tests/index.js"
+    "test:server": "./node_modules/.bin/mocha --compilers js:babel-register tests/server/*"
   },
   "repository": {
     "type": "git",

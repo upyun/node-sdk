@@ -1,11 +1,11 @@
 'use strict'
 
-import upyun from './upyun/upyun'
+import Client from './upyun/upyun'
 import sign from './upyun/sign'
-import bucket from './upyun/bucket'
+import Bucket from './upyun/bucket'
 
 export default {
-  upyun,
+  Client,
   sign,
-  bucket
+  Bucket
 }

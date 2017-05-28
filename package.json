@@ -1,9 +1,11 @@
 {
   "name": "upyun",
-  "version": "2.0.4",
-  "description": "UPYUN node sdk",
-  "main": "index.js",
+  "version": "3.0.0",
+  "description": "UPYUN js sdk",
+  "main": "dist/upyun.common.js",
+  "unpkg": "dist/upyun.js",
   "scripts": {
+    "build": "node build/build.js",
     "test": "npm run test:server && npm run test:client",
     "test:client": "./node_modules/.bin/karma start tests/karma.conf.js",
     "test:server": "./node_modules/.bin/mocha --compilers js:babel-register tests/server/*"
@@ -14,6 +16,8 @@
   },
   "keywords": [
     "upyun",
+    "js",
+    "nodejs",
     "sdk",
     "cdn",
     "cloud",
@@ -46,6 +50,7 @@
   "devDependencies": {
     "babel-cli": "^6.24.1",
     "babel-loader": "^7.0.0",
+    "babel-plugin-external-helpers": "^6.22.0",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.4.0",
     "babel-register": "^6.24.1",
@@ -57,7 +62,15 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^2.0.3",
     "mocha": "^3.4.1",
+    "rollup": "^0.41.6",
+    "rollup-plugin-alias": "^1.3.1",
+    "rollup-plugin-babel": "^2.7.1",
+    "rollup-plugin-commonjs": "^8.0.2",
+    "rollup-plugin-json": "^2.1.1",
+    "rollup-plugin-node-resolve": "^3.0.0",
+    "rollup-plugin-replace": "^1.1.1",
     "should": "^9.0.2",
+    "uglify-js": "^3.0.11",
     "webpack": "^2.5.1"
   },
   "dependencies": {
@@ -71,5 +84,8 @@
   "browser": {
     "./upyun/utils.js": "./upyun/browser-utils.js",
     "./upyun/form-upload.js": "./upyun/browser-form-upload.js"
+  },
+  "peerDependencies": {
+    "babel-polyfill": "^6.23.0"
   }
 }

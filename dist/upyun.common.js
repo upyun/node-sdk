@@ -147,15 +147,17 @@ var createReq = function (endpoint, bucket, getHeaderSign) {
           switch (_context.prev = _context.next) {
             case 0:
               method = config.method.toUpperCase();
+
+              config.url = encodeURI(config.url);
               path = config.url.substring(config.baseURL.length);
-              _context.next = 4;
+              _context.next = 5;
               return getHeaderSign(bucket, method, path);
 
-            case 4:
+            case 5:
               config.headers.common = _context.sent;
               return _context.abrupt('return', config);
 
-            case 6:
+            case 7:
             case 'end':
               return _context.stop();
           }
@@ -270,7 +272,7 @@ var license = "MIT";
 var bugs = { "url": "https://github.com/upyun/node-sdk/issues" };
 var homepage = "https://github.com/upyun/node-sdk";
 var contributors = [{ "name": "yejingx", "email": "yejingx@gmail.com" }, { "name": "Leigh", "email": "i@zhuli.me" }, { "name": "kaidiren", "email": "kaidiren@gmail.com" }, { "name": "Gaara", "email": "sabakugaara@users.noreply.github.com" }];
-var devDependencies = { "babel-cli": "^6.24.1", "babel-loader": "^7.0.0", "babel-plugin-external-helpers": "^6.22.0", "babel-plugin-transform-runtime": "^6.23.0", "babel-preset-env": "^1.4.0", "babel-register": "^6.24.1", "chai": "^3.5.0", "istanbul": "^0.4.3", "karma": "^1.7.0", "karma-chrome-launcher": "^2.1.1", "karma-mocha": "^1.3.0", "karma-sourcemap-loader": "^0.3.7", "karma-webpack": "^2.0.3", "mocha": "^3.4.1", "rollup": "^0.41.6", "rollup-plugin-alias": "^1.3.1", "rollup-plugin-babel": "^2.7.1", "rollup-plugin-commonjs": "^8.0.2", "rollup-plugin-json": "^2.1.1", "rollup-plugin-node-resolve": "^3.0.0", "rollup-plugin-replace": "^1.1.1", "should": "^9.0.2", "uglify-js": "^3.0.11", "webpack": "^2.5.1" };
+var devDependencies = { "babel-cli": "^6.24.1", "babel-loader": "^7.0.0", "babel-plugin-external-helpers": "^6.22.0", "babel-plugin-transform-runtime": "^6.23.0", "babel-preset-env": "^1.4.0", "babel-register": "^6.24.1", "chai": "^3.5.0", "istanbul": "^0.4.3", "karma": "^1.7.0", "karma-chrome-launcher": "^2.1.1", "karma-mocha": "^1.3.0", "karma-sourcemap-loader": "^0.3.7", "karma-webpack": "^2.0.3", "mocha": "^3.4.1", "rollup": "^0.41.6", "rollup-plugin-alias": "^1.3.1", "rollup-plugin-babel": "^2.7.1", "rollup-plugin-commonjs": "^8.0.2", "rollup-plugin-json": "^2.1.1", "rollup-plugin-node-resolve": "^3.0.0", "should": "^9.0.2", "uglify-js": "^3.0.11", "webpack": "^2.5.1" };
 var dependencies = { "axios": "^0.16.1", "base-64": "^0.1.0", "form-data": "^2.1.4", "hmacsha1": "^1.0.0", "md5": "^2.2.1", "mime-types": "^2.1.15" };
 var browser = { "./upyun/utils.js": "./upyun/browser-utils.js", "./upyun/form-upload.js": "./upyun/browser-form-upload.js" };
 var peerDependencies = { "babel-polyfill": "^6.23.0" };
@@ -446,16 +448,15 @@ var Upyun = function () {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                path = encodeURI(path + '?usage');
-                _context.next = 3;
+                _context.next = 2;
                 return this.req.get(path);
 
-              case 3:
+              case 2:
                 _ref2 = _context.sent;
                 data = _ref2.data;
                 return _context.abrupt('return', data);
 
-              case 6:
+              case 5:
               case 'end':
                 return _context.stop();
             }
@@ -489,7 +490,6 @@ var Upyun = function () {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                path = encodeURI(path);
                 requestHeaders = {
                   'x-list-limit': limit,
                   'x-list-order': order
@@ -500,29 +500,29 @@ var Upyun = function () {
                   requestHeaders['x-list-iter'] = iter;
                 }
 
-                _context2.next = 5;
+                _context2.next = 4;
                 return this.req.get(path, {
                   headers: requestHeaders
                 });
 
-              case 5:
+              case 4:
                 _ref5 = _context2.sent;
                 data = _ref5.data;
                 headers = _ref5.headers;
                 status = _ref5.status;
 
                 if (!(status === 404)) {
-                  _context2.next = 11;
+                  _context2.next = 10;
                   break;
                 }
 
                 return _context2.abrupt('return', false);
 
-              case 11:
+              case 10:
                 next = headers['x-upyun-list-iter'];
 
                 if (data) {
-                  _context2.next = 14;
+                  _context2.next = 13;
                   break;
                 }
 
@@ -531,7 +531,7 @@ var Upyun = function () {
                   next: next
                 });
 
-              case 14:
+              case 13:
                 items = data.split('\n');
                 files = items.map(function (item) {
                   var _item$split = item.split('\t'),
@@ -553,7 +553,7 @@ var Upyun = function () {
                   next: next
                 });
 
-              case 17:
+              case 16:
               case 'end':
                 return _context2.stop();
             }
@@ -580,43 +580,41 @@ var Upyun = function () {
       var _ref6 = asyncToGenerator(regeneratorRuntime.mark(function _callee3(remotePath, localFile) {
         var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-        var path, keys, headers, _ref7, responseHeaders, status, params, result;
+        var keys, headers, _ref7, responseHeaders, status, params, result;
 
         return regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                path = encodeURI(remotePath);
                 // optional params
-                // TODO header params more better 
-
                 keys = ['Content-MD5', 'Content-Length', 'Content-Type', 'Content-Secret', 'x-gmkerl-thumb'];
                 headers = {};
 
                 keys.forEach(function (key) {
-                  if (options[key]) {
-                    headers[key] = options[key];
+                  var lower = key.toLowerCase();
+                  var finded = options[key] || options[lower];
+                  if (finded) {
+                    headers[key] = finded;
                   } else if (isMeta(key)) {
                     headers[key] = options[key];
                   }
                 });
 
-                _context3.next = 6;
-                return this.req.put(path, localFile, {
+                _context3.next = 5;
+                return this.req.put(remotePath, localFile, {
                   headers: headers
                 });
 
-              case 6:
+              case 5:
                 _ref7 = _context3.sent;
                 responseHeaders = _ref7.headers;
                 status = _ref7.status;
 
                 if (!(status === 200)) {
-                  _context3.next = 16;
+                  _context3.next = 15;
                   break;
                 }
 
-                // TODO process prefix x-upyun
                 params = ['x-upyun-width', 'x-upyun-height', 'x-upyun-file-type', 'x-upyun-frames'];
                 result = {};
 
@@ -631,10 +629,10 @@ var Upyun = function () {
                 });
                 return _context3.abrupt('return', Object.keys(result).length > 0 ? result : true);
 
-              case 16:
+              case 15:
                 return _context3.abrupt('return', false);
 
-              case 17:
+              case 16:
               case 'end':
                 return _context3.stop();
             }
@@ -1139,8 +1137,8 @@ function defaultGetHeaderSign(bucket, method, path) {
 }
 
 var Bucket = function Bucket(bucketName) {
-  var operatorName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-  var password = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+  var operatorName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+  var password = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
   classCallCheck(this, Bucket);
 
   this.bucketName = bucketName;

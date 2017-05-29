@@ -5,7 +5,7 @@ const util = require('util')
 const upyun = require('../')
 const fs = require('fs')
 
-const bucket = new upyun.bucket('sdkimg', 'tester', 'grjxv2mxELR3')
+const bucket = new upyun.Bucket('sdkimg', 'tester', 'grjxv2mxELR3')
 
 http.createServer(function(req, res) {
   if (req.url.indexOf('index.html') !== -1 || req.url === '/') {

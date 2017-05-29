@@ -14,8 +14,6 @@ const json = require('rollup-plugin-json')
 const node = require('rollup-plugin-node-resolve')
 const pkg = require('../package.json')
 const alias = require('rollup-plugin-alias')
-const replace = require('rollup-plugin-replace')
-
 const resolve = _path => path.resolve(__dirname, _path)
 const version = pkg.version
 
@@ -35,12 +33,14 @@ build([
     dest: resolve('../dist/upyun.js'),
     format: 'umd',
     isBrowser: true,
+    external: ['axios'],
     env: 'development'
   },
   {
     dest: resolve('../dist/upyun.min.js'),
     format: 'umd',
     isBrowser: true,
+    external: ['axios'],
     env: 'production'
   },
   {
@@ -57,13 +57,10 @@ function genConfig (opts) {
     dest: opts.dest,
     banner,
     format: opts.format,
-    moduleName: 'Upyun',
+    moduleName: 'upyun',
     external: opts.external,
     paths: opts.paths,
     plugins: [
-      replace({
-        'process.env.NODE_ENV': JSON.stringify('production') // this is for axios
-      }),
       node({
         browser: opts.isBrowser,
         preferBuiltins: !opts.isBrowser

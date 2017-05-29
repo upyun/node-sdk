@@ -24,6 +24,18 @@ require('babel-polyfill')
 
 ## cdn
 
+手动安装时，需要先引入 sdk 的依赖 `babel-polyfill` 和 `axios`
+
+```
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.23.0/polyfill.min.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+```
+
+再引入编译后的 sdk 文件
+```
+<script src="https://unpkg.com/upyun/dist/upyun.min.js"></script>
+```
+
 # 测试
 ```
 $ npm run test

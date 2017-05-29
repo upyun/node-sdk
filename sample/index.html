@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>又拍云 - js sdk 使用示例</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.23.0/polyfill.min.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="../dist/upyun.js"></script>
 </head>
 <body>
@@ -11,7 +12,7 @@
   <input type="submit" value="upload" onclick="upload()">
   <script>
     // client side only need bucket name
-    var bucket = new Upyun.Bucket('sdkimg', '', '')
+    var bucket = new upyun.Bucket('sdkimg')
     function getHeaderSign(bucket, method, path) {
       var params = 'bucket=' + bucket.bucketName + '&method=' + method + '&path=' + path
       return fetch('http://localhost:3000/sign/head?' + params)
@@ -23,11 +24,11 @@
           return response.json()
         })
     }
-    var client = new Upyun.Client(bucket, getHeaderSign)
+    var client = new upyun.Client(bucket, getHeaderSign)
 
     function upload() {
       var file = document.getElementById('file').files[0]
-      client.putFile('/client-upload-sample.jpg', file).then(function(result) {
+      client.putFile('/sample-upload-' + file.name, file).then(function(result) {
         console.log('put file to upyun ' + (result ? 'success' : 'failed'))
       })
     }

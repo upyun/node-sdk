@@ -25,6 +25,12 @@ describe('index', () => {
       expect(data).to.equal(true)
     })
 
+    it('should upload with chinese path success', async () => {
+      let data = await client.putFile('/中文.txt', '中文测试')
+
+      expect(data).to.equal(true)
+    })
+
     it('should upload picture success', async () => {
       // only use stream on server side
       let jpg = fixtures + '/cat.jpg'

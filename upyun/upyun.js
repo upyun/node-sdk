@@ -15,7 +15,7 @@ export default class Upyun {
     if (typeof bucket.bucketName === 'undefined') {
       throw new Error('upyun - must config bucketName')
     }
-    
+
     if (typeof params === 'function') {
       getHeaderSign = params
       params = {}
@@ -59,13 +59,11 @@ export default class Upyun {
   }
 
   async usage (path = '/') {
-    path = encodeURI(path + '?usage')
     const {data} = await this.req.get(path)
     return data
   }
 
   async listDir (path = '/', {limit = 100, order = 'asc', iter = ''} = {}) {
-    path = encodeURI(path)
     const requestHeaders = {
       'x-list-limit': limit,
       'x-list-order': order
@@ -114,25 +112,24 @@ export default class Upyun {
    * @see https://github.com/mzabriskie/axios/blob/master/lib/adapters/http.js#L32
    */
   async putFile (remotePath, localFile, options = {}) {
-    let path = encodeURI(remotePath)
     // optional params
-    // TODO header params more better 
     const keys = ['Content-MD5', 'Content-Length', 'Content-Type', 'Content-Secret', 'x-gmkerl-thumb']
     let headers = {}
     keys.forEach(key => {
-      if (options[key]) {
-        headers[key] = options[key]
+      const lower = key.toLowerCase()
+      const finded = options[key] || options[lower]
+      if (finded) {
+        headers[key] = finded
       } else if (isMeta(key)) {
         headers[key] = options[key]
       }
     })
 
-    const {headers: responseHeaders, status} = await this.req.put(path, localFile, {
+    const {headers: responseHeaders, status} = await this.req.put(remotePath, localFile, {
       headers
     })
 
     if (status === 200) {
-      // TODO process prefix x-upyun
       let params = ['x-upyun-width', 'x-upyun-height', 'x-upyun-file-type', 'x-upyun-frames']
       let result = {}
       params.forEach(item => {

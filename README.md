@@ -124,9 +124,9 @@ upyun.usage('/sub/dir').then(function(size) {
 
 **参数**
 
-- `remotePath`: 文件保存路径
+- `remotePath`: 文件保存路径（不需要 encodeURI，sdk 会统一处理）
 - `localFile`: 需要上传的文件。服务端支持 `String | Stream | Buffer`, 浏览器端支持 `File | String` 
-- `options`: 其他可选参数 `Content-MD5 | Content-Length | Content-Type | Content-Secret | x-gmkerl-thumb`
+- `options`: 其他可选参数 `Content-MD5 | Content-Length | Content-Type | Content-Secret | x-gmkerl-thumb` （大小写无关，详见[上传参数](http://docs.upyun.com/api/rest_api/#_2)）
 
 **响应**
 

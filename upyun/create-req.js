@@ -7,6 +7,7 @@ export default function (endpoint, bucket, getHeaderSign) {
 
   req.interceptors.request.use(async (config) => {
     let method = config.method.toUpperCase()
+    config.url = encodeURI(config.url)
     let path = config.url.substring(config.baseURL.length)
 
     config.headers.common = await getHeaderSign(bucket, method, path)

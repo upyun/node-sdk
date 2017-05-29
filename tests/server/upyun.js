@@ -207,4 +207,24 @@ describe('index', () => {
       expect(result).to.equal(true)
     })
   })
+
+  describe('#purge', function () {
+    this.timeout(5000)
+    it('should purge urls sucess', async () => {
+      const urls = 'http://sdkimg.b0.upaiyun.com/a.txt'
+      const result = await client.purge(urls)
+      expect(result).to.equal(true)
+    })
+
+    it('should get some url purge failed', async () => {
+      const urls = ['http://zzzzzz.b0.upaiyun.com/a.txt', 'http://xxxx.b0.upaiyun.com/a.txt']
+      try {
+        const result = await client.purge(urls)
+      } catch (err) {
+        expect(err.message).to.include('some url purge failed')
+        return
+      }
+      throw new Error('should get error')
+    })
+  })
 })

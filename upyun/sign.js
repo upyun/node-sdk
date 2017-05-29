@@ -1,6 +1,7 @@
 import hmacsha1 from 'hmacsha1'
 import base64 from 'base-64'
 import pkg from '../package.json'
+import md5 from 'md5'
 
 /**
  * generate head sign
@@ -77,8 +78,21 @@ export function getPolicyAndAuthorization (bucket, params) {
   }
 }
 
+export function getPurgeHeaderSign (bucket, urls) {
+  const date = new Date().toGMTString()
+  const str = urls.join('\n')
+  const sign = md5(`${str}&${bucket.bucketName}&${date}&${bucket.password}`)
+
+  return {
+    'Authorization': `UpYun ${bucket.bucketName}:${bucket.operatorName}:${sign}`,
+    'Date': date,
+    'User-Agent': 'Js-Sdk/' + pkg.version
+  }
+}
+
 export default {
   genSign,
   getHeaderSign,
-  getPolicyAndAuthorization
+  getPolicyAndAuthorization,
+  getPurgeHeaderSign
 }

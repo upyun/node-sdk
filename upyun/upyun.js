@@ -1,6 +1,7 @@
 import createReq from './create-req'
 import utils from './utils'
 import formUpload from './form-upload'
+import axios from 'axios'
 import sign from './sign'
 
 export default class Upyun {
@@ -315,6 +316,28 @@ export default class Upyun {
     const bodySign = await this.bodySignCallback(this.bucket, params)
     const result = await formUpload(this.endpoint + '/' + params['bucket'], localFile, bodySign)
     return result
+  }
+
+  async purge (urls) {
+    if (typeof urls === 'string') {
+      urls = [urls]
+    }
+    try {
+      const headers = sign.getPurgeHeaderSign(this.bucket, urls)
+      const {data} = await axios.post(
+        'http://purge.upyun.com/purge/',
+        'purge=' + urls.join('\n'), {
+        headers
+      })
+      if(Object.keys(data.invalid_domain_of_url).length === 0) {
+        return true
+      } else {
+        throw new Error('some url purge failed ' + data.invalid_domain_of_url.join(' '))
+      }
+    } catch (err) {
+      throw new Error('upyun - request failed: ' + err.message)
+    }
+
   }
 }
 

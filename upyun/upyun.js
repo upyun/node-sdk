@@ -60,7 +60,7 @@ export default class Upyun {
   }
 
   async usage (path = '/') {
-    const {data} = await this.req.get(path)
+    const {data} = await this.req.get(path + '?usage')
     return data
   }
 

@@ -263,7 +263,6 @@ var name = "upyun";
 var version = "3.0.0";
 var description = "UPYUN js sdk";
 var main = "dist/upyun.common.js";
-var unpkg = "dist/upyun.js";
 var scripts = { "build": "node build/build.js", "test": "npm run test:server && npm run test:client", "test:client": "./node_modules/.bin/karma start tests/karma.conf.js", "test:server": "./node_modules/.bin/mocha --compilers js:babel-register tests/server/*" };
 var repository = { "type": "git", "url": "git@github.com:upyun/node-sdk.git" };
 var keywords = ["upyun", "js", "nodejs", "sdk", "cdn", "cloud", "storage"];
@@ -281,7 +280,6 @@ var pkg = {
 	version: version,
 	description: description,
 	main: main,
-	unpkg: unpkg,
 	scripts: scripts,
 	repository: repository,
 	keywords: keywords,
@@ -372,10 +370,23 @@ function getPolicyAndAuthorization(bucket, params) {
   };
 }
 
+function getPurgeHeaderSign(bucket, urls) {
+  var date = new Date().toGMTString();
+  var str = urls.join('\n');
+  var sign = md5(str + '&' + bucket.bucketName + '&' + date + '&' + bucket.password);
+
+  return {
+    'Authorization': 'UpYun ' + bucket.bucketName + ':' + bucket.operatorName + ':' + sign,
+    'Date': date,
+    'User-Agent': 'Js-Sdk/' + pkg.version
+  };
+}
+
 var sign = {
   genSign: genSign,
   getHeaderSign: getHeaderSign,
-  getPolicyAndAuthorization: getPolicyAndAuthorization
+  getPolicyAndAuthorization: getPolicyAndAuthorization,
+  getPurgeHeaderSign: getPurgeHeaderSign
 };
 
 var Upyun = function () {
@@ -449,7 +460,7 @@ var Upyun = function () {
             switch (_context.prev = _context.next) {
               case 0:
                 _context.next = 2;
-                return this.req.get(path);
+                return this.req.get(path + '?usage');
 
               case 2:
                 _ref2 = _context.sent;
@@ -1122,6 +1133,63 @@ var Upyun = function () {
       }
 
       return formPutFile;
+    }()
+  }, {
+    key: 'purge',
+    value: function () {
+      var _ref25 = asyncToGenerator(regeneratorRuntime.mark(function _callee13(urls) {
+        var headers, _ref26, data;
+
+        return regeneratorRuntime.wrap(function _callee13$(_context13) {
+          while (1) {
+            switch (_context13.prev = _context13.next) {
+              case 0:
+                if (typeof urls === 'string') {
+                  urls = [urls];
+                }
+                _context13.prev = 1;
+                headers = sign.getPurgeHeaderSign(this.bucket, urls);
+                _context13.next = 5;
+                return axios.post('http://purge.upyun.com/purge/', 'purge=' + urls.join('\n'), {
+                  headers: headers
+                });
+
+              case 5:
+                _ref26 = _context13.sent;
+                data = _ref26.data;
+
+                if (!(Object.keys(data.invalid_domain_of_url).length === 0)) {
+                  _context13.next = 11;
+                  break;
+                }
+
+                return _context13.abrupt('return', true);
+
+              case 11:
+                throw new Error('some url purge failed ' + data.invalid_domain_of_url.join(' '));
+
+              case 12:
+                _context13.next = 17;
+                break;
+
+              case 14:
+                _context13.prev = 14;
+                _context13.t0 = _context13['catch'](1);
+                throw new Error('upyun - request failed: ' + _context13.t0.message);
+
+              case 17:
+              case 'end':
+                return _context13.stop();
+            }
+          }
+        }, _callee13, this, [[1, 14]]);
+      }));
+
+      function purge(_x25) {
+        return _ref25.apply(this, arguments);
+      }
+
+      return purge;
     }()
   }]);
   return Upyun;

@@ -15,7 +15,7 @@ const node = require('rollup-plugin-node-resolve')
 const pkg = require('../package.json')
 const alias = require('rollup-plugin-alias')
 const resolve = _path => path.resolve(__dirname, _path)
-const version = pkg.version
+const version = process.env.VERSION || pkg.version
 
 const banner =
 `/**

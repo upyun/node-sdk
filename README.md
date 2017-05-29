@@ -1,4 +1,4 @@
-# UPYUN Js SDK
+# UPYUN JS SDK
 [![NPM version](https://img.shields.io/npm/v/upyun.svg?style=flat)](https://www.npmjs.org/package/upyun)
 [![Build Status](https://travis-ci.org/upyun/node-sdk.svg?branch=master)](https://travis-ci.org/upyun/node-sdk)
 

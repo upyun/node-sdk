@@ -63,7 +63,7 @@ const bucket = new upyun.Bucket('your bucket name', 'your operator name', 'your 
 const upyun = new upyun.Client(bucket);
 ```
 
-- 客户端使用，必须设置签名回调函数，又拍云服务信息只需服务名即可
+- 客户端使用，必须设置签名回调函数，又拍云服务信息只需服务名即可（注意：**如果回调函数是异步，则必须返回一个 Promise**）
 
 ```js
 /**

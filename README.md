@@ -17,17 +17,11 @@ upyun js sdk, 支持服务端和客户端使用，集成：
 $ npm install upyun --save
 ```
 
-该库依赖 `babel-polyfill`，需要在项目入口文件第一行添加
-```
-require('babel-polyfill')
-```
-
 ## cdn
 
-手动安装时，需要先引入 sdk 的依赖 `babel-polyfill` 和 `axios`
+浏览器端手动安装时，需要手动引入 sdk 的依赖 `axios` （考虑到方便 axios 被复用，浏览器版本构建时，没有引入此依赖）
 
 ```
-<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.23.0/polyfill.min.js"></script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 ```
 
@@ -42,6 +36,8 @@ $ npm run test
 ```
 
 # 接口列表
+
+所有的接口返回均是 Promise
 
 ## Client
 

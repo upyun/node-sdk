@@ -11,160 +11,21 @@
 
 axios = 'default' in axios ? axios['default'] : axios;
 
-var asyncToGenerator = function (fn) {
-  return function () {
-    var gen = fn.apply(this, arguments);
-    return new Promise(function (resolve, reject) {
-      function step(key, arg) {
-        try {
-          var info = gen[key](arg);
-          var value = info.value;
-        } catch (error) {
-          reject(error);
-          return;
-        }
-
-        if (info.done) {
-          resolve(value);
-        } else {
-          return Promise.resolve(value).then(function (value) {
-            step("next", value);
-          }, function (err) {
-            step("throw", err);
-          });
-        }
-      }
-
-      return step("next");
-    });
-  };
-};
-
-var classCallCheck = function (instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-};
-
-var createClass = function () {
-  function defineProperties(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];
-      descriptor.enumerable = descriptor.enumerable || false;
-      descriptor.configurable = true;
-      if ("value" in descriptor) descriptor.writable = true;
-      Object.defineProperty(target, descriptor.key, descriptor);
-    }
-  }
-
-  return function (Constructor, protoProps, staticProps) {
-    if (protoProps) defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) defineProperties(Constructor, staticProps);
-    return Constructor;
-  };
-}();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-var slicedToArray = function () {
-  function sliceIterator(arr, i) {
-    var _arr = [];
-    var _n = true;
-    var _d = false;
-    var _e = undefined;
-
-    try {
-      for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
-        _arr.push(_s.value);
-
-        if (i && _arr.length === i) break;
-      }
-    } catch (err) {
-      _d = true;
-      _e = err;
-    } finally {
-      try {
-        if (!_n && _i["return"]) _i["return"]();
-      } finally {
-        if (_d) throw _e;
-      }
-    }
-
-    return _arr;
-  }
-
-  return function (arr, i) {
-    if (Array.isArray(arr)) {
-      return arr;
-    } else if (Symbol.iterator in Object(arr)) {
-      return sliceIterator(arr, i);
-    } else {
-      throw new TypeError("Invalid attempt to destructure non-iterable instance");
-    }
-  };
-}();
-
 var createReq = function (endpoint, bucket, getHeaderSign) {
-  var _this = this;
-
   var req = axios.create({
     baseURL: endpoint + '/' + bucket.bucketName
   });
 
-  req.interceptors.request.use(function () {
-    var _ref = asyncToGenerator(regeneratorRuntime.mark(function _callee(config) {
-      var method, path;
-      return regeneratorRuntime.wrap(function _callee$(_context) {
-        while (1) {
-          switch (_context.prev = _context.next) {
-            case 0:
-              method = config.method.toUpperCase();
+  req.interceptors.request.use(function (config) {
+    var method = config.method.toUpperCase();
+    config.url = encodeURI(config.url);
+    var path = config.url.substring(config.baseURL.length);
 
-              config.url = encodeURI(config.url);
-              path = config.url.substring(config.baseURL.length);
-              _context.next = 5;
-              return getHeaderSign(bucket, method, path);
-
-            case 5:
-              config.headers.common = _context.sent;
-              return _context.abrupt('return', config);
-
-            case 7:
-            case 'end':
-              return _context.stop();
-          }
-        }
-      }, _callee, _this);
-    }));
-
-    return function (_x) {
-      return _ref.apply(this, arguments);
-    };
-  }(), function (error) {
+    return getHeaderSign(bucket, method, path).then(function (headers) {
+      config.headers.common = headers;
+      return Promise.resolve(config);
+    });
+  }, function (error) {
     throw new Error('upyun - request failed: ' + error.message);
   });
 
@@ -201,44 +62,20 @@ var utils = {
   readBlockAsync: readBlockAsync
 };
 
-var formUpload = (function () {
-  var _ref2 = asyncToGenerator(regeneratorRuntime.mark(function _callee(remoteUrl, localFile, _ref) {
-    var authorization = _ref.authorization,
-        policy = _ref.policy;
+function formUpload(remoteUrl, localFile, _ref) {
+  var authorization = _ref.authorization,
+      policy = _ref.policy;
 
-    var data, _ref3, status;
+  var data = new FormData();
+  data.append('authorization', authorization);
+  data.append('policy', policy);
+  data.append('file', localFile);
+  return axios.post(remoteUrl, data).then(function (_ref2) {
+    var status = _ref2.status;
 
-    return regeneratorRuntime.wrap(function _callee$(_context) {
-      while (1) {
-        switch (_context.prev = _context.next) {
-          case 0:
-            data = new FormData();
-
-            data.append('authorization', authorization);
-            data.append('policy', policy);
-            data.append('file', localFile);
-            _context.next = 6;
-            return axios.post(remoteUrl, data);
-
-          case 6:
-            _ref3 = _context.sent;
-            status = _ref3.status;
-            return _context.abrupt('return', status === 200);
-
-          case 9:
-          case 'end':
-            return _context.stop();
-        }
-      }
-    }, _callee, this);
-  }));
-
-  function formUpload(_x, _x2, _x3) {
-    return _ref2.apply(this, arguments);
-  }
-
-  return formUpload;
-})();
+    return Promise.resolve(status === 200);
+  });
+}
 
 /* OAuthSimple
 * A simpler version of OAuth
@@ -914,6 +751,94 @@ var sign = {
   getPurgeHeaderSign: getPurgeHeaderSign
 };
 
+var classCallCheck = function (instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+};
+
+var createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }
+
+  return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) defineProperties(Constructor, staticProps);
+    return Constructor;
+  };
+}();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var slicedToArray = function () {
+  function sliceIterator(arr, i) {
+    var _arr = [];
+    var _n = true;
+    var _d = false;
+    var _e = undefined;
+
+    try {
+      for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+        _arr.push(_s.value);
+
+        if (i && _arr.length === i) break;
+      }
+    } catch (err) {
+      _d = true;
+      _e = err;
+    } finally {
+      try {
+        if (!_n && _i["return"]) _i["return"]();
+      } finally {
+        if (_d) throw _e;
+      }
+    }
+
+    return _arr;
+  }
+
+  return function (arr, i) {
+    if (Array.isArray(arr)) {
+      return arr;
+    } else if (Symbol.iterator in Object(arr)) {
+      return sliceIterator(arr, i);
+    } else {
+      throw new TypeError("Invalid attempt to destructure non-iterable instance");
+    }
+  };
+}();
+
 var Upyun = function () {
   /**
    * @param {object} bucket - a instance of Bucket class
@@ -974,135 +899,79 @@ var Upyun = function () {
     }
   }, {
     key: 'usage',
-    value: function () {
-      var _ref = asyncToGenerator(regeneratorRuntime.mark(function _callee() {
-        var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '/';
+    value: function usage() {
+      var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '/';
 
-        var _ref2, data;
+      return this.req.get(path + '?usage').then(function (_ref) {
+        var data = _ref.data;
 
-        return regeneratorRuntime.wrap(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                _context.next = 2;
-                return this.req.get(path + '?usage');
-
-              case 2:
-                _ref2 = _context.sent;
-                data = _ref2.data;
-                return _context.abrupt('return', data);
-
-              case 5:
-              case 'end':
-                return _context.stop();
-            }
-          }
-        }, _callee, this);
-      }));
-
-      function usage() {
-        return _ref.apply(this, arguments);
-      }
-
-      return usage;
-    }()
+        return Promise.resolve(data);
+      });
+    }
   }, {
     key: 'listDir',
-    value: function () {
-      var _ref3 = asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
-        var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '/';
+    value: function listDir() {
+      var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '/';
 
-        var _ref4 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
-            _ref4$limit = _ref4.limit,
-            limit = _ref4$limit === undefined ? 100 : _ref4$limit,
-            _ref4$order = _ref4.order,
-            order = _ref4$order === undefined ? 'asc' : _ref4$order,
-            _ref4$iter = _ref4.iter,
-            iter = _ref4$iter === undefined ? '' : _ref4$iter;
+      var _ref2 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+          _ref2$limit = _ref2.limit,
+          limit = _ref2$limit === undefined ? 100 : _ref2$limit,
+          _ref2$order = _ref2.order,
+          order = _ref2$order === undefined ? 'asc' : _ref2$order,
+          _ref2$iter = _ref2.iter,
+          iter = _ref2$iter === undefined ? '' : _ref2$iter;
 
-        var requestHeaders, _ref5, data, headers, status, next, items, files;
+      var requestHeaders = {
+        'x-list-limit': limit,
+        'x-list-order': order
+      };
 
-        return regeneratorRuntime.wrap(function _callee2$(_context2) {
-          while (1) {
-            switch (_context2.prev = _context2.next) {
-              case 0:
-                requestHeaders = {
-                  'x-list-limit': limit,
-                  'x-list-order': order
-                };
-
-
-                if (iter) {
-                  requestHeaders['x-list-iter'] = iter;
-                }
-
-                _context2.next = 4;
-                return this.req.get(path, {
-                  headers: requestHeaders
-                });
-
-              case 4:
-                _ref5 = _context2.sent;
-                data = _ref5.data;
-                headers = _ref5.headers;
-                status = _ref5.status;
-
-                if (!(status === 404)) {
-                  _context2.next = 10;
-                  break;
-                }
-
-                return _context2.abrupt('return', false);
-
-              case 10:
-                next = headers['x-upyun-list-iter'];
-
-                if (data) {
-                  _context2.next = 13;
-                  break;
-                }
-
-                return _context2.abrupt('return', {
-                  files: [],
-                  next: next
-                });
-
-              case 13:
-                items = data.split('\n');
-                files = items.map(function (item) {
-                  var _item$split = item.split('\t'),
-                      _item$split2 = slicedToArray(_item$split, 4),
-                      name = _item$split2[0],
-                      type = _item$split2[1],
-                      size = _item$split2[2],
-                      time = _item$split2[3];
-
-                  return {
-                    name: name,
-                    type: type,
-                    size: parseInt(size),
-                    time: parseInt(time)
-                  };
-                });
-                return _context2.abrupt('return', {
-                  files: files,
-                  next: next
-                });
-
-              case 16:
-              case 'end':
-                return _context2.stop();
-            }
-          }
-        }, _callee2, this);
-      }));
-
-      function listDir() {
-        return _ref3.apply(this, arguments);
+      if (iter) {
+        requestHeaders['x-list-iter'] = iter;
       }
 
-      return listDir;
-    }()
+      return this.req.get(path, {
+        headers: requestHeaders
+      }).then(function (_ref3) {
+        var data = _ref3.data,
+            headers = _ref3.headers,
+            status = _ref3.status;
+
+        if (status === 404) {
+          return false;
+        }
+
+        var next = headers['x-upyun-list-iter'];
+        if (!data) {
+          return Promise.resolve({
+            files: [],
+            next: next
+          });
+        }
+
+        var items = data.split('\n');
+        var files = items.map(function (item) {
+          var _item$split = item.split('\t'),
+              _item$split2 = slicedToArray(_item$split, 4),
+              name = _item$split2[0],
+              type = _item$split2[1],
+              size = _item$split2[2],
+              time = _item$split2[3];
+
+          return {
+            name: name,
+            type: type,
+            size: parseInt(size),
+            time: parseInt(time)
+          };
+        });
+
+        return Promise.resolve({
+          files: files,
+          next: next
+        });
+      });
+    }
 
     /**
      * @param localFile: file content, available type is Stream | String | Buffer for server; File | String for client
@@ -1112,387 +981,173 @@ var Upyun = function () {
 
   }, {
     key: 'putFile',
-    value: function () {
-      var _ref6 = asyncToGenerator(regeneratorRuntime.mark(function _callee3(remotePath, localFile) {
-        var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+    value: function putFile(remotePath, localFile) {
+      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-        var keys, headers, _ref7, responseHeaders, status, params, result;
+      // optional params
+      var keys = ['Content-MD5', 'Content-Length', 'Content-Type', 'Content-Secret', 'x-gmkerl-thumb'];
+      var headers = {};
+      keys.forEach(function (key) {
+        var lower = key.toLowerCase();
+        var finded = options[key] || options[lower];
+        if (finded) {
+          headers[key] = finded;
+        } else if (isMeta(key)) {
+          headers[key] = options[key];
+        }
+      });
 
-        return regeneratorRuntime.wrap(function _callee3$(_context3) {
-          while (1) {
-            switch (_context3.prev = _context3.next) {
-              case 0:
-                // optional params
-                keys = ['Content-MD5', 'Content-Length', 'Content-Type', 'Content-Secret', 'x-gmkerl-thumb'];
-                headers = {};
+      return this.req.put(remotePath, localFile, {
+        headers: headers
+      }).then(function (_ref4) {
+        var responseHeaders = _ref4.headers,
+            status = _ref4.status;
 
-                keys.forEach(function (key) {
-                  var lower = key.toLowerCase();
-                  var finded = options[key] || options[lower];
-                  if (finded) {
-                    headers[key] = finded;
-                  } else if (isMeta(key)) {
-                    headers[key] = options[key];
-                  }
-                });
+        if (status !== 200) {
+          return Promise.resolve(false);
+        }
 
-                _context3.next = 5;
-                return this.req.put(remotePath, localFile, {
-                  headers: headers
-                });
-
-              case 5:
-                _ref7 = _context3.sent;
-                responseHeaders = _ref7.headers;
-                status = _ref7.status;
-
-                if (!(status === 200)) {
-                  _context3.next = 15;
-                  break;
-                }
-
-                params = ['x-upyun-width', 'x-upyun-height', 'x-upyun-file-type', 'x-upyun-frames'];
-                result = {};
-
-                params.forEach(function (item) {
-                  var key = item.split('x-upyun-')[1];
-                  if (responseHeaders[item]) {
-                    result[key] = responseHeaders[item];
-                    if (key !== 'file-type') {
-                      result[key] = parseInt(result[key], 10);
-                    }
-                  }
-                });
-                return _context3.abrupt('return', Object.keys(result).length > 0 ? result : true);
-
-              case 15:
-                return _context3.abrupt('return', false);
-
-              case 16:
-              case 'end':
-                return _context3.stop();
+        var params = ['x-upyun-width', 'x-upyun-height', 'x-upyun-file-type', 'x-upyun-frames'];
+        var result = {};
+        params.forEach(function (item) {
+          var key = item.split('x-upyun-')[1];
+          if (responseHeaders[item]) {
+            result[key] = responseHeaders[item];
+            if (key !== 'file-type') {
+              result[key] = parseInt(result[key], 10);
             }
           }
-        }, _callee3, this);
-      }));
-
-      function putFile(_x7, _x8) {
-        return _ref6.apply(this, arguments);
-      }
-
-      return putFile;
-    }()
+        });
+        return Promise.resolve(Object.keys(result).length > 0 ? result : true);
+      });
+    }
   }, {
     key: 'makeDir',
-    value: function () {
-      var _ref8 = asyncToGenerator(regeneratorRuntime.mark(function _callee4(remotePath) {
-        var _ref9, status;
+    value: function makeDir(remotePath) {
+      return this.req.post(remotePath, null, {
+        headers: { folder: 'true' }
+      }).then(function (_ref5) {
+        var status = _ref5.status;
 
-        return regeneratorRuntime.wrap(function _callee4$(_context4) {
-          while (1) {
-            switch (_context4.prev = _context4.next) {
-              case 0:
-                _context4.next = 2;
-                return this.req.post(remotePath, null, {
-                  headers: { folder: 'true' }
-                });
-
-              case 2:
-                _ref9 = _context4.sent;
-                status = _ref9.status;
-                return _context4.abrupt('return', status === 200);
-
-              case 5:
-              case 'end':
-                return _context4.stop();
-            }
-          }
-        }, _callee4, this);
-      }));
-
-      function makeDir(_x9) {
-        return _ref8.apply(this, arguments);
-      }
-
-      return makeDir;
-    }()
+        return Promise.resolve(status === 200);
+      });
+    }
   }, {
     key: 'headFile',
-    value: function () {
-      var _ref10 = asyncToGenerator(regeneratorRuntime.mark(function _callee5(remotePath) {
-        var _ref11, headers, status, params, result;
+    value: function headFile(remotePath) {
+      return this.req.head(remotePath).then(function (_ref6) {
+        var headers = _ref6.headers,
+            status = _ref6.status;
 
-        return regeneratorRuntime.wrap(function _callee5$(_context5) {
-          while (1) {
-            switch (_context5.prev = _context5.next) {
-              case 0:
-                _context5.next = 2;
-                return this.req.head(remotePath);
+        if (status === 404) {
+          return Promise.resolve(false);
+        }
 
-              case 2:
-                _ref11 = _context5.sent;
-                headers = _ref11.headers;
-                status = _ref11.status;
-
-                if (!(status === 404)) {
-                  _context5.next = 7;
-                  break;
-                }
-
-                return _context5.abrupt('return', false);
-
-              case 7:
-                params = ['x-upyun-file-type', 'x-upyun-file-size', 'x-upyun-file-date', 'Content-Md5'];
-                result = {};
-
-                params.forEach(function (item) {
-                  var key = item.split('x-upyun-file-')[1];
-                  if (headers[item]) {
-                    result[key] = headers[item];
-                    if (key === 'size' || key === 'date') {
-                      result[key] = parseInt(result[key], 10);
-                    }
-                  }
-                });
-                return _context5.abrupt('return', result);
-
-              case 11:
-              case 'end':
-                return _context5.stop();
+        var params = ['x-upyun-file-type', 'x-upyun-file-size', 'x-upyun-file-date', 'Content-Md5'];
+        var result = {};
+        params.forEach(function (item) {
+          var key = item.split('x-upyun-file-')[1];
+          if (headers[item]) {
+            result[key] = headers[item];
+            if (key === 'size' || key === 'date') {
+              result[key] = parseInt(result[key], 10);
             }
           }
-        }, _callee5, this);
-      }));
-
-      function headFile(_x10) {
-        return _ref10.apply(this, arguments);
-      }
-
-      return headFile;
-    }()
+        });
+        return Promise.resolve(result);
+      });
+    }
   }, {
     key: 'deleteFile',
-    value: function () {
-      var _ref12 = asyncToGenerator(regeneratorRuntime.mark(function _callee6(remotePath) {
-        var _ref13, status;
+    value: function deleteFile(remotePath) {
+      return this.req.delete(remotePath).then(function (_ref7) {
+        var status = _ref7.status;
 
-        return regeneratorRuntime.wrap(function _callee6$(_context6) {
-          while (1) {
-            switch (_context6.prev = _context6.next) {
-              case 0:
-                _context6.next = 2;
-                return this.req.delete(remotePath);
-
-              case 2:
-                _ref13 = _context6.sent;
-                status = _ref13.status;
-                return _context6.abrupt('return', status === 200);
-
-              case 5:
-              case 'end':
-                return _context6.stop();
-            }
-          }
-        }, _callee6, this);
-      }));
-
-      function deleteFile(_x11) {
-        return _ref12.apply(this, arguments);
-      }
-
-      return deleteFile;
-    }()
+        return Promise.resolve(status === 200);
+      });
+    }
   }, {
     key: 'deleteDir',
-    value: function () {
-      var _ref14 = asyncToGenerator(regeneratorRuntime.mark(function _callee7(remotePath) {
-        return regeneratorRuntime.wrap(function _callee7$(_context7) {
-          while (1) {
-            switch (_context7.prev = _context7.next) {
-              case 0:
-                _context7.next = 2;
-                return this.deleteFile(remotePath);
-
-              case 2:
-                return _context7.abrupt('return', _context7.sent);
-
-              case 3:
-              case 'end':
-                return _context7.stop();
-            }
-          }
-        }, _callee7, this);
-      }));
-
-      function deleteDir(_x12) {
-        return _ref14.apply(this, arguments);
-      }
-
-      return deleteDir;
-    }()
+    value: function deleteDir(remotePath) {
+      return this.deleteFile(remotePath);
+    }
   }, {
     key: 'getFile',
-    value: function () {
-      var _ref15 = asyncToGenerator(regeneratorRuntime.mark(function _callee8(remotePath) {
-        var saveStream = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-        var response, stream;
-        return regeneratorRuntime.wrap(function _callee8$(_context8) {
-          while (1) {
-            switch (_context8.prev = _context8.next) {
-              case 0:
-                if (!(saveStream && typeof window !== 'undefined')) {
-                  _context8.next = 2;
-                  break;
-                }
+    value: function getFile(remotePath) {
+      var saveStream = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 
-                throw new Error('upyun - save as stream are only available on the server side.');
-
-              case 2:
-                _context8.next = 4;
-                return this.req({
-                  method: 'GET',
-                  url: remotePath,
-                  responseType: saveStream ? 'stream' : null
-                });
-
-              case 4:
-                response = _context8.sent;
-
-                if (!(response.status === 404)) {
-                  _context8.next = 7;
-                  break;
-                }
-
-                return _context8.abrupt('return', false);
-
-              case 7:
-                if (saveStream) {
-                  _context8.next = 9;
-                  break;
-                }
-
-                return _context8.abrupt('return', response.data);
-
-              case 9:
-                stream = response.data.pipe(saveStream);
-                return _context8.abrupt('return', new Promise(function (resolve, reject) {
-                  stream.on('finish', function () {
-                    return resolve(stream);
-                  });
-
-                  stream.on('error', reject);
-                }));
-
-              case 11:
-              case 'end':
-                return _context8.stop();
-            }
-          }
-        }, _callee8, this);
-      }));
-
-      function getFile(_x14) {
-        return _ref15.apply(this, arguments);
+      if (saveStream && typeof window !== 'undefined') {
+        throw new Error('upyun - save as stream are only available on the server side.');
       }
 
-      return getFile;
-    }()
+      return this.req({
+        method: 'GET',
+        url: remotePath,
+        responseType: saveStream ? 'stream' : null
+      }).then(function (response) {
+        if (response.status === 404) {
+          return Promise.resolve(false);
+        }
+
+        if (!saveStream) {
+          return Promise.resolve(response.data);
+        }
+
+        var stream = response.data.pipe(saveStream);
+
+        return new Promise(function (resolve, reject) {
+          stream.on('finish', function () {
+            return resolve(stream);
+          });
+
+          stream.on('error', reject);
+        });
+      });
+    }
   }, {
     key: 'updateMetadata',
-    value: function () {
-      var _ref16 = asyncToGenerator(regeneratorRuntime.mark(function _callee9(remotePath, metas) {
-        var operate = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'merge';
+    value: function updateMetadata(remotePath, metas) {
+      var operate = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'merge';
 
-        var metaHeaders, key, _ref17, status;
-
-        return regeneratorRuntime.wrap(function _callee9$(_context9) {
-          while (1) {
-            switch (_context9.prev = _context9.next) {
-              case 0:
-                metaHeaders = {};
-
-                for (key in metas) {
-                  if (!isMeta(key)) {
-                    metaHeaders['x-upyun-meta-' + key] = metas[key];
-                  } else {
-                    metaHeaders[key] = metas;
-                  }
-                }
-                _context9.next = 4;
-                return this.req.patch(remotePath + '?metadata=' + operate, null, { headers: metaHeaders });
-
-              case 4:
-                _ref17 = _context9.sent;
-                status = _ref17.status;
-                return _context9.abrupt('return', status === 200);
-
-              case 7:
-              case 'end':
-                return _context9.stop();
-            }
-          }
-        }, _callee9, this);
-      }));
-
-      function updateMetadata(_x16, _x17) {
-        return _ref16.apply(this, arguments);
+      var metaHeaders = {};
+      for (var key in metas) {
+        if (!isMeta(key)) {
+          metaHeaders['x-upyun-meta-' + key] = metas[key];
+        } else {
+          metaHeaders[key] = metas;
+        }
       }
 
-      return updateMetadata;
-    }()
+      return this.req.patch(remotePath + '?metadata=' + operate, null, { headers: metaHeaders }).then(function (_ref8) {
+        var status = _ref8.status;
+
+        return Promise.resolve(status === 200);
+      });
+    }
 
     // be careful: this will download the entire file
 
   }, {
     key: 'getMetadata',
-    value: function () {
-      var _ref18 = asyncToGenerator(regeneratorRuntime.mark(function _callee10(remotePath) {
-        var _ref19, headers, status, result, key;
+    value: function getMetadata(remotePath) {
+      return this.req.get(remotePath).then(function (_ref9) {
+        var headers = _ref9.headers,
+            status = _ref9.status;
 
-        return regeneratorRuntime.wrap(function _callee10$(_context10) {
-          while (1) {
-            switch (_context10.prev = _context10.next) {
-              case 0:
-                _context10.next = 2;
-                return this.req.get(remotePath);
+        if (status !== 200) {
+          return Promise.resolve(false);
+        }
 
-              case 2:
-                _ref19 = _context10.sent;
-                headers = _ref19.headers;
-                status = _ref19.status;
-
-                if (!(status !== 200)) {
-                  _context10.next = 7;
-                  break;
-                }
-
-                return _context10.abrupt('return', false);
-
-              case 7:
-                result = {};
-
-                for (key in headers) {
-                  if (isMeta(key)) {
-                    result[key] = headers[key];
-                  }
-                }
-
-                return _context10.abrupt('return', result);
-
-              case 10:
-              case 'end':
-                return _context10.stop();
-            }
+        var result = {};
+        for (var key in headers) {
+          if (isMeta(key)) {
+            result[key] = headers[key];
           }
-        }, _callee10, this);
-      }));
+        }
 
-      function getMetadata(_x18) {
-        return _ref18.apply(this, arguments);
-      }
-
-      return getMetadata;
-    }()
+        return Promise.resolve(result);
+      });
+    }
 
     /**
      * in browser: type of fileOrPath is File
@@ -1501,221 +1156,124 @@ var Upyun = function () {
 
   }, {
     key: 'blockUpload',
-    value: function () {
-      var _ref20 = asyncToGenerator(regeneratorRuntime.mark(function _callee11(remotePath, fileOrPath) {
-        var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+    value: function blockUpload(remotePath, fileOrPath) {
+      var _this = this;
 
-        var isBrowser, fileSize, contentType, _ref21, headers, uuid, nextId, block, blockSize, start, end, _ref22, _headers, _ref23, status;
+      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-        return regeneratorRuntime.wrap(function _callee11$(_context11) {
-          while (1) {
-            switch (_context11.prev = _context11.next) {
-              case 0:
-                isBrowser = typeof window !== 'undefined';
-                fileSize = void 0;
-                contentType = void 0;
+      var isBrowser = typeof window !== 'undefined';
 
-                if (!isBrowser) {
-                  _context11.next = 8;
-                  break;
-                }
+      var fileSizePromise = void 0;
+      var contentType = void 0;
+      if (isBrowser) {
+        fileSizePromise = Promise.resolve(fileOrPath.size);
+        contentType = fileOrPath.type;
+      } else {
+        fileSizePromise = utils.getFileSizeAsync(fileOrPath);
+        contentType = utils.getContentType(fileOrPath);
+      }
 
-                fileSize = fileOrPath.size;
-                contentType = fileOrPath.type;
-                _context11.next = 12;
-                break;
+      return fileSizePromise.then(function (fileSize) {
+        Object.assign(options, {
+          'x-upyun-multi-stage': 'initiate',
+          'x-upyun-multi-length': fileSize,
+          'x-upyun-multi-type': contentType
+        });
 
-              case 8:
-                _context11.next = 10;
-                return utils.getFileSizeAsync(fileOrPath);
+        var blockSize = 1024 * 1024;
+        var blocks = Math.ceil(fileSize / blockSize);
 
-              case 10:
-                fileSize = _context11.sent;
+        return _this.req.put(remotePath, null, {
+          headers: options
+        }).then(function (_ref10) {
+          var headers = _ref10.headers;
 
-                contentType = utils.getContentType(fileOrPath);
+          var uuid = headers['x-upyun-multi-uuid'];
+          var nextId = headers['x-upyun-next-part-id'];
 
-              case 12:
-
-                Object.assign(options, {
-                  'x-upyun-multi-stage': 'initiate',
-                  'x-upyun-multi-length': fileSize,
-                  'x-upyun-multi-type': contentType
-                });
-
-                _context11.next = 15;
-                return this.req.put(remotePath, null, {
-                  headers: options
-                });
-
-              case 15:
-                _ref21 = _context11.sent;
-                headers = _ref21.headers;
-                uuid = headers['x-upyun-multi-uuid'];
-                nextId = headers['x-upyun-next-part-id'];
-                block = void 0;
-
-              case 20:
-                blockSize = 1024 * 1024;
-                start = nextId * blockSize;
-                end = Math.min(start + blockSize, fileSize);
-                _context11.next = 25;
-                return utils.readBlockAsync(fileOrPath, start, end);
-
-              case 25:
-                block = _context11.sent;
-                _context11.next = 28;
-                return this.req.put(remotePath, block, {
+          var p = Promise.resolve(nextId);
+          for (var index = 0; index < blocks; index++) {
+            p = p.then(function (nextId) {
+              var start = nextId * blockSize;
+              var end = Math.min(start + blockSize, fileSize);
+              var blockPromise = utils.readBlockAsync(fileOrPath, start, end);
+              return blockPromise.then(function (block) {
+                return _this.req.put(remotePath, block, {
                   headers: {
                     'x-upyun-multi-stage': 'upload',
                     'x-upyun-multi-uuid': uuid,
                     'x-upyun-part-id': nextId
                   }
+                }).then(function (_ref11) {
+                  var headers = _ref11.headers;
+
+                  nextId = headers['x-upyun-next-part-id'];
+                  return Promise.resolve(nextId);
                 });
-
-              case 28:
-                _ref22 = _context11.sent;
-                _headers = _ref22.headers;
-
-                nextId = _headers['x-upyun-next-part-id'];
-
-              case 31:
-                if (nextId !== '-1') {
-                  _context11.next = 20;
-                  break;
-                }
-
-              case 32:
-                _context11.next = 34;
-                return this.req.put(remotePath, null, {
-                  headers: {
-                    'x-upyun-multi-stage': 'complete',
-                    'x-upyun-multi-uuid': uuid
-                  }
-                });
-
-              case 34:
-                _ref23 = _context11.sent;
-                status = _ref23.status;
-                return _context11.abrupt('return', status === 204 || status === 201);
-
-              case 37:
-              case 'end':
-                return _context11.stop();
-            }
+              });
+            });
           }
-        }, _callee11, this);
-      }));
 
-      function blockUpload(_x20, _x21) {
-        return _ref20.apply(this, arguments);
-      }
+          return p.then(function () {
+            return _this.req.put(remotePath, null, {
+              headers: {
+                'x-upyun-multi-stage': 'complete',
+                'x-upyun-multi-uuid': uuid
+              }
+            }).then(function (_ref12) {
+              var status = _ref12.status;
 
-      return blockUpload;
-    }()
+              return Promise.resolve(status === 204 || status === 201);
+            });
+          });
+        });
+      });
+    }
   }, {
     key: 'formPutFile',
-    value: function () {
-      var _ref24 = asyncToGenerator(regeneratorRuntime.mark(function _callee12(remotePath, localFile) {
-        var params = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-        var bodySign, result;
-        return regeneratorRuntime.wrap(function _callee12$(_context12) {
-          while (1) {
-            switch (_context12.prev = _context12.next) {
-              case 0:
-                if (!(typeof this.bodySignCallback !== 'function')) {
-                  _context12.next = 2;
-                  break;
-                }
+    value: function formPutFile(remotePath, localFile) {
+      var _this2 = this;
 
-                throw new Error('upyun - must setBodySignCallback first!');
+      var params = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-              case 2:
-
-                params['bucket'] = this.bucket.bucketName;
-                params['save-key'] = remotePath;
-                _context12.next = 6;
-                return this.bodySignCallback(this.bucket, params);
-
-              case 6:
-                bodySign = _context12.sent;
-                _context12.next = 9;
-                return formUpload(this.endpoint + '/' + params['bucket'], localFile, bodySign);
-
-              case 9:
-                result = _context12.sent;
-                return _context12.abrupt('return', result);
-
-              case 11:
-              case 'end':
-                return _context12.stop();
-            }
-          }
-        }, _callee12, this);
-      }));
-
-      function formPutFile(_x23, _x24) {
-        return _ref24.apply(this, arguments);
+      if (typeof this.bodySignCallback !== 'function') {
+        throw new Error('upyun - must setBodySignCallback first!');
       }
 
-      return formPutFile;
-    }()
+      params['bucket'] = this.bucket.bucketName;
+      params['save-key'] = remotePath;
+      var result = this.bodySignCallback(this.bucket, params);
+      if (typeof result.then !== 'function') {
+        result = Promise.resolve(result);
+      }
+
+      return result.then(function (bodySign) {
+        return formUpload(_this2.endpoint + '/' + params['bucket'], localFile, bodySign).then(function (result) {
+          return Promise.resolve(result);
+        });
+      });
+    }
   }, {
     key: 'purge',
-    value: function () {
-      var _ref25 = asyncToGenerator(regeneratorRuntime.mark(function _callee13(urls) {
-        var headers, _ref26, data;
-
-        return regeneratorRuntime.wrap(function _callee13$(_context13) {
-          while (1) {
-            switch (_context13.prev = _context13.next) {
-              case 0:
-                if (typeof urls === 'string') {
-                  urls = [urls];
-                }
-                _context13.prev = 1;
-                headers = sign.getPurgeHeaderSign(this.bucket, urls);
-                _context13.next = 5;
-                return axios.post('http://purge.upyun.com/purge/', 'purge=' + urls.join('\n'), {
-                  headers: headers
-                });
-
-              case 5:
-                _ref26 = _context13.sent;
-                data = _ref26.data;
-
-                if (!(Object.keys(data.invalid_domain_of_url).length === 0)) {
-                  _context13.next = 11;
-                  break;
-                }
-
-                return _context13.abrupt('return', true);
-
-              case 11:
-                throw new Error('some url purge failed ' + data.invalid_domain_of_url.join(' '));
-
-              case 12:
-                _context13.next = 17;
-                break;
-
-              case 14:
-                _context13.prev = 14;
-                _context13.t0 = _context13['catch'](1);
-                throw new Error('upyun - request failed: ' + _context13.t0.message);
-
-              case 17:
-              case 'end':
-                return _context13.stop();
-            }
-          }
-        }, _callee13, this, [[1, 14]]);
-      }));
-
-      function purge(_x25) {
-        return _ref25.apply(this, arguments);
+    value: function purge(urls) {
+      if (typeof urls === 'string') {
+        urls = [urls];
       }
+      var headers = sign.getPurgeHeaderSign(this.bucket, urls);
+      return axios.post('http://purge.upyun.com/purge/', 'purge=' + urls.join('\n'), {
+        headers: headers
+      }).then(function (_ref13) {
+        var data = _ref13.data;
 
-      return purge;
-    }()
+        if (Object.keys(data.invalid_domain_of_url).length === 0) {
+          return true;
+        } else {
+          throw new Error('some url purge failed ' + data.invalid_domain_of_url.join(' '));
+        }
+      }, function (err) {
+        throw new Error('upyun - request failed: ' + err.message);
+      });
+    }
   }]);
   return Upyun;
 }();

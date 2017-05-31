@@ -82,8 +82,5 @@
   "browser": {
     "./upyun/utils.js": "./upyun/browser-utils.js",
     "./upyun/form-upload.js": "./upyun/browser-form-upload.js"
-  },
-  "peerDependencies": {
-    "babel-polyfill": "^6.23.0"
   }
 }

@@ -59,12 +59,13 @@ export default class Upyun {
     this.bodySignCallback = getBodySign
   }
 
-  async usage (path = '/') {
-    const {data} = await this.req.get(path + '?usage')
-    return data
+  usage (path = '/') {
+    return this.req.get(path + '?usage').then(({data}) => {
+      return Promise.resolve(data)
+    })
   }
 
-  async listDir (path = '/', {limit = 100, order = 'asc', iter = ''} = {}) {
+  listDir (path = '/', {limit = 100, order = 'asc', iter = ''} = {}) {
     const requestHeaders = {
       'x-list-limit': limit,
       'x-list-order': order
@@ -74,37 +75,37 @@ export default class Upyun {
       requestHeaders['x-list-iter'] = iter
     }
 
-    const {data, headers, status} = await this.req.get(path, {
+    return this.req.get(path, {
       headers: requestHeaders
-    })
+    }).then(({data, headers, status}) => {
+      if (status === 404) {
+        return false
+      }
 
-    if (status === 404) {
-      return false
-    }
+      const next = headers['x-upyun-list-iter']
+      if (!data) {
+        return Promise.resolve({
+          files: [],
+          next
+        })
+      }
 
-    const next = headers['x-upyun-list-iter']
-    if (!data) {
-      return {
-        files: [],
+      const items = data.split('\n')
+      const files = items.map(item => {
+        const [name, type, size, time] = item.split('\t')
+        return {
+          name,
+          type,
+          size: parseInt(size),
+          time: parseInt(time)
+        }
+      })
+
+      return Promise.resolve({
+        files,
         next
-      }
-    }
-
-    const items = data.split('\n')
-    const files = items.map(item => {
-      const [name, type, size, time] = item.split('\t')
-      return {
-        name,
-        type,
-        size: parseInt(size),
-        time: parseInt(time)
-      }
+      })
     })
-
-    return {
-      files,
-      next
-    }
   }
 
   /**
@@ -112,7 +113,7 @@ export default class Upyun {
    * @see https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/send
    * @see https://github.com/mzabriskie/axios/blob/master/lib/adapters/http.js#L32
    */
-  async putFile (remotePath, localFile, options = {}) {
+  putFile (remotePath, localFile, options = {}) {
     // optional params
     const keys = ['Content-MD5', 'Content-Length', 'Content-Type', 'Content-Secret', 'x-gmkerl-thumb']
     let headers = {}
@@ -126,11 +127,13 @@ export default class Upyun {
       }
     })
 
-    const {headers: responseHeaders, status} = await this.req.put(remotePath, localFile, {
+    return this.req.put(remotePath, localFile, {
       headers
-    })
+    }).then(({headers: responseHeaders, status}) => {
+      if (status !== 200) {
+        return Promise.resolve(false)
+      }
 
-    if (status === 200) {
       let params = ['x-upyun-width', 'x-upyun-height', 'x-upyun-file-type', 'x-upyun-frames']
       let result = {}
       params.forEach(item => {
@@ -142,79 +145,78 @@ export default class Upyun {
           }
         }
       })
-      return Object.keys(result).length > 0 ? result : true
-    } else {
-      return false
-    }
+      return Promise.resolve(Object.keys(result).length > 0 ? result : true)
+    })
   }
 
-  async makeDir (remotePath) {
-    const {status} = await this.req.post(remotePath, null, {
+  makeDir (remotePath) {
+    return this.req.post(remotePath, null, {
       headers: { folder: 'true' }
+    }).then(({status}) => {
+      return Promise.resolve(status === 200)
     })
-    return status === 200
   }
 
-  async headFile (remotePath) {
-    const {headers, status} = await this.req.head(remotePath)
-
-    if (status === 404) {
-      return false
-    }
-
-    let params = ['x-upyun-file-type', 'x-upyun-file-size', 'x-upyun-file-date', 'Content-Md5']
-    let result = {}
-    params.forEach(item => {
-      let key = item.split('x-upyun-file-')[1]
-      if (headers[item]) {
-        result[key] = headers[item]
-        if (key === 'size' || key === 'date') {
-          result[key] = parseInt(result[key], 10)
-        }
+  headFile (remotePath) {
+    return this.req.head(remotePath).then(({headers, status}) => {
+      if (status === 404) {
+        return Promise.resolve(false)
       }
+
+      let params = ['x-upyun-file-type', 'x-upyun-file-size', 'x-upyun-file-date', 'Content-Md5']
+      let result = {}
+      params.forEach(item => {
+        let key = item.split('x-upyun-file-')[1]
+        if (headers[item]) {
+          result[key] = headers[item]
+          if (key === 'size' || key === 'date') {
+            result[key] = parseInt(result[key], 10)
+          }
+        }
+      })
+      return Promise.resolve(result)
     })
-    return result
   }
 
-  async deleteFile (remotePath) {
-    const {status} = await this.req.delete(remotePath)
-
-    return status === 200
+  deleteFile (remotePath) {
+    return this.req.delete(remotePath).then(({status}) => {
+      return Promise.resolve(status === 200)
+    })
   }
 
-  async deleteDir (remotePath) {
-    return await this.deleteFile(remotePath)
+  deleteDir (remotePath) {
+    return this.deleteFile(remotePath)
   }
 
-  async getFile (remotePath, saveStream = null) {
+  getFile (remotePath, saveStream = null) {
     if (saveStream && typeof window !== 'undefined') {
       throw new Error('upyun - save as stream are only available on the server side.')
     }
 
-    const response = await this.req({
+    return this.req({
       method: 'GET',
       url: remotePath,
       responseType: saveStream ? 'stream' : null
-    })
+    }).then((response) => {
+      if (response.status === 404) {
+        return Promise.resolve(false)
+      }
 
-    if (response.status === 404) {
-      return false
-    }
+      if (!saveStream) {
+        return Promise.resolve(response.data)
+      }
 
-    if (!saveStream) {
-      return response.data
-    }
+      const stream = response.data.pipe(saveStream)
 
-    const stream = response.data.pipe(saveStream)
+      return new Promise((resolve, reject) => {
+        stream.on('finish', () => resolve(stream))
 
-    return new Promise((resolve, reject) => {
-      stream.on('finish', () => resolve(stream))
-
-      stream.on('error', reject)
+        stream.on('error', reject)
+      })
     })
   }
 
-  async updateMetadata (remotePath, metas, operate = 'merge') {
+  updateMetadata (remotePath, metas, operate = 'merge') {
     let metaHeaders = {}
     for (let key in metas) {
       if (!isMeta(key)) {
@@ -223,121 +225,140 @@ export default class Upyun {
         metaHeaders[key] = metas
       }
     }
-    const {status} = await this.req.patch(
+
+    return this.req.patch(
       remotePath + '?metadata=' + operate,
       null,
       { headers: metaHeaders }
-    )
-
-    return status === 200
+    ).then(({status}) => {
+      return Promise.resolve(status === 200)
+    })
   }
 
   // be careful: this will download the entire file
-  async getMetadata (remotePath) {
-    const {headers, status} = await this.req.get(remotePath)
-
-    if (status !== 200) {
-      return false
-    }
-
-    let result = {}
-    for (let key in headers) {
-      if (isMeta(key)) {
-        result[key] = headers[key]
+  getMetadata (remotePath) {
+    return this.req.get(remotePath).then(({headers, status}) => {
+      if (status !== 200) {
+        return Promise.resolve(false)
       }
-    }
 
-    return result
+      let result = {}
+      for (let key in headers) {
+        if (isMeta(key)) {
+          result[key] = headers[key]
+        }
+      }
+
+      return Promise.resolve(result)
+    })
   }
 
   /**
    * in browser: type of fileOrPath is File
    * in server: type of fileOrPath is string: local file path
    */
-  async blockUpload (remotePath, fileOrPath, options = {}) {
+  blockUpload (remotePath, fileOrPath, options = {}) {
     const isBrowser = typeof window !== 'undefined'
 
-    let fileSize
+    let fileSizePromise
     let contentType
     if (isBrowser) {
-      fileSize = fileOrPath.size
+      fileSizePromise = Promise.resolve(fileOrPath.size)
       contentType = fileOrPath.type
     } else {
-      fileSize = await utils.getFileSizeAsync(fileOrPath)
+      fileSizePromise = utils.getFileSizeAsync(fileOrPath)
       contentType = utils.getContentType(fileOrPath)
     }
 
-    Object.assign(options, {
-      'x-upyun-multi-stage': 'initiate',
-      'x-upyun-multi-length': fileSize,
-      'x-upyun-multi-type': contentType
-    })
-
-    let {headers} = await this.req.put(remotePath, null, {
-      headers: options
-    })
-
-    let uuid = headers['x-upyun-multi-uuid']
-    let nextId = headers['x-upyun-next-part-id']
-
-    let block
-    do {
-      const blockSize = 1024 * 1024
-      const start = nextId * blockSize
-      const end = Math.min(start + blockSize, fileSize)
-      block = await utils.readBlockAsync(fileOrPath, start, end)
-
-      let {headers} = await this.req.put(remotePath, block, {
-        headers: {
-          'x-upyun-multi-stage': 'upload',
-          'x-upyun-multi-uuid': uuid,
-          'x-upyun-part-id': nextId
-        }
+    return fileSizePromise.then((fileSize) => {
+      Object.assign(options, {
+        'x-upyun-multi-stage': 'initiate',
+        'x-upyun-multi-length': fileSize,
+        'x-upyun-multi-type': contentType
       })
-      nextId = headers['x-upyun-next-part-id']
-    } while (nextId !== '-1')
 
-    const {status} = await this.req.put(remotePath, null, {
-      headers: {
-        'x-upyun-multi-stage': 'complete',
-        'x-upyun-multi-uuid': uuid
-      }
+      const blockSize = 1024 * 1024
+      const blocks = Math.ceil(fileSize / blockSize)
+
+      return this.req.put(remotePath, null, {
+        headers: options
+      }).then(({headers}) => {
+        let uuid = headers['x-upyun-multi-uuid']
+        let nextId = headers['x-upyun-next-part-id']
+
+        let p = Promise.resolve(nextId)
+        for (let index = 0; index < blocks; index++) {
+          p = p.then((nextId) => {
+            const start = nextId * blockSize
+            const end = Math.min(start + blockSize, fileSize)
+            const blockPromise = utils.readBlockAsync(fileOrPath, start, end)
+            return blockPromise.then((block) => {
+              return this.req.put(remotePath, block, {
+                headers: {
+                  'x-upyun-multi-stage': 'upload',
+                  'x-upyun-multi-uuid': uuid,
+                  'x-upyun-part-id': nextId
+                }
+              }).then(({headers}) => {
+                nextId = headers['x-upyun-next-part-id']
+                return Promise.resolve(nextId)
+              })
+            })
+          })
+        }
+
+        return p.then(() => {
+          return this.req.put(remotePath, null, {
+            headers: {
+              'x-upyun-multi-stage': 'complete',
+              'x-upyun-multi-uuid': uuid
+            }
+          }).then(({status}) => {
+            return Promise.resolve(status === 204 || status === 201)
+          })
+        })
+      })
     })
-    return status === 204 || status === 201
   }
 
-  async formPutFile (remotePath, localFile, params = {}) {
+  formPutFile (remotePath, localFile, params = {}) {
     if (typeof this.bodySignCallback !== 'function') {
       throw new Error('upyun - must setBodySignCallback first!')
     }
 
     params['bucket'] = this.bucket.bucketName
     params['save-key'] = remotePath
-    const bodySign = await this.bodySignCallback(this.bucket, params)
-    const result = await formUpload(this.endpoint + '/' + params['bucket'], localFile, bodySign)
-    return result
+    let result = this.bodySignCallback(this.bucket, params)
+    if (typeof result.then !== 'function') {
+      result = Promise.resolve(result)
+    }
+
+    return result.then((bodySign) => {
+      return formUpload(this.endpoint + '/' + params['bucket'], localFile, bodySign)
+        .then((result) => {
+          return Promise.resolve(result)
+        })
+    })
   }
 
-  async purge (urls) {
+  purge (urls) {
     if (typeof urls === 'string') {
       urls = [urls]
     }
-    try {
-      const headers = sign.getPurgeHeaderSign(this.bucket, urls)
-      const {data} = await axios.post(
-        'http://purge.upyun.com/purge/',
-        'purge=' + urls.join('\n'), {
-        headers
-      })
+    const headers = sign.getPurgeHeaderSign(this.bucket, urls)
+    return axios.post(
+      'http://purge.upyun.com/purge/',
+      'purge=' + urls.join('\n'), {
+      headers
+    }).then(({data}) => {
       if(Object.keys(data.invalid_domain_of_url).length === 0) {
         return true
       } else {
         throw new Error('some url purge failed ' + data.invalid_domain_of_url.join(' '))
       }
-    } catch (err) {
+    }, (err) => {
       throw new Error('upyun - request failed: ' + err.message)
-    }
-
+    })
   }
 }
 

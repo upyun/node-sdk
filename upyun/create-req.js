@@ -5,13 +5,15 @@ export default function (endpoint, bucket, getHeaderSign) {
     baseURL: endpoint + '/' + bucket.bucketName
   })
 
-  req.interceptors.request.use(async (config) => {
+  req.interceptors.request.use((config) => {
     let method = config.method.toUpperCase()
     config.url = encodeURI(config.url)
     let path = config.url.substring(config.baseURL.length)
 
-    config.headers.common = await getHeaderSign(bucket, method, path)
-    return config
+    return getHeaderSign(bucket, method, path).then((headers) => {
+      config.headers.common = headers
+      return Promise.resolve(config)
+    })
   }, error => {
     throw new Error('upyun - request failed: ' + error.message)
   })

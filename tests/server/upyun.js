@@ -10,7 +10,8 @@ const fixtures = path.join(__dirname, '../fixtures')
 
 const client = new Upyun(new Bucket('sdkimg', 'tester', 'grjxv2mxELR3'))
 
-describe('index', () => {
+describe('index', function () {
+  this.timeout(10000)
   describe('#usage', () => {
     it('should get usage success', async () => {
       let data = await client.usage()

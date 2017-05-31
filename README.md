@@ -43,7 +43,7 @@ $ npm run test
 
 ### 初始化
 ```js
-const upyun = new Upyun.Client(bucket[, options][, getHeaderSignCallback])
+const upyun = new upyun.Client(bucket[, options][, getHeaderSignCallback])
 ```
 
 **参数**
@@ -59,8 +59,8 @@ const upyun = new Upyun.Client(bucket[, options][, getHeaderSignCallback])
 - 服务端使用，一般只需要配置完整又拍云服务信息（服务名、操作员名、操作员密码）即可：
 
 ```js
-const bucket = new Upyun.Bucket('your bucket name', 'your operator name', 'your operator password')
-const upyun = new Upyun.Client(bucket);
+const bucket = new upyun.Bucket('your bucket name', 'your operator name', 'your operator password')
+const upyun = new upyun.Client(bucket);
 ```
 
 - 客户端使用，必须设置签名回调函数，又拍云服务信息只需服务名即可
@@ -76,8 +76,8 @@ function getSignHeader(bucket, method, path) {
   // 可以参考该项目 sample 目录中的示例代码
   ...
 }
-const bucket = new Upyun.Bucket('your bucket name')
-const upyun = new Upyun.Client(bucket, getSignHeader);
+const bucket = new upyun.Bucket('your bucket name')
+const upyun = new upyun.Client(bucket, getSignHeader);
 ```
 
 ### usage(path = '/')

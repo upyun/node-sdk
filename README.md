@@ -14,7 +14,7 @@ upyun js sdk, 支持服务端和客户端使用，集成：
 
 ## npm
 ```
-$ npm install upyun --save
+$ npm install upyun --production --save
 ```
 
 ## cdn

@@ -3,13 +3,7 @@
   * (c) 2017
   * @license MIT
   */
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('axios')) :
-	typeof define === 'function' && define.amd ? define(['axios'], factory) :
-	(global.upyun = factory(global.axios));
-}(this, (function (axios) { 'use strict';
-
-axios = 'default' in axios ? axios['default'] : axios;
+import axios from 'axios';
 
 var createReq = function (endpoint, bucket, getHeaderSign) {
   var req = axios.create({
@@ -1303,6 +1297,4 @@ var index = {
   Bucket: Bucket
 };
 
-return index;
-
-})));
+export default index;

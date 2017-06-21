@@ -19,7 +19,7 @@ client.setBodySignCallback((ignore, params) => {
   return Promise.resolve(sign.getPolicyAndAuthorization(bucket, params))
 })
 
-describe('index', function () => {
+describe('index', function () {
   this.timeout(10000)
   describe('#blockUpload', () => {
     it('should upload file success', async () => {

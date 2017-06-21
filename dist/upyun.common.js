@@ -1,5 +1,5 @@
 /**
-  * UPYUN js-sdk 3.0.0
+  * UPYUN js-sdk 3.0.1
   * (c) 2017
   * @license MIT
   */
@@ -124,7 +124,8 @@ var name = "upyun";
 var version = "3.0.0";
 var description = "UPYUN js sdk";
 var main = "dist/upyun.common.js";
-var scripts = { "build": "node build/build.js", "test": "npm run test:server && npm run test:client", "test:client": "./node_modules/.bin/karma start tests/karma.conf.js", "test:server": "./node_modules/.bin/mocha --compilers js:babel-register tests/server/*" };
+var module$1 = "dist/upyun.esm.js";
+var scripts = { "build": "node build/build.js", "test": "npm run test:server && npm run test:client", "test:client": "karma start tests/karma.conf.js", "test:server": "mocha --compilers js:babel-register tests/server/*" };
 var repository = { "type": "git", "url": "git@github.com:upyun/node-sdk.git" };
 var keywords = ["upyun", "js", "nodejs", "sdk", "cdn", "cloud", "storage"];
 var author = "Leigh";
@@ -135,12 +136,12 @@ var contributors = [{ "name": "yejingx", "email": "yejingx@gmail.com" }, { "name
 var devDependencies = { "babel-cli": "^6.24.1", "babel-loader": "^7.0.0", "babel-plugin-external-helpers": "^6.22.0", "babel-plugin-transform-runtime": "^6.23.0", "babel-preset-env": "^1.4.0", "babel-register": "^6.24.1", "chai": "^3.5.0", "istanbul": "^0.4.3", "karma": "^1.7.0", "karma-chrome-launcher": "^2.1.1", "karma-mocha": "^1.3.0", "karma-sourcemap-loader": "^0.3.7", "karma-webpack": "^2.0.3", "mocha": "^3.4.1", "rollup": "^0.41.6", "rollup-plugin-alias": "^1.3.1", "rollup-plugin-babel": "^2.7.1", "rollup-plugin-commonjs": "^8.0.2", "rollup-plugin-json": "^2.1.1", "rollup-plugin-node-resolve": "^3.0.0", "should": "^9.0.2", "uglify-js": "^3.0.11", "webpack": "^2.5.1" };
 var dependencies = { "axios": "^0.16.1", "base-64": "^0.1.0", "form-data": "^2.1.4", "hmacsha1": "^1.0.0", "md5": "^2.2.1", "mime-types": "^2.1.15" };
 var browser = { "./upyun/utils.js": "./upyun/browser-utils.js", "./upyun/form-upload.js": "./upyun/browser-form-upload.js" };
-var peerDependencies = { "babel-polyfill": "^6.23.0" };
 var pkg = {
 	name: name,
 	version: version,
 	description: description,
 	main: main,
+	module: module$1,
 	scripts: scripts,
 	repository: repository,
 	keywords: keywords,
@@ -151,8 +152,7 @@ var pkg = {
 	contributors: contributors,
 	devDependencies: devDependencies,
 	dependencies: dependencies,
-	browser: browser,
-	peerDependencies: peerDependencies
+	browser: browser
 };
 
 /**

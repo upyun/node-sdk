@@ -13,7 +13,6 @@ const cjs = require('rollup-plugin-commonjs')
 const json = require('rollup-plugin-json')
 const node = require('rollup-plugin-node-resolve')
 const pkg = require('../package.json')
-const alias = require('rollup-plugin-alias')
 const resolve = _path => path.resolve(__dirname, _path)
 const version = process.env.VERSION || pkg.version
 
@@ -42,6 +41,12 @@ build([
     isBrowser: true,
     external: ['axios'],
     env: 'production'
+  },
+  {
+    dest: resolve('../dist/upyun.esm.js'),
+    format: 'es',
+    isBrowser: true,
+    external: ['axios']
   },
   {
     dest: resolve('../dist/upyun.common.js'),

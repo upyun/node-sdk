@@ -3,6 +3,7 @@
   "version": "3.0.0",
   "description": "UPYUN js sdk",
   "main": "dist/upyun.common.js",
+  "module": "dist/upyun.esm.js",
   "scripts": {
     "build": "node build/build.js",
     "test": "npm run test:server && npm run test:client",

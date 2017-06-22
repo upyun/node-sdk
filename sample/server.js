@@ -17,7 +17,8 @@ http.createServer(function(req, res) {
     const headSign = upyun.sign.getHeaderSign(bucket, query.method, query.path)
     res.end(JSON.stringify(headSign))
   } else {
-    res.statusCode(404)
+    res.writeHead(404)
+    res.end()
   }
 }).listen(3000)
 

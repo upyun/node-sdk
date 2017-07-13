@@ -43,7 +43,7 @@ $ npm run test
 
 ### 初始化
 ```js
-const upyun = new upyun.Client(bucket[, options][, getHeaderSignCallback])
+const client = new upyun.Client(bucket[, options][, getHeaderSignCallback])
 ```
 
 **参数**
@@ -60,7 +60,7 @@ const upyun = new upyun.Client(bucket[, options][, getHeaderSignCallback])
 
 ```js
 const bucket = new upyun.Bucket('your bucket name', 'your operator name', 'your operator password')
-const upyun = new upyun.Client(bucket);
+const client = new upyun.Client(bucket);
 ```
 
 - 客户端使用，必须设置签名回调函数，又拍云服务信息只需服务名即可（注意：**如果回调函数是异步，则必须返回一个 Promise**）
@@ -77,7 +77,7 @@ function getSignHeader(bucket, method, path) {
   ...
 }
 const bucket = new upyun.Bucket('your bucket name')
-const upyun = new upyun.Client(bucket, getSignHeader);
+const client = new upyun.Client(bucket, getSignHeader);
 ```
 
 ### usage(path = '/')
@@ -91,7 +91,7 @@ const upyun = new upyun.Client(bucket, getSignHeader);
 **示例**
 
 ```
-upyun.usage('/sub/dir').then(function(size) {
+client.usage('/sub/dir').then(function(size) {
   console.log('/sub/dir total used size: ' + size)
 })
 ```
@@ -210,7 +210,7 @@ upyun.usage('/sub/dir').then(function(size) {
 
 获取文件内容
 ```js
-upyun.getFile('/sample.txt').then(function (content) {
+client.getFile('/sample.txt').then(function (content) {
   console.log(content) // will out put file content directly
 })
 ```
@@ -218,7 +218,7 @@ upyun.getFile('/sample.txt').then(function (content) {
 写入其他流
 ```js
 const saveTo = fs.createWriteStream('./localSample.txt')
-upyun.getFile('/sample.txt', saveTo).then(function (stream) {
+client.getFile('/sample.txt', saveTo).then(function (stream) {
   // file has been saved to localSample.txt
   // you can pipe the stream to anywhere you want
 })

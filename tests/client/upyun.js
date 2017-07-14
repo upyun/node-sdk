@@ -39,7 +39,7 @@ describe('index', function () {
       const f = new Blob(['text'], {type: 'text/plain'})
       f.name = 'testFormUpload.txt'
       const result = await client.formPutFile('/testFormUpload.txt', f)
-      expect(result).to.equal(true)
+      expect(result.code).to.equal(200)
     })
   })
 })

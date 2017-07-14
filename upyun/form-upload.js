@@ -11,7 +11,27 @@ export default function formUpload (remoteUrl, localFile, {authorization, policy
         return reject(err)
       }
 
-      return resolve(res.statusCode === 200)
+      if (res.statusCode !== 200) {
+        return false
+      }
+
+      let body = []
+      res.on('data', (chunk) => {
+        body.push(chunk)
+      })
+      res.on('end', () => {
+        body = Buffer.concat(body).toString('utf8')
+        try {
+          const data = JSON.parse(body)
+          return resolve(data)
+        } catch (err) {
+          return reject(err)
+        }
+      })
+
+      res.on('error', (err) => {
+        reject(err)
+      })
     })
   })
 }

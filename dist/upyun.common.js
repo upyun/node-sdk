@@ -1,5 +1,5 @@
 /**
-  * UPYUN js-sdk 3.0.1
+  * UPYUN js-sdk 3.1.0
   * (c) 2017
   * @license MIT
   */
@@ -115,13 +115,33 @@ function formUpload(remoteUrl, localFile, _ref) {
         return reject(err);
       }
 
-      return resolve(res.statusCode === 200);
+      if (res.statusCode !== 200) {
+        return false;
+      }
+
+      var body = [];
+      res.on('data', function (chunk) {
+        body.push(chunk);
+      });
+      res.on('end', function () {
+        body = Buffer.concat(body).toString('utf8');
+        try {
+          var _data = JSON.parse(body);
+          return resolve(_data);
+        } catch (err) {
+          return reject(err);
+        }
+      });
+
+      res.on('error', function (err) {
+        reject(err);
+      });
     });
   });
 }
 
 var name = "upyun";
-var version = "3.0.0";
+var version = "3.0.1";
 var description = "UPYUN js sdk";
 var main = "dist/upyun.common.js";
 var module$1 = "dist/upyun.esm.js";

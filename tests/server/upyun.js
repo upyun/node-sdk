@@ -186,7 +186,7 @@ describe('index', function () {
   describe('#formUpload', () => {
     it('should upload file success', async () => {
       const result = await client.formPutFile('/testFormUpload.jpg', fs.createReadStream(fixtures + '/cat.jpg'))
-      expect(result).to.equal(true)
+      expect(result.code).to.equal(200)
     })
 
     it('should convert amr to mp3 success when upload amr file', async () => {
@@ -205,7 +205,7 @@ describe('index', function () {
         fs.createReadStream(fixtures + '/example.amr'),
         options
       )
-      expect(result).to.equal(true)
+      expect(result.code).to.equal(200)
     })
   })
 

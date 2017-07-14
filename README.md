@@ -237,7 +237,7 @@ client.getFile('/sample.txt', saveTo).then(function (stream) {
 
 **响应**
 
-成功返回 `true`，失败返回 `false`
+成功返回一个对象，详细说明见[异步通知规则](http://docs.upyun.com/api/form_api/#notify_return)参数说明部分，失败返回 `false`
 
 ## Bucket
 

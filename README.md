@@ -43,41 +43,41 @@ $ npm run test
 
 ### 初始化
 ```js
-const client = new upyun.Client(bucket[, options][, getHeaderSignCallback])
+const client = new upyun.Client(service[, options][, getHeaderSignCallback])
 ```
 
 **参数**
 
-- `bucket`: 又拍云服务（空间），Bucket 实例: `new upyun.Bucket({bucketName: 'your bucket name', operatorName: 'your operator name', password: 'your operator password'})`
+- `service`: 又拍云服务，Service 实例: `new upyun.Service({serviceName: 'your service name', operatorName: 'your operator name', password: 'your operator password'})`
 - `options`: 配置项，可以配置以下参数
   - `domain`: 又拍云 rest api 地址，默认 `v0.api.upyun.com` 其他可配置域名见又拍云[文档](http://docs.upyun.com/api/rest_api/)
   - `protocol`: 使用 `http|https` 协议，默认 `https` 协议
-- `getHeaderSignCallback`: 获取又拍云 HTTP Header 签名回调函数，服务端使用时不需要设置该参数。客户端使用必须设置该回调函数，它接受三个参数：`bucket, method, path`，用于计算当前请求签名
+- `getHeaderSignCallback`: 获取又拍云 HTTP Header 签名回调函数，服务端使用时不需要设置该参数。客户端使用必须设置该回调函数，它接受三个参数：`service, method, path`，用于计算当前请求签名
 
 **示例**
 
 - 服务端使用，一般只需要配置完整又拍云服务信息（服务名、操作员名、操作员密码）即可：
 
 ```js
-const bucket = new upyun.Bucket('your bucket name', 'your operator name', 'your operator password')
-const client = new upyun.Client(bucket);
+const service = new upyun.Service('your service name', 'your operator name', 'your operator password')
+const client = new upyun.Client(service);
 ```
 
 - 客户端使用，必须设置签名回调函数，又拍云服务信息只需服务名即可（注意：**如果回调函数是异步，则必须返回一个 Promise**）
 
 ```js
 /**
- *@param bucket: Bucket 实例
+ *@param service: Service 实例
  *@param method: 当前请求的 API 使用的方法
  *@param path: 当前请求的资源路径
  */
-function getSignHeader(bucket, method, path) {
+function getSignHeader(service, method, path) {
   // 请求自己的服务器，计算当前 api 请求签名信息
   // 可以参考该项目 sample 目录中的示例代码
   ...
 }
-const bucket = new upyun.Bucket('your bucket name')
-const client = new upyun.Client(bucket, getSignHeader);
+const service = new upyun.Service('your service name')
+const client = new upyun.Client(service, getSignHeader);
 ```
 
 ### usage(path = '/')
@@ -167,7 +167,7 @@ client.usage('/sub/dir').then(function(size) {
 `HEAD` 请求，获取文件基本信息
 
 **参数**
-- `remotePath`: 文件在又拍云服务（空间）的路径
+- `remotePath`: 文件在又拍云云存储服务的路径
 
 **响应**
 
@@ -233,17 +233,17 @@ client.getFile('/sample.txt', saveTo).then(function (stream) {
 
 - `remotePath`: 保存路径
 - `localFile`: 需要上传的文件，和 `putFile` 相同
-- `params`: 又拍云表单 api 支持的可选参数（`save-key` `bucket` 两个必选参数不需要手动在这里设置）
+- `params`: 又拍云表单 api 支持的可选参数（`save-key` `service` 两个必选参数不需要手动在这里设置）
 
 **响应**
 
 成功返回一个对象，详细说明见[异步通知规则](http://docs.upyun.com/api/form_api/#notify_return)参数说明部分，失败返回 `false`
 
-## Bucket
+## Service
 
 又拍云服务，包含以下属性
 
-- `bucketName` 服务名（空间名）
+- `serviceName` 服务名
 - `operatorName` 操作员名
 - `password` 操作员密码，读取该属性时，获取的值是 md5 加密后的结果
 

@@ -1,8 +1,8 @@
 import axios from 'axios'
 
-export default function (endpoint, bucket, getHeaderSign) {
+export default function (endpoint, service, getHeaderSign) {
   const req = axios.create({
-    baseURL: endpoint + '/' + bucket.bucketName
+    baseURL: endpoint + '/' + service.serviceName
   })
 
   req.interceptors.request.use((config) => {
@@ -10,7 +10,7 @@ export default function (endpoint, bucket, getHeaderSign) {
     config.url = encodeURI(config.url)
     let path = config.url.substring(config.baseURL.length)
 
-    return getHeaderSign(bucket, method, path).then((headers) => {
+    return getHeaderSign(service, method, path).then((headers) => {
       config.headers.common = headers
       return Promise.resolve(config)
     })

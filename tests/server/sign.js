@@ -3,13 +3,13 @@
 import md5 from 'md5'
 import { expect } from 'chai'
 import sign from '../../upyun/sign'
-import Bucket from '../../upyun/bucket'
+import Service from '../../upyun/service'
 
 describe('sign', () => {
-  const bucket = new Bucket('sdkimg', 'operator', 'password')
+  const service = new Service('sdkimg', 'operator', 'password')
   describe('#genSign', () => {
     it('should gen sign success', () => {
-      const str = sign.genSign(bucket, {
+      const str = sign.genSign(service, {
         method: 'POST',
         path: '/bucket'
       })

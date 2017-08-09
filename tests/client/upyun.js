@@ -2,21 +2,22 @@
 
 import { expect } from 'chai'
 import Upyun from '../../upyun/upyun'
-import Bucket from '../../upyun/bucket'
+import Service from '../../upyun/service'
 import sign from '../../upyun/sign'
 
-const bucket = new Bucket('sdkimg', 'tester', 'grjxv2mxELR3')
+
+const service = new Service('sdkimg', 'tester', 'grjxv2mxELR3')
 function getHeaderSign (ignore, method, path) {
-  const headers = sign.getHeaderSign(bucket, method, path)
+  const headers = sign.getHeaderSign(service, method, path)
   return Promise.resolve(headers)
 }
 
 const client = new Upyun({
-  bucketName: 'sdkimg'
+  serviceName: 'sdkimg'
 }, getHeaderSign)
 
 client.setBodySignCallback((ignore, params) => {
-  return Promise.resolve(sign.getPolicyAndAuthorization(bucket, params))
+  return Promise.resolve(sign.getPolicyAndAuthorization(service, params))
 })
 
 describe('index', function () {

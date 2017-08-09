@@ -6,15 +6,15 @@ import sign from './sign'
 
 export default class Upyun {
   /**
-   * @param {object} bucket - a instance of Bucket class
+   * @param {object} service - a instance of Service class
    * @param {object} params - optional params
    * @param {callback} getHeaderSign - callback function to get header sign
    */
-  constructor (bucket, params = {}, getHeaderSign = null) {
+  constructor (service, params = {}, getHeaderSign = null) {
     const isBrowser = typeof window !== 'undefined'
 
-    if (typeof bucket.bucketName === 'undefined') {
-      throw new Error('upyun - must config bucketName')
+    if (typeof service.serviceName === 'undefined') {
+      throw new Error('upyun - must config serviceName')
     }
 
     if (typeof params === 'function') {
@@ -27,8 +27,8 @@ export default class Upyun {
     }
 
     if (!isBrowser && (
-        typeof bucket.operatorName === 'undefined' ||
-        typeof bucket.password === 'undefined'
+        typeof service.operatorName === 'undefined' ||
+        typeof service.password === 'undefined'
       )) {
       throw new Error('upyun - must config operateName and password in server side')
     }
@@ -40,16 +40,23 @@ export default class Upyun {
     }, params)
     this.endpoint = config.protocol + '://' + config.domain
 
-    this.req = createReq(this.endpoint, bucket, getHeaderSign || defaultGetHeaderSign)
-    this.bucket = bucket
-    if (!isBrowser)  {
+    this.req = createReq(this.endpoint, service, getHeaderSign || defaultGetHeaderSign)
+    // NOTE this will be removed
+    this.bucket = service
+    this.service = service
+    if (!isBrowser) {
       this.setBodySignCallback(sign.getPolicyAndAuthorization)
     }
   }
 
+  setService (service) {
+    this.service = service
+    this.req.defaults.baseURL = this.endpoint + '/' + service.serviceName
+  }
+
+  // NOTE this will be removed
   setBucket (bucket) {
-    this.bucket = bucket
-    this.req.defaults.baseURL = this.endpoint + '/' + this.bucketName
+    return this.setService(bucket)
   }
 
   setBodySignCallback (getBodySign) {
@@ -326,15 +333,15 @@ export default class Upyun {
       throw new Error('upyun - must setBodySignCallback first!')
     }
 
-    params['bucket'] = this.bucket.bucketName
+    params['service'] = this.service.serviceName
     params['save-key'] = remotePath
-    let result = this.bodySignCallback(this.bucket, params)
+    let result = this.bodySignCallback(this.service, params)
     if (typeof result.then !== 'function') {
       result = Promise.resolve(result)
     }
 
     return result.then((bodySign) => {
-      return formUpload(this.endpoint + '/' + params['bucket'], localFile, bodySign)
+      return formUpload(this.endpoint + '/' + params['service'], localFile, bodySign)
         .then((result) => {
           return Promise.resolve(result)
         })
@@ -345,13 +352,14 @@ export default class Upyun {
     if (typeof urls === 'string') {
       urls = [urls]
     }
-    const headers = sign.getPurgeHeaderSign(this.bucket, urls)
+    const headers = sign.getPurgeHeaderSign(this.service, urls)
     return axios.post(
       'http://purge.upyun.com/purge/',
       'purge=' + urls.join('\n'), {
-      headers
-    }).then(({data}) => {
-      if(Object.keys(data.invalid_domain_of_url).length === 0) {
+        headers
+      }
+    ).then(({data}) => {
+      if (Object.keys(data.invalid_domain_of_url).length === 0) {
         return true
       } else {
         throw new Error('some url purge failed ' + data.invalid_domain_of_url.join(' '))
@@ -366,7 +374,7 @@ function isMeta (key) {
   return key.indexOf('x-upyun-meta-') === 0
 }
 
-function defaultGetHeaderSign (bucket, method, path) {
-  const headers = sign.getHeaderSign(bucket, method, path)
+function defaultGetHeaderSign (service, method, path) {
+  const headers = sign.getHeaderSign(service, method, path)
   return Promise.resolve(headers)
 }

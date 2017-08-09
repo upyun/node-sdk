@@ -2,10 +2,11 @@
 
 import Client from './upyun/upyun'
 import sign from './upyun/sign'
-import Bucket from './upyun/bucket'
+import Service from './upyun/service'
 
 export default {
   Client,
   sign,
-  Bucket
+  Bucket: Service,
+  Service
 }

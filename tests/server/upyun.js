@@ -2,13 +2,13 @@
 
 import { expect } from 'chai'
 import Upyun from '../../upyun/upyun'
-import Bucket from '../../upyun/bucket'
+import Service from '../../upyun/service'
 import fs from 'fs'
 import path from 'path'
 
 const fixtures = path.join(__dirname, '../fixtures')
 
-const client = new Upyun(new Bucket('sdkimg', 'tester', 'grjxv2mxELR3'))
+const client = new Upyun(new Service('sdkimg', 'tester', 'grjxv2mxELR3'))
 
 describe('index', function () {
   this.timeout(10000)

@@ -1,13 +1,13 @@
 /**
-  * UPYUN js-sdk 3.1.1
+  * UPYUN js-sdk 3.2.0
   * (c) 2017
   * @license MIT
   */
 import axios from 'axios';
 
-var createReq = function (endpoint, bucket, getHeaderSign) {
+var createReq = function (endpoint, service, getHeaderSign) {
   var req = axios.create({
-    baseURL: endpoint + '/' + bucket.bucketName
+    baseURL: endpoint + '/' + service.serviceName
   });
 
   req.interceptors.request.use(function (config) {
@@ -15,7 +15,7 @@ var createReq = function (endpoint, bucket, getHeaderSign) {
     config.url = encodeURI(config.url);
     var path = config.url.substring(config.baseURL.length);
 
-    return getHeaderSign(bucket, method, path).then(function (headers) {
+    return getHeaderSign(service, method, path).then(function (headers) {
       config.headers.common = headers;
       return Promise.resolve(config);
     });
@@ -303,7 +303,7 @@ var base64 = createCommonjsModule(function (module, exports) {
 });
 
 var name = "upyun";
-var version = "3.1.0";
+var version = "3.1.1";
 var description = "UPYUN js sdk";
 var main = "dist/upyun.common.js";
 var module$1 = "dist/upyun.esm.js";
@@ -657,16 +657,16 @@ var md5 = createCommonjsModule(function (module) {
 
 /**
  * generate head sign
- * @param {object} bucket
+ * @param {object} service
  * @param {string} path - storage path on upyun server, e.g: /your/dir/example.txt
  * @param {string} contentMd5 - md5 of the file that will be uploaded
  */
-function getHeaderSign(bucket, method, path) {
+function getHeaderSign(service, method, path) {
   var contentMd5 = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
   var date = new Date().toGMTString();
-  path = '/' + bucket.bucketName + path;
-  var sign = genSign(bucket, {
+  path = '/' + service.serviceName + path;
+  var sign = genSign(service, {
     method: method,
     path: path,
     date: date,
@@ -681,10 +681,10 @@ function getHeaderSign(bucket, method, path) {
 
 /**
  * generate signature string which can be used in head sign or body sign
- * @param {object} bucket
+ * @param {object} service
  * @param {object} options - must include key is method, path
  */
-function genSign(bucket, options) {
+function genSign(service, options) {
   var method = options.method,
       path = options.path;
 
@@ -699,17 +699,17 @@ function genSign(bucket, options) {
   });
 
   // hmacsha1 return base64 encoded string
-  var sign = index$1(bucket.password, data.join('&'));
-  return 'UPYUN ' + bucket.operatorName + ':' + sign;
+  var sign = index$1(service.password, data.join('&'));
+  return 'UPYUN ' + service.operatorName + ':' + sign;
 }
 
 /**
  * get policy and authorization for form api
- * @param {object} bucket
+ * @param {object} service
  * @param {object} - other optional params @see http://docs.upyun.com/api/form_api/#_2
  */
-function getPolicyAndAuthorization(bucket, params) {
-  params['bucket'] = bucket.bucketName;
+function getPolicyAndAuthorization(service, params) {
+  params['service'] = service.serviceName;
   if (typeof params['save-key'] === 'undefined') {
     throw new Error('upyun - calclate body sign need save-key');
   }
@@ -720,9 +720,9 @@ function getPolicyAndAuthorization(bucket, params) {
   }
 
   var policy = base64.encode(JSON.stringify(params));
-  var authorization = genSign(bucket, {
+  var authorization = genSign(service, {
     method: 'POST',
-    path: '/' + bucket.bucketName,
+    path: '/' + service.serviceName,
     policy: policy
   });
   return {
@@ -731,13 +731,13 @@ function getPolicyAndAuthorization(bucket, params) {
   };
 }
 
-function getPurgeHeaderSign(bucket, urls) {
+function getPurgeHeaderSign(service, urls) {
   var date = new Date().toGMTString();
   var str = urls.join('\n');
-  var sign = md5(str + '&' + bucket.bucketName + '&' + date + '&' + bucket.password);
+  var sign = md5(str + '&' + service.serviceName + '&' + date + '&' + service.password);
 
   return {
-    'Authorization': 'UpYun ' + bucket.bucketName + ':' + bucket.operatorName + ':' + sign,
+    'Authorization': 'UpYun ' + service.serviceName + ':' + service.operatorName + ':' + sign,
     'Date': date,
     'User-Agent': 'Js-Sdk/' + pkg.version
   };
@@ -840,19 +840,19 @@ var slicedToArray = function () {
 
 var Upyun = function () {
   /**
-   * @param {object} bucket - a instance of Bucket class
+   * @param {object} service - a instance of Service class
    * @param {object} params - optional params
    * @param {callback} getHeaderSign - callback function to get header sign
    */
-  function Upyun(bucket) {
+  function Upyun(service) {
     var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
     var getHeaderSign$$1 = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
     classCallCheck(this, Upyun);
 
     var isBrowser = typeof window !== 'undefined';
 
-    if (typeof bucket.bucketName === 'undefined') {
-      throw new Error('upyun - must config bucketName');
+    if (typeof service.serviceName === 'undefined') {
+      throw new Error('upyun - must config serviceName');
     }
 
     if (typeof params === 'function') {
@@ -864,7 +864,7 @@ var Upyun = function () {
       throw new Error('upyun - must config a callback function getHeaderSign in client side');
     }
 
-    if (!isBrowser && (typeof bucket.operatorName === 'undefined' || typeof bucket.password === 'undefined')) {
+    if (!isBrowser && (typeof service.operatorName === 'undefined' || typeof service.password === 'undefined')) {
       throw new Error('upyun - must config operateName and password in server side');
     }
     this.isBrowser = isBrowser;
@@ -875,18 +875,28 @@ var Upyun = function () {
     }, params);
     this.endpoint = config.protocol + '://' + config.domain;
 
-    this.req = createReq(this.endpoint, bucket, getHeaderSign$$1 || defaultGetHeaderSign);
-    this.bucket = bucket;
+    this.req = createReq(this.endpoint, service, getHeaderSign$$1 || defaultGetHeaderSign);
+    // NOTE this will be removed
+    this.bucket = service;
+    this.service = service;
     if (!isBrowser) {
       this.setBodySignCallback(sign.getPolicyAndAuthorization);
     }
   }
 
   createClass(Upyun, [{
+    key: 'setService',
+    value: function setService(service) {
+      this.service = service;
+      this.req.defaults.baseURL = this.endpoint + '/' + service.serviceName;
+    }
+
+    // NOTE this will be removed
+
+  }, {
     key: 'setBucket',
     value: function setBucket(bucket) {
-      this.bucket = bucket;
-      this.req.defaults.baseURL = this.endpoint + '/' + this.bucketName;
+      return this.setService(bucket);
     }
   }, {
     key: 'setBodySignCallback',
@@ -1239,15 +1249,15 @@ var Upyun = function () {
         throw new Error('upyun - must setBodySignCallback first!');
       }
 
-      params['bucket'] = this.bucket.bucketName;
+      params['service'] = this.service.serviceName;
       params['save-key'] = remotePath;
-      var result = this.bodySignCallback(this.bucket, params);
+      var result = this.bodySignCallback(this.service, params);
       if (typeof result.then !== 'function') {
         result = Promise.resolve(result);
       }
 
       return result.then(function (bodySign) {
-        return formUpload(_this2.endpoint + '/' + params['bucket'], localFile, bodySign).then(function (result) {
+        return formUpload(_this2.endpoint + '/' + params['service'], localFile, bodySign).then(function (result) {
           return Promise.resolve(result);
         });
       });
@@ -1258,7 +1268,7 @@ var Upyun = function () {
       if (typeof urls === 'string') {
         urls = [urls];
       }
-      var headers = sign.getPurgeHeaderSign(this.bucket, urls);
+      var headers = sign.getPurgeHeaderSign(this.service, urls);
       return axios.post('http://purge.upyun.com/purge/', 'purge=' + urls.join('\n'), {
         headers: headers
       }).then(function (_ref13) {
@@ -1281,17 +1291,19 @@ function isMeta(key) {
   return key.indexOf('x-upyun-meta-') === 0;
 }
 
-function defaultGetHeaderSign(bucket, method, path) {
-  var headers = sign.getHeaderSign(bucket, method, path);
+function defaultGetHeaderSign(service, method, path) {
+  var headers = sign.getHeaderSign(service, method, path);
   return Promise.resolve(headers);
 }
 
-var Bucket = function Bucket(bucketName) {
+var Service = function Service(serviceName) {
   var operatorName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
   var password = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
-  classCallCheck(this, Bucket);
+  classCallCheck(this, Service);
 
-  this.bucketName = bucketName;
+  // NOTE bucketName will be removed
+  this.bucketName = serviceName;
+  this.serviceName = this.bucketName;
   this.operatorName = operatorName;
   this.password = md5(password);
 };
@@ -1299,7 +1311,8 @@ var Bucket = function Bucket(bucketName) {
 var index = {
   Client: Upyun,
   sign: sign,
-  Bucket: Bucket
+  Bucket: Service,
+  Service: Service
 };
 
 export default index;

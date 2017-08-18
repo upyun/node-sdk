@@ -1,5 +1,5 @@
 /**
-  * UPYUN js-sdk 3.2.0
+  * UPYUN js-sdk 3.2.1
   * (c) 2017
   * @license MIT
   */
@@ -303,7 +303,7 @@ var base64 = createCommonjsModule(function (module, exports) {
 });
 
 var name = "upyun";
-var version = "3.1.1";
+var version = "3.2.0";
 var description = "UPYUN js sdk";
 var main = "dist/upyun.common.js";
 var module$1 = "dist/upyun.esm.js";
@@ -1069,7 +1069,15 @@ var Upyun = function () {
   }, {
     key: 'deleteFile',
     value: function deleteFile(remotePath) {
-      return this.req.delete(remotePath).then(function (_ref7) {
+      var isAsync = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+      var headers = {};
+      if (isAsync) {
+        headers['x-upyun-async'] = true;
+      }
+      return this.req.delete(remotePath, {
+        headers: headers
+      }).then(function (_ref7) {
         var status = _ref7.status;
 
         return Promise.resolve(status === 200);
@@ -1077,8 +1085,12 @@ var Upyun = function () {
     }
   }, {
     key: 'deleteDir',
-    value: function deleteDir(remotePath) {
-      return this.deleteFile(remotePath);
+    value: function deleteDir() {
+      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      return this.deleteFile.apply(this, args);
     }
   }, {
     key: 'getFile',

@@ -185,14 +185,20 @@ export default class Upyun {
     })
   }
 
-  deleteFile (remotePath) {
-    return this.req.delete(remotePath).then(({status}) => {
+  deleteFile (remotePath, isAsync = false) {
+    const headers = {}
+    if (isAsync) {
+      headers['x-upyun-async'] = true
+    }
+    return this.req.delete(remotePath, {
+      headers
+    }).then(({status}) => {
       return Promise.resolve(status === 200)
     })
   }
 
-  deleteDir (remotePath) {
-    return this.deleteFile(remotePath)
+  deleteDir (...args) {
+    return this.deleteFile.apply(this, args)
   }
 
   getFile (remotePath, saveStream = null) {

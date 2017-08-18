@@ -120,6 +120,12 @@ describe('index', function () {
       expect(result).to.equal(true)
     })
 
+    it('should async delete success', async () => {
+      await client.putFile('/async-path.txt', 'Dictum accumsan, convallis accumsan.')
+      let result = await client.deleteFile('/async-path.txt', true)
+      expect(result).to.equal(true)
+    })
+
     it('should get false when file not exist', async () => {
       let result = await client.deleteFile('/not-exist-path2333')
       expect(result).to.equal(false)

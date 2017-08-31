@@ -7,8 +7,8 @@ export default function (endpoint, service, getHeaderSign) {
 
   req.interceptors.request.use((config) => {
     let method = config.method.toUpperCase()
-    config.url = encodeURI(config.url)
     let path = config.url.substring(config.baseURL.length)
+    config.url = encodeURI(config.url);
 
     return getHeaderSign(service, method, path).then((headers) => {
       config.headers.common = headers

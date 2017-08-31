@@ -34,7 +34,7 @@ export function genSign (service, options) {
 
   const data = [
     method,
-    path
+    encodeURI(path)
   ];
 
   // optional params

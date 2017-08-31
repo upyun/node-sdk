@@ -21,7 +21,6 @@ export function getHeaderSign (service, method, path, contentMd5 = null) {
   return {
     'Authorization': sign,
     'X-Date': date,
-    'X-User-Agent': 'Js-Sdk/' + pkg.version
   }
 }
 

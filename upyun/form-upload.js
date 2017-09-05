@@ -5,7 +5,12 @@ export default function formUpload (remoteUrl, localFile, {authorization, policy
     const data = new FormData()
     data.append('authorization', authorization)
     data.append('policy', policy)
-    data.append('file', localFile)
+    // NOTE when type of localFile is buffer/string,
+    // force set filename=file, FormData will treat it as a file
+    // real filename will be set by save-key in policy
+    data.append('file', localFile, {
+      filename: 'file'
+    })
     data.submit(remoteUrl, (err, res) => {
       if (err) {
         return reject(err)

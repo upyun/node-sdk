@@ -1,5 +1,5 @@
 /**
-  * UPYUN js-sdk 3.2.5
+  * UPYUN js-sdk 3.2.6
   * (c) 2017
   * @license MIT
   */
@@ -146,7 +146,7 @@ function formUpload(remoteUrl, localFile, _ref) {
 }
 
 var name = "upyun";
-var version = "3.2.4";
+var version = "3.2.5";
 var description = "UPYUN js sdk";
 var main = "dist/upyun.common.js";
 var module$1 = "dist/upyun.esm.js";

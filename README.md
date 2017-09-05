@@ -232,7 +232,7 @@ client.getFile('/sample.txt', saveTo).then(function (stream) {
 **参数**
 
 - `remotePath`: 保存路径
-- `localFile`: 需要上传的文件，和 `putFile` 相同
+- `localFile`: 需要上传的文件，和 `putFile` 相同(**如果在浏览器端使用，只支持 String/Blob/File **)
 - `params`: 又拍云表单 api 支持的可选参数（`save-key` `service` 两个必选参数不需要手动在这里设置）
 
 **响应**

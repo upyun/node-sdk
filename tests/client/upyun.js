@@ -42,5 +42,18 @@ describe('index', function () {
       const result = await client.formPutFile('/testFormUpload.txt', f)
       expect(result.code).to.equal(200)
     })
+
+    it('should upload base64 encode file success', async () => {
+      const options = {
+        'content-type': 'text/plain',
+        'b64encoded': 'on',
+      }
+      const result = await client.formPutFile(
+        '/test-client-base64.txt',
+        'dGVzdCBiYXNlNjQgdXBsb2Fk',
+        options
+      )
+      expect(result.code).to.equal(200)
+    })
   })
 })

@@ -12,7 +12,7 @@ export default function formUpload (remoteUrl, localFile, {authorization, policy
       }
 
       if (res.statusCode !== 200) {
-        return false
+        return resolve(false)
       }
 
       let body = []

@@ -48,7 +48,7 @@ const client = new upyun.Client(service[, options][, getHeaderSignCallback])
 
 **参数**
 
-- `service`: 又拍云服务，Service 实例: `new upyun.Service({serviceName: 'your service name', operatorName: 'your operator name', password: 'your operator password'})`
+- `service`: 又拍云服务，Service 实例: `new upyun.Service('your service name', 'your operator name', 'your operator password')`
 - `options`: 配置项，可以配置以下参数
   - `domain`: 又拍云 rest api 地址，默认 `v0.api.upyun.com` 其他可配置域名见又拍云[文档](http://docs.upyun.com/api/rest_api/)
   - `protocol`: 使用 `http|https` 协议，默认 `https` 协议

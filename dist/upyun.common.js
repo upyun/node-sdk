@@ -1,5 +1,5 @@
 /**
-  * UPYUN js-sdk 3.2.6
+  * UPYUN js-sdk 3.3.0
   * (c) 2017
   * @license MIT
   */
@@ -146,7 +146,7 @@ function formUpload(remoteUrl, localFile, _ref) {
 }
 
 var name = "upyun";
-var version = "3.2.5";
+var version = "3.2.6";
 var description = "UPYUN js sdk";
 var main = "dist/upyun.common.js";
 var module$1 = "dist/upyun.esm.js";
@@ -454,10 +454,16 @@ var Upyun = function () {
           _ref2$iter = _ref2.iter,
           iter = _ref2$iter === undefined ? '' : _ref2$iter;
 
-      var requestHeaders = {
-        'x-list-limit': limit,
-        'x-list-order': order
-      };
+      var requestHeaders = {};
+
+      // NOTE: 默认值可以省去请求头设置，避免跨域影响
+      if (limit !== 100) {
+        requestHeaders['x-list-limit'] = limit;
+      }
+
+      if (order !== 'asc') {
+        requestHeaders['x-list-order'] = order;
+      }
 
       if (iter) {
         requestHeaders['x-list-iter'] = iter;
@@ -529,6 +535,11 @@ var Upyun = function () {
           headers[key] = options[key];
         }
       });
+
+      if (!headers['content-type']) {
+        var defaultType = 'application/octet-stream';
+        headers['content-type'] = mime.lookup(remotePath) || defaultType;
+      }
 
       return this.req.put(remotePath, localFile, {
         headers: headers

@@ -239,7 +239,7 @@ describe('index', function () {
     it('should get some url purge failed', async () => {
       const urls = ['http://zzzzzz.b0.upaiyun.com/a.txt', 'http://xxxx.b0.upaiyun.com/a.txt']
       try {
-        const result = await client.purge(urls)
+        await client.purge(urls)
       } catch (err) {
         expect(err.message).to.include('some url purge failed')
         return

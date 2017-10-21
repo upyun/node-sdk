@@ -4,6 +4,7 @@ import formUpload from './form-upload'
 import axios from 'axios'
 import sign from './sign'
 import mime from 'mime-types'
+import { isBrowser } from './constants'
 
 export default class Upyun {
   /**
@@ -12,8 +13,6 @@ export default class Upyun {
    * @param {callback} getHeaderSign - callback function to get header sign
    */
   constructor (service, params = {}, getHeaderSign = null) {
-    const isBrowser = typeof window !== 'undefined'
-
     if (typeof service.serviceName === 'undefined') {
       throw new Error('upyun - must config serviceName')
     }
@@ -33,7 +32,6 @@ export default class Upyun {
       )) {
       throw new Error('upyun - must config operateName and password in server side')
     }
-    this.isBrowser = isBrowser
 
     const config = Object.assign({
       domain: 'v0.api.upyun.com',
@@ -214,7 +212,7 @@ export default class Upyun {
   }
 
   getFile (remotePath, saveStream = null) {
-    if (saveStream && typeof window !== 'undefined') {
+    if (saveStream && isBrowser) {
       throw new Error('upyun - save as stream are only available on the server side.')
     }
 
@@ -283,8 +281,6 @@ export default class Upyun {
    * in server: type of fileOrPath is string: local file path
    */
   blockUpload (remotePath, fileOrPath, options = {}) {
-    const isBrowser = typeof window !== 'undefined'
-
     let fileSizePromise
     let contentType
     if (isBrowser) {

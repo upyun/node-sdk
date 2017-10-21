@@ -1,4 +1,17 @@
 import axios from 'axios'
+import { isBrowser } from './constants'
+
+const adapter = axios.defaults.adapter
+
+axios.defaults.adapter = (function () {
+  // NOTE: in electron environment, support http and xhr both, use http adapter first
+  if (isBrowser) {
+    return adapter
+  }
+
+  const http = require('axios/lib/adapters/http')
+  return http
+})()
 
 export default function (endpoint, service, getHeaderSign) {
   const req = axios.create({
@@ -8,7 +21,7 @@ export default function (endpoint, service, getHeaderSign) {
   req.interceptors.request.use((config) => {
     let method = config.method.toUpperCase()
     let path = config.url.substring(config.baseURL.length)
-    config.url = encodeURI(config.url);
+    config.url = encodeURI(config.url)
 
     return getHeaderSign(service, method, path).then((headers) => {
       config.headers.common = headers

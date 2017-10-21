@@ -5,7 +5,6 @@ import Upyun from '../../upyun/upyun'
 import Service from '../../upyun/service'
 import sign from '../../upyun/sign'
 
-
 const service = new Service('sdkimg', 'tester', 'grjxv2mxELR3')
 function getHeaderSign (ignore, method, path) {
   const headers = sign.getHeaderSign(service, method, path)

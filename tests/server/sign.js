@@ -1,6 +1,5 @@
 'use strict'
 
-import md5 from 'md5'
 import { expect } from 'chai'
 import sign from '../../upyun/sign'
 import Service from '../../upyun/service'

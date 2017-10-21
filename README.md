@@ -180,9 +180,9 @@ client.usage('/sub/dir').then(function(size) {
 
 ```js
 {
-  'file-type': 'file', // 文件类型
-  'file-size': 289239, // 文件大小
-  'file-date': 1486053098, // 文件创建时间
+  'type': 'file', // 文件类型
+  'size': 289239, // 文件大小
+  'date': 1486053098, // 文件创建时间
   'Content-Md5': '...'  // 文件 md5 值，该值可能不存在
 }
 ```

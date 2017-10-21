@@ -1,5 +1,5 @@
 /**
-  * UPYUN js-sdk 3.3.0
+  * UPYUN js-sdk 3.3.1
   * (c) 2017
   * @license MIT
   */
@@ -11,6 +11,22 @@
 
 axios = 'default' in axios ? axios['default'] : axios;
 path = 'default' in path ? path['default'] : path;
+
+// NOTE: choose node.js first
+// process is defined in client test
+var isBrowser = typeof window !== 'undefined' && (typeof process === 'undefined' || process.title === 'browser');
+
+var adapter = axios.defaults.adapter;
+
+axios.defaults.adapter = function () {
+  // NOTE: in electron environment, support http and xhr both, use http adapter first
+  if (isBrowser) {
+    return adapter;
+  }
+
+  var http = require('axios/lib/adapters/http');
+  return http;
+}();
 
 var createReq = function (endpoint, service, getHeaderSign) {
   var req = axios.create({
@@ -313,7 +329,7 @@ var base64 = createCommonjsModule(function (module, exports) {
 });
 
 var name = "upyun";
-var version = "3.2.6";
+var version = "3.3.0";
 var description = "UPYUN js sdk";
 var main = "dist/upyun.common.js";
 var module$1 = "dist/upyun.esm.js";
@@ -3053,8 +3069,6 @@ var Upyun = function () {
     var getHeaderSign$$1 = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
     classCallCheck(this, Upyun);
 
-    var isBrowser = typeof window !== 'undefined';
-
     if (typeof service.serviceName === 'undefined') {
       throw new Error('upyun - must config serviceName');
     }
@@ -3071,7 +3085,6 @@ var Upyun = function () {
     if (!isBrowser && (typeof service.operatorName === 'undefined' || typeof service.password === 'undefined')) {
       throw new Error('upyun - must config operateName and password in server side');
     }
-    this.isBrowser = isBrowser;
 
     var config = Object.assign({
       domain: 'v0.api.upyun.com',
@@ -3312,7 +3325,7 @@ var Upyun = function () {
     value: function getFile(remotePath) {
       var saveStream = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 
-      if (saveStream && typeof window !== 'undefined') {
+      if (saveStream && isBrowser) {
         throw new Error('upyun - save as stream are only available on the server side.');
       }
 
@@ -3396,8 +3409,6 @@ var Upyun = function () {
       var _this = this;
 
       var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-
-      var isBrowser = typeof window !== 'undefined';
 
       var fileSizePromise = void 0;
       var contentType$$1 = void 0;

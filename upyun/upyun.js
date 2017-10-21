@@ -73,9 +73,15 @@ export default class Upyun {
   }
 
   listDir (path = '/', {limit = 100, order = 'asc', iter = ''} = {}) {
-    const requestHeaders = {
-      'x-list-limit': limit,
-      'x-list-order': order
+    const requestHeaders = {}
+
+    // NOTE: 默认值可以省去请求头设置，避免跨域影响
+    if (limit !== 100) {
+      requestHeaders['x-list-limit'] = limit
+    }
+
+    if (order !== 'asc') {
+      requestHeaders['x-list-order'] = order
     }
 
     if (iter) {

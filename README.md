@@ -9,6 +9,11 @@ upyun js sdk, 支持服务端和客户端使用，集成：
 
 - 安全起见，浏览器端不能设置操作员账号名和密码
 - 服务端需要设置操作员账号名和密码
+- 浏览器端使用时，部分参数设置或方法调用会导致跨域失败问题
+    - `listDir` 设置 `limit | order | iter`
+    - `putFile` 设置 `Content-Type` 以外的其他选项
+    - `makeDir | updateMetadata | blockUpload` 无法在浏览器端使用
+    - `deleteFile` 无法再浏览器端使用异步删除
 
 # 安装
 

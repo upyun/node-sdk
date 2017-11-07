@@ -36,7 +36,7 @@ function imageFormSyncProcess() {
  */
 function imageRestSyncProcess() {
   // params 参数详见云处理，云存储参数说明文档
-  var params = { 'x-gmkerl-thumb': '/format/png', 'notify-url': notifyUrl }
+  var params = { 'x-gmkerl-thumb': '/fw/300/unsharp/true/quality/80/format/png', 'notify-url': notifyUrl }
   client.putFile(remoteFile, fs.createReadStream(localFile), params)
 }
 

@@ -25,7 +25,6 @@ const client = new Upyun(new Service(serviceName, operatorName, password))
  * 内容识别-图片上传预处理
  */
 function imageFormProcess() {
-  var res
   // params 参数详见人工智能，云存储参数说明文档
   var params = { 'apps': [{ 'name': 'imgaudit' }], 'notify-url': notifyUrl }
   client.formPutFile(remoteFile, fs.createReadStream(localFile), params)
@@ -35,7 +34,6 @@ function imageFormProcess() {
  * 内容识别-视频点播上传预处理
  */
 function videoFormProcess() {
-  var res
   // params 参数详见人工智能，云存储参数说明文档
   var params = { 'apps': [{ 'name': 'videoaudit' }], 'notify-url': notifyUrl }
   client.formPutFile(remoteFile, fs.createReadStream(localFile), params)

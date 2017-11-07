@@ -23,21 +23,16 @@ const saveAs = ''
 const client = new Upyun(new Service(serviceName, operatorName, password))
 
 /**
- * form同步图片上传预处理
+ * 同步图片上传预处理
  */
-function imageFormSyncProcess() {
+function imageFormSyncProcess(isForm) {
   // params 参数详见云处理，云存储参数说明文档
   var params = { 'x-gmkerl-thumb': '/format/png', 'notify-url': notifyUrl }
-  client.formPutFile(remoteFile, fs.createReadStream(localFile), params)
-}
-
-/**
- * rest同步图片上传预处理
- */
-function imageRestSyncProcess() {
-  // params 参数详见云处理，云存储参数说明文档
-  var params = { 'x-gmkerl-thumb': '/fw/300/unsharp/true/quality/80/format/png', 'notify-url': notifyUrl }
-  client.putFile(remoteFile, fs.createReadStream(localFile), params)
+  if (isForm) {
+    client.formPutFile(remoteFile, fs.createReadStream(localFile), params)
+  } else {
+    client.putFile(remoteFile, fs.createReadStream(localFile), params)
+  }
 }
 
 /**
@@ -67,7 +62,7 @@ function fileFormConvert() {
   client.formPutFile(remoteFile, fs.createReadStream(localFile), params)
 }
 
-imageFormSyncProcess()
+imageFormSyncProcess(true)
 imageRestSyncProcess()
 imageASyncProcess()
 videoFormProcess()

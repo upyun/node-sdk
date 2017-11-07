@@ -26,7 +26,6 @@ const client = new Upyun(new Service(serviceName, operatorName, password))
  * form同步图片上传预处理
  */
 function imageFormSyncProcess() {
-  var res
   // params 参数详见云处理，云存储参数说明文档
   var params = { 'x-gmkerl-thumb': '/format/png', 'notify-url': notifyUrl }
   client.formPutFile(remoteFile, fs.createReadStream(localFile), params)
@@ -36,7 +35,6 @@ function imageFormSyncProcess() {
  * rest同步图片上传预处理
  */
 function imageRestSyncProcess() {
-  var res
   // params 参数详见云处理，云存储参数说明文档
   var params = { 'x-gmkerl-thumb': '/format/png', 'notify-url': notifyUrl }
   client.putFile(remoteFile, fs.createReadStream(localFile), params)
@@ -46,7 +44,6 @@ function imageRestSyncProcess() {
  * 异步图片上传预处理
  */
 function imageASyncProcess() {
-  var res
   // params 参数详见云处理，云存储参数说明文档
   var params = { 'apps': [{ 'name': 'thumb', 'x-gmkerl-thumb': '/format/png', 'save_as': saveAs }], 'notify-url': notifyUrl }
   client.formPutFile(remoteFile, fs.createReadStream(localFile), params)
@@ -56,7 +53,6 @@ function imageASyncProcess() {
  * 异步音视频处理-上传预处理
  */
 function videoFormProcess() {
-  var res
   // params 参数详见云处理，云存储参数说明文档
   var params = { 'apps': [{ 'name': 'naga', 'type': 'video', 'avopts': '/s/128x96', 'save_as': saveAs }], 'notify-url': notifyUrl }
   client.formPutFile(remoteFile, fs.createReadStream(localFile), params)
@@ -66,7 +62,6 @@ function videoFormProcess() {
  * 文档转换-上传预处理
  */
 function fileFormConvert() {
-  var res
   // params 参数详见云处理，云存储参数说明文档
   var params = { 'apps': [{ 'name': 'uconvert', 'save_as': saveAs }], 'notify-url': notifyUrl }
   client.formPutFile(remoteFile, fs.createReadStream(localFile), params)

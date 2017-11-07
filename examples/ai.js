@@ -10,14 +10,14 @@ import Service from '../upyun/service'
 import fs from 'fs'
 
 // 需要填写自己的服务名，操作员名，密码，通知URL
-const serviceName = 'upyun-xiang-1'
-const operatorName = 'xiang1'
-const password = 'feixiang1218'
-const notifyUrl = 'http://101.132.47.61:12345/'
+const serviceName = ''
+const operatorName = ''
+const password = ''
+const notifyUrl = ''
 
 // 需要填写本地路劲，云存储路径
-const localFile = './test.jpg'
-const remoteFile = '/test.jpg'
+const localFile = ''
+const remoteFile = ''
 
 const client = new Upyun(new Service(serviceName, operatorName, password))
 

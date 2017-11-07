@@ -25,7 +25,7 @@ const client = new Upyun(new Service(serviceName, operatorName, password))
 /**
  * 同步图片上传预处理
  */
-function imageFormSyncProcess(isForm) {
+function imageSyncProcess(isForm) {
   // params 参数详见云处理，云存储参数说明文档
   var params = { 'x-gmkerl-thumb': '/format/png', 'notify-url': notifyUrl }
   if (isForm) {
@@ -62,8 +62,7 @@ function fileFormConvert() {
   client.formPutFile(remoteFile, fs.createReadStream(localFile), params)
 }
 
-imageFormSyncProcess(true)
-imageRestSyncProcess()
+imageSyncProcess(true)
 imageASyncProcess()
 videoFormProcess()
 fileFormConvert()

@@ -109,7 +109,7 @@ client.usage('/sub/dir').then(function(size) {
 
 - `remotePath`: 需要查看的目录路径
 - `options`:
-  - `limit`: 每次请求获取的目录最大列表，最大值 1000，默认 100
+  - `limit`: 每次请求获取的目录最大列表，最大值 10000，默认 100
   - `order`: 列表以文件最后修改时间排序，可选值 `asc|desc`，默认 `asc`
   - `iter`: 遍历起点，每次响应参数中，将会包含遍历下一页需要的 `iter` 值
 

@@ -21,9 +21,9 @@
 参数信息
 
 ```
-`localFile` 本地把文件路劲
+`localFile` 本地把文件路径
 
 `remoteFile` 云存储中的路径
 
-`saveAs` 云存储中另存为路劲
+`saveAs` 云存储中另存为路径
 ```

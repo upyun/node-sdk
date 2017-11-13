@@ -15,7 +15,7 @@ const operatorName = ''
 const password = ''
 const notifyUrl = ''
 
-// 需要填写本地路劲，云存储路径
+// 需要填写本地路径，云存储路径
 const localFile = ''
 const remoteFile = ''
 

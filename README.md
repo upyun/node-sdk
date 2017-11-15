@@ -137,7 +137,7 @@ client.usage('/sub/dir').then(function(size) {
 
 **参数**
 
-- `remotePath`: 文件保存路径（不需要 encodeURI，sdk 会统一处理）
+- `remotePath`: 文件保存路径 *需包含文件名*（**路径不需要 encodeURI，sdk 会统一处理**）
 - `localFile`: 需要上传的文件。服务端支持 `String | Stream | Buffer`, 浏览器端支持 `File | String` **注意 `String` 表示文件内容，不是本地文件路径**
 - `options`: 其他可选参数 `Content-MD5 | Content-Length | Content-Type | Content-Secret | x-gmkerl-thumb`（大小写无关，详见[上传参数](http://docs.upyun.com/api/rest_api/#_2)），其中 `Content-Type` 未设置时，将会根据文件路径设置默认值
 

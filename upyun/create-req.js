@@ -40,7 +40,7 @@ export default function (endpoint, service, getHeaderSign) {
       }
 
       if (response.status !== 404) {
-        throw new Error('upyun - response error: ' + response.data.code + ' ' + response.data.msg)
+        throw new Error('upyun - response error: ' + error.message)
       } else {
         return response
       }

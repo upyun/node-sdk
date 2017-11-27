@@ -3,7 +3,6 @@ import utils from './utils'
 import formUpload from './form-upload'
 import axios from 'axios'
 import sign from './sign'
-import mime from 'mime-types'
 import { isBrowser } from './constants'
 
 export default class Upyun {
@@ -138,11 +137,6 @@ export default class Upyun {
         headers[key] = options[key]
       }
     })
-
-    if (!headers['content-type']) {
-      const defaultType = 'application/octet-stream'
-      headers['content-type'] = mime.lookup(remotePath) || defaultType
-    }
 
     return this.req.put(remotePath, localFile, {
       headers

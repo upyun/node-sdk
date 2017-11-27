@@ -1,5 +1,5 @@
 /**
-  * UPYUN js-sdk 3.3.2
+  * UPYUN js-sdk 3.3.3
   * (c) 2017
   * @license MIT
   */
@@ -162,7 +162,7 @@ function formUpload(remoteUrl, localFile, _ref) {
 }
 
 var name = "upyun";
-var version = "3.3.1";
+var version = "3.3.2";
 var description = "UPYUN js sdk";
 var main = "dist/upyun.common.js";
 var module$1 = "dist/upyun.esm.js";
@@ -548,11 +548,6 @@ var Upyun = function () {
           headers[key] = options[key];
         }
       });
-
-      if (!headers['content-type']) {
-        var defaultType = 'application/octet-stream';
-        headers['content-type'] = mime.lookup(remotePath) || defaultType;
-      }
 
       return this.req.put(remotePath, localFile, {
         headers: headers

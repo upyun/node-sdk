@@ -1,6 +1,6 @@
 /**
-  * UPYUN js-sdk 3.3.3
-  * (c) 2017
+  * UPYUN js-sdk v3.3.4
+  * (c) 2018
   * @license MIT
   */
 import axios from 'axios';
@@ -23,7 +23,8 @@ axios.defaults.adapter = function () {
 
 var createReq = function (endpoint, service, getHeaderSign) {
   var req = axios.create({
-    baseURL: endpoint + '/' + service.serviceName
+    baseURL: endpoint + '/' + service.serviceName,
+    maxRedirects: 0
   });
 
   req.interceptors.request.use(function (config) {
@@ -322,7 +323,7 @@ var base64 = createCommonjsModule(function (module, exports) {
 });
 
 var name = "upyun";
-var version = "3.3.2";
+var version = "3.3.3";
 var description = "UPYUN js sdk";
 var main = "dist/upyun.common.js";
 var module$1 = "dist/upyun.esm.js";

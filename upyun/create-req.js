@@ -15,7 +15,8 @@ axios.defaults.adapter = (function () {
 
 export default function (endpoint, service, getHeaderSign) {
   const req = axios.create({
-    baseURL: endpoint + '/' + service.serviceName
+    baseURL: endpoint + '/' + service.serviceName,
+    maxRedirects: 0,
   })
 
   req.interceptors.request.use((config) => {

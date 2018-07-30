@@ -39,7 +39,10 @@ var createReq = function (endpoint, service, getHeaderSign) {
 
   req.interceptors.request.use(function (config) {
     var method = config.method.toUpperCase();
-    var path = config.url.substring(config.baseURL.length);
+    var path = config.url;
+    if (config.url.indexOf(config.baseURL) === 0) {
+      path = config.url.substring(config.baseURL.length);
+    }
     config.url = encodeURI(config.url);
 
     return getHeaderSign(service, method, path).then(function (headers) {
@@ -163,7 +166,7 @@ function formUpload(remoteUrl, localFile, _ref) {
 }
 
 var name = "upyun";
-var version = "3.3.3";
+var version = "3.3.4";
 var description = "UPYUN js sdk";
 var main = "dist/upyun.common.js";
 var module$1 = "dist/upyun.esm.js";

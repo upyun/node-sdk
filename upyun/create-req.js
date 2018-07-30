@@ -21,7 +21,10 @@ export default function (endpoint, service, getHeaderSign) {
 
   req.interceptors.request.use((config) => {
     let method = config.method.toUpperCase()
-    let path = config.url.substring(config.baseURL.length)
+    let path = config.url
+    if (config.url.indexOf(config.baseURL) === 0) {
+      path = config.url.substring(config.baseURL.length)
+    }
     config.url = encodeURI(config.url)
 
     return getHeaderSign(service, method, path).then((headers) => {

@@ -14,7 +14,7 @@
     var bucket = new upyun.Bucket('sdkimg')
     function getHeaderSign(bucket, method, path) {
       var params = 'bucket=' + bucket.bucketName + '&method=' + method + '&path=' + path
-      return fetch('http://localhost:3000/sign/head?' + params)
+      return fetch('/sign/head?' + params)
         .then(function(response) {
           if (response.status !== 200) {
             console.error('gen header sign faild!')

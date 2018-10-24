@@ -126,7 +126,7 @@ export default class Upyun {
    */
   putFile (remotePath, localFile, options = {}) {
     // optional params
-    const keys = ['Content-MD5', 'Content-Length', 'Content-Type', 'Content-Secret', 'x-gmkerl-thumb']
+    const keys = ['Content-MD5', 'Content-Length', 'Content-Type', 'Content-Secret', 'x-gmkerl-thumb', 'x-upyun-meta-ttl']
     let headers = {}
     keys.forEach(key => {
       const lower = key.toLowerCase()

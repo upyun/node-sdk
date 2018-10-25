@@ -1,5 +1,5 @@
 {
-  "name": "upyun-fork",
+  "name": "upyun-alfred",
   "version": "3.3.5",
   "description": "UPYUN js sdk",
   "main": "dist/upyun.common.js",
@@ -26,9 +26,9 @@
   "author": "Leigh",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/upyun/node-sdk/issues"
+    "url": "https://github.com/RifeWang/node-sdk/issues"
   },
-  "homepage": "https://github.com/upyun/node-sdk",
+  "homepage": "https://github.com/RifeWang/node-sdk",
   "contributors": [
     {
       "name": "yejingx",
@@ -45,6 +45,10 @@
     {
       "name": "Gaara",
       "email": "sabakugaara@users.noreply.github.com"
+    },
+    {
+      "name": "alfred",
+      "email": "rifewang@gmail.com"
     }
   ],
   "devDependencies": {

@@ -126,17 +126,21 @@ export default class Upyun {
    */
   putFile (remotePath, localFile, options = {}) {
     // optional params
-    const keys = ['Content-MD5', 'Content-Length', 'Content-Type', 'Content-Secret', 'x-gmkerl-thumb', 'x-upyun-meta-ttl']
+    const keys = ['Content-MD5', 'Content-Length', 'Content-Type', 'Content-Secret', 'x-gmkerl-thumb']
     let headers = {}
-    keys.forEach(key => {
-      const lower = key.toLowerCase()
-      const finded = options[key] || options[lower]
-      if (finded) {
-        headers[key] = finded
-      } else if (isMeta(key)) {
+    for (const key of Object.keys(options)) {
+      if (isMeta(key) && options[key]) {
         headers[key] = options[key]
+      } else {
+        keys.forEach(key => {
+          const lower = key.toLowerCase()
+          const finded = options[key] || options[lower]
+          if (finded) {
+            headers[key] = finded
+          }
+        })
       }
-    })
+    }
 
     return this.req.put(remotePath, localFile, {
       headers

@@ -1,6 +1,6 @@
 {
-  "name": "upyun",
-  "version": "3.3.4",
+  "name": "upyun-fork",
+  "version": "3.3.5",
   "description": "UPYUN js sdk",
   "main": "dist/upyun.common.js",
   "module": "dist/upyun.esm.js",
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:upyun/node-sdk.git"
+    "url": "git@github.com:RifeWang/node-sdk.git"
   },
   "keywords": [
     "upyun",

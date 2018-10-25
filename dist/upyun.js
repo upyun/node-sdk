@@ -1,5 +1,5 @@
 /**
-  * UPYUN js-sdk 3.3.4
+  * UPYUN js-sdk 3.3.5
   * (c) 2018
   * @license MIT
   */
@@ -331,13 +331,13 @@ var base64 = createCommonjsModule(function (module, exports) {
 }(commonjsGlobal));
 });
 
-var name = "upyun";
-var version = "3.3.4";
+var name = "upyun-fork";
+var version = "3.3.5";
 var description = "UPYUN js sdk";
 var main = "dist/upyun.common.js";
 var module$1 = "dist/upyun.esm.js";
 var scripts = { "build": "node build/build.js", "test": "npm run test:server && npm run test:client", "test:client": "karma start tests/karma.conf.js", "test:server": "mocha --compilers js:babel-register tests/server/*" };
-var repository = { "type": "git", "url": "git@github.com:upyun/node-sdk.git" };
+var repository = { "type": "git", "url": "git@github.com:RifeWang/node-sdk.git" };
 var keywords = ["upyun", "js", "nodejs", "sdk", "cdn", "cloud", "storage"];
 var author = "Leigh";
 var license = "MIT";

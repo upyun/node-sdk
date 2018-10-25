@@ -1027,15 +1027,40 @@ var Upyun = function () {
       // optional params
       var keys = ['Content-MD5', 'Content-Length', 'Content-Type', 'Content-Secret', 'x-gmkerl-thumb'];
       var headers = {};
-      keys.forEach(function (key) {
-        var lower = key.toLowerCase();
-        var finded = options[key] || options[lower];
-        if (finded) {
-          headers[key] = finded;
-        } else if (isMeta(key)) {
-          headers[key] = options[key];
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = Object.keys(options)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var key = _step.value;
+
+          if (isMeta(key) && options[key]) {
+            headers[key] = options[key];
+          } else {
+            keys.forEach(function (key) {
+              var lower = key.toLowerCase();
+              var finded = options[key] || options[lower];
+              if (finded) {
+                headers[key] = finded;
+              }
+            });
+          }
         }
-      });
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
 
       return this.req.put(remotePath, localFile, {
         headers: headers

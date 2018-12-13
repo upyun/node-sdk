@@ -128,13 +128,18 @@ export default class Upyun {
     // optional params
     const keys = ['Content-MD5', 'Content-Length', 'Content-Type', 'Content-Secret', 'x-gmkerl-thumb']
     let headers = {}
+    const optionsLower = {};
     for (const key of Object.keys(options)) {
-      if (isMeta(key) && options[key]) {
-        headers[key] = options[key]
+      optionsLower[key.toLowerCase()] = options[key];
+    }
+
+    for (const key of Object.keys(optionsLower)) {
+      if (isMeta(key) && optionsLower[key]) {
+        headers[key] = optionsLower[key]
       } else {
         keys.forEach(key => {
           const lower = key.toLowerCase()
-          const finded = options[key] || options[lower]
+          const finded = optionsLower[lower]
           if (finded) {
             headers[key] = finded
           }

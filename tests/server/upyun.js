@@ -189,6 +189,23 @@ describe('index', function () {
     })
   })
 
+  describe('#multipartUpload', () => {
+    it ('should upload file success', async () => {
+      const remotePath = 'testMultipartUpload.jpg'
+      const localPath = fixtures + '/cat.jpg'
+      const {fileSize, partCount, uuid} = await client.initMultipartUpload(remotePath, localPath)
+
+      await Promise.all(Array.apply(null, {length: partCount}).map(Function.call, index => {
+        const partId = index
+        return client.multipartUpload(remotePath, localPath, uuid, partId)
+      }))
+
+      const result = await client.completeMultipartUpload(remotePath, uuid)
+
+      expect(result).to.equal(true)
+    })
+  })
+
   describe('#formUpload', () => {
     it('should upload file success', async () => {
       const result = await client.formPutFile('/testFormUpload.jpg', fs.createReadStream(fixtures + '/cat.jpg'))

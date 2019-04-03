@@ -1,6 +1,6 @@
 /**
   * UPYUN js-sdk 3.3.6
-  * (c) 2018
+  * (c) 2019
   * @license MIT
   */
 'use strict';

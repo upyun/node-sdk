@@ -3,7 +3,7 @@ import utils from './utils'
 import formUpload from './form-upload'
 import axios from 'axios'
 import sign from './sign'
-import { isBrowser } from './constants'
+import { isBrowser, PARTSIZE } from './constants'
 
 export default class Upyun {
   /**
@@ -166,6 +166,87 @@ export default class Upyun {
         }
       })
       return Promise.resolve(Object.keys(result).length > 0 ? result : true)
+    })
+  }
+
+  initMultipartUpload (remotePath, fileOrPath, options = {}) {
+    let fileSizePromise
+    const lowerOptions = key2LowerCase(options);
+    let contentType = lowerOptions['x-upyun-multi-type']
+
+    if (isBrowser) {
+      fileSizePromise = Promise.resolve(fileOrPath.size)
+      contentType = contentType || fileOrPath.type
+    } else {
+      fileSizePromise = utils.getFileSizeAsync(fileOrPath)
+      contentType = contentType || utils.getContentType(fileOrPath)
+    }
+
+    return fileSizePromise.then((fileSize) => {
+      Object.assign(lowerOptions, {
+        'x-upyun-multi-disorder': true,
+        'x-upyun-multi-stage': 'initiate',
+        'x-upyun-multi-length': fileSize,
+        'x-upyun-multi-type': contentType
+      })
+
+      return this.req.put(remotePath, null, {
+        headers: lowerOptions
+      }).then(({headers, status}) => {
+        if (status !== 204) {
+          return Promise.resolve(false)
+        }
+
+        let uuid = headers['x-upyun-multi-uuid']
+
+        return Promise.resolve({
+          fileSize,
+          partCount: Math.ceil(fileSize / PARTSIZE),
+          uuid
+        })
+      })
+    })
+  }
+
+  multipartUpload (remotePath, fileOrPath, multiUuid, partId) {
+    const start = partId * PARTSIZE
+    let fileSizePromise
+    let contentType
+
+    if (isBrowser) {
+      fileSizePromise = Promise.resolve(fileOrPath.size)
+      contentType = fileOrPath.type
+    } else {
+      fileSizePromise = utils.getFileSizeAsync(fileOrPath)
+      contentType = utils.getContentType(fileOrPath)
+    }
+
+    const blockPromise = fileSizePromise.then((fileSize) => {
+      const end = Math.min(start + PARTSIZE, fileSize)
+      return utils.readBlockAsync(fileOrPath, start, end)
+    })
+
+    return blockPromise.then((block) => {
+      return this.req.put(remotePath, block, {
+        headers: {
+          'x-upyun-multi-stage': 'upload',
+          'x-upyun-multi-uuid': multiUuid,
+          'x-upyun-part-id': partId
+        }
+      }).then(({status}) => {
+        return Promise.resolve(status === 204)
+      })
+    })
+  }
+
+  completeMultipartUpload (remotePath, multiUuid) {
+    return this.req.put(remotePath, null, {
+      headers: {
+        'x-upyun-multi-stage': 'complete',
+        'x-upyun-multi-uuid': multiUuid
+      }
+    }).then(({status}) => {
+      return Promise.resolve(status === 204 || status === 201)
     })
   }
 
@@ -394,4 +475,12 @@ function isMeta (key) {
 function defaultGetHeaderSign (service, method, path) {
   const headers = sign.getHeaderSign(service, method, path)
   return Promise.resolve(headers)
+}
+
+function key2LowerCase (obj) {
+  const objLower = {}
+  for (const key of Object.keys(obj)) {
+    objLower[key.toLowerCase()] = obj[key]
+  }
+  return objLower
 }

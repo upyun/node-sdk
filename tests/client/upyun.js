@@ -34,6 +34,26 @@ describe('index', function () {
     })
   })
 
+  describe('#multipartUpload', () => {
+    it('should upload file success', async () => {
+      const remotePath = 'testMultipartUpload.txt'
+
+      const f = new Blob(['text'], {type: 'text/plain'})
+      f.name = 'testBlockUpload.txt'
+
+      const {fileSize, partCount, uuid} = await client.initMultipartUpload(remotePath, f)
+
+      await Promise.all(Array.apply(null, {length: partCount}).map(Function.call, index => {
+        const partId = index
+        return client.multipartUpload(remotePath, f, uuid, partId)
+      }))
+
+      const result = await client.completeMultipartUpload(remotePath, uuid)
+
+      expect(result).to.equal(true)
+    })
+  })
+
   describe('#formUpload', () => {
     it('should upload file success', async () => {
       const f = new Blob(['text'], {type: 'text/plain'})

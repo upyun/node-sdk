@@ -1,6 +1,6 @@
 /**
   * UPYUN js-sdk 3.3.6
-  * (c) 2018
+  * (c) 2019
   * @license MIT
   */
 import axios from 'axios';
@@ -1107,12 +1107,111 @@ var Upyun = function () {
       });
     }
   }, {
+    key: 'initMultipartUpload',
+    value: function initMultipartUpload(remotePath, fileOrPath) {
+      var _this = this;
+
+      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+      var fileSizePromise = void 0;
+      var partSize = 1024 * 1024;
+      var lowerOptions = key2LowerCase(options);
+      var contentType = lowerOptions['x-upyun-multi-type'];
+
+      if (isBrowser) {
+        fileSizePromise = Promise.resolve(fileOrPath.size);
+        contentType = contentType || fileOrPath.type;
+      } else {
+        fileSizePromise = utils.getFileSizeAsync(fileOrPath);
+        contentType = contentType || utils.getContentType(fileOrPath);
+      }
+
+      return fileSizePromise.then(function (fileSize) {
+        Object.assign(lowerOptions, {
+          'x-upyun-multi-disorder': true,
+          'x-upyun-multi-stage': 'initiate',
+          'x-upyun-multi-length': fileSize,
+          'x-upyun-multi-type': contentType
+        });
+
+        return _this.req.put(remotePath, null, {
+          headers: lowerOptions
+        }).then(function (_ref5) {
+          var headers = _ref5.headers,
+              status = _ref5.status;
+
+          if (status !== 204) {
+            return Promise.resolve(false);
+          }
+
+          var uuid = headers['x-upyun-multi-uuid'];
+
+          return Promise.resolve({
+            fileSize: fileSize,
+            partCount: Math.ceil(fileSize / partSize),
+            uuid: uuid
+          });
+        });
+      });
+    }
+  }, {
+    key: 'multipartUpload',
+    value: function multipartUpload(remotePath, fileOrPath, multiUuid, partId) {
+      var _this2 = this;
+
+      var partSize = 1024 * 1024;
+      var start = partId * partSize;
+      var fileSizePromise = void 0;
+      var contentType = void 0;
+
+      if (isBrowser) {
+        fileSizePromise = Promise.resolve(fileOrPath.size);
+        contentType = fileOrPath.type;
+      } else {
+        fileSizePromise = utils.getFileSizeAsync(fileOrPath);
+        contentType = utils.getContentType(fileOrPath);
+      }
+
+      var blockPromise = fileSizePromise.then(function (fileSize) {
+        var end = Math.min(start + partSize, fileSize);
+        return utils.readBlockAsync(fileOrPath, start, end);
+      });
+
+      return blockPromise.then(function (block) {
+        return _this2.req.put(remotePath, block, {
+          headers: {
+            'x-upyun-multi-stage': 'upload',
+            'x-upyun-multi-uuid': multiUuid,
+            'x-upyun-part-id': partId
+          }
+        }).then(function (_ref6) {
+          var status = _ref6.status;
+
+          return Promise.resolve(status === 204);
+        });
+      });
+    }
+  }, {
+    key: 'completeMultipartUpload',
+    value: function completeMultipartUpload(remotePath, multiUuid) {
+      return this.req.put(remotePath, null, {
+        headers: {
+          'x-upyun-multi-stage': 'complete',
+          'x-upyun-multi-uuid': multiUuid
+        }
+      }).then(function (_ref7) {
+        var status = _ref7.status;
+
+        return Promise.resolve(status === 204 || status === 201);
+      });
+    }
+  }, {
     key: 'makeDir',
     value: function makeDir(remotePath) {
       return this.req.post(remotePath, null, {
         headers: { folder: 'true' }
-      }).then(function (_ref5) {
-        var status = _ref5.status;
+      }).then(function (_ref8) {
+        var status = _ref8.status;
 
         return Promise.resolve(status === 200);
       });
@@ -1120,9 +1219,9 @@ var Upyun = function () {
   }, {
     key: 'headFile',
     value: function headFile(remotePath) {
-      return this.req.head(remotePath).then(function (_ref6) {
-        var headers = _ref6.headers,
-            status = _ref6.status;
+      return this.req.head(remotePath).then(function (_ref9) {
+        var headers = _ref9.headers,
+            status = _ref9.status;
 
         if (status === 404) {
           return Promise.resolve(false);
@@ -1153,8 +1252,8 @@ var Upyun = function () {
       }
       return this.req.delete(remotePath, {
         headers: headers
-      }).then(function (_ref7) {
-        var status = _ref7.status;
+      }).then(function (_ref10) {
+        var status = _ref10.status;
 
         return Promise.resolve(status === 200);
       });
@@ -1215,8 +1314,8 @@ var Upyun = function () {
         }
       }
 
-      return this.req.patch(remotePath + '?metadata=' + operate, null, { headers: metaHeaders }).then(function (_ref8) {
-        var status = _ref8.status;
+      return this.req.patch(remotePath + '?metadata=' + operate, null, { headers: metaHeaders }).then(function (_ref11) {
+        var status = _ref11.status;
 
         return Promise.resolve(status === 200);
       });
@@ -1227,9 +1326,9 @@ var Upyun = function () {
   }, {
     key: 'getMetadata',
     value: function getMetadata(remotePath) {
-      return this.req.get(remotePath).then(function (_ref9) {
-        var headers = _ref9.headers,
-            status = _ref9.status;
+      return this.req.get(remotePath).then(function (_ref12) {
+        var headers = _ref12.headers,
+            status = _ref12.status;
 
         if (status !== 200) {
           return Promise.resolve(false);
@@ -1254,7 +1353,7 @@ var Upyun = function () {
   }, {
     key: 'blockUpload',
     value: function blockUpload(remotePath, fileOrPath) {
-      var _this = this;
+      var _this3 = this;
 
       var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
@@ -1278,10 +1377,10 @@ var Upyun = function () {
         var blockSize = 1024 * 1024;
         var blocks = Math.ceil(fileSize / blockSize);
 
-        return _this.req.put(remotePath, null, {
+        return _this3.req.put(remotePath, null, {
           headers: options
-        }).then(function (_ref10) {
-          var headers = _ref10.headers;
+        }).then(function (_ref13) {
+          var headers = _ref13.headers;
 
           var uuid = headers['x-upyun-multi-uuid'];
           var nextId = headers['x-upyun-next-part-id'];
@@ -1293,14 +1392,14 @@ var Upyun = function () {
               var end = Math.min(start + blockSize, fileSize);
               var blockPromise = utils.readBlockAsync(fileOrPath, start, end);
               return blockPromise.then(function (block) {
-                return _this.req.put(remotePath, block, {
+                return _this3.req.put(remotePath, block, {
                   headers: {
                     'x-upyun-multi-stage': 'upload',
                     'x-upyun-multi-uuid': uuid,
                     'x-upyun-part-id': nextId
                   }
-                }).then(function (_ref11) {
-                  var headers = _ref11.headers;
+                }).then(function (_ref14) {
+                  var headers = _ref14.headers;
 
                   nextId = headers['x-upyun-next-part-id'];
                   return Promise.resolve(nextId);
@@ -1310,13 +1409,13 @@ var Upyun = function () {
           }
 
           return p.then(function () {
-            return _this.req.put(remotePath, null, {
+            return _this3.req.put(remotePath, null, {
               headers: {
                 'x-upyun-multi-stage': 'complete',
                 'x-upyun-multi-uuid': uuid
               }
-            }).then(function (_ref12) {
-              var status = _ref12.status;
+            }).then(function (_ref15) {
+              var status = _ref15.status;
 
               return Promise.resolve(status === 204 || status === 201);
             });
@@ -1327,7 +1426,7 @@ var Upyun = function () {
   }, {
     key: 'formPutFile',
     value: function formPutFile(remotePath, localFile) {
-      var _this2 = this;
+      var _this4 = this;
 
       var params = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
@@ -1343,7 +1442,7 @@ var Upyun = function () {
       }
 
       return result.then(function (bodySign) {
-        return formUpload(_this2.endpoint + '/' + params['service'], localFile, bodySign).then(function (result) {
+        return formUpload(_this4.endpoint + '/' + params['service'], localFile, bodySign).then(function (result) {
           return Promise.resolve(result);
         });
       });
@@ -1357,8 +1456,8 @@ var Upyun = function () {
       var headers = sign.getPurgeHeaderSign(this.service, urls);
       return axios.post('http://purge.upyun.com/purge/', 'purge=' + urls.join('\n'), {
         headers: headers
-      }).then(function (_ref13) {
-        var data = _ref13.data;
+      }).then(function (_ref16) {
+        var data = _ref16.data;
 
         if (Object.keys(data.invalid_domain_of_url).length === 0) {
           return true;
@@ -1380,6 +1479,36 @@ function isMeta(key) {
 function defaultGetHeaderSign(service, method, path) {
   var headers = sign.getHeaderSign(service, method, path);
   return Promise.resolve(headers);
+}
+
+function key2LowerCase(obj) {
+  var objLower = {};
+  var _iteratorNormalCompletion3 = true;
+  var _didIteratorError3 = false;
+  var _iteratorError3 = undefined;
+
+  try {
+    for (var _iterator3 = Object.keys(obj)[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+      var key = _step3.value;
+
+      objLower[key.toLowerCase()] = obj[key];
+    }
+  } catch (err) {
+    _didIteratorError3 = true;
+    _iteratorError3 = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion3 && _iterator3.return) {
+        _iterator3.return();
+      }
+    } finally {
+      if (_didIteratorError3) {
+        throw _iteratorError3;
+      }
+    }
+  }
+
+  return objLower;
 }
 
 var Service = function Service(serviceName) {

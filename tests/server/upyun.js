@@ -5,6 +5,10 @@ import Upyun from '../../upyun/upyun'
 import Service from '../../upyun/service'
 import fs from 'fs'
 import path from 'path'
+import {promisify} from 'util'
+import md5 from 'md5'
+
+const readFileAsync = promisify(fs.readFile);
 
 const fixtures = path.join(__dirname, '../fixtures')
 
@@ -36,12 +40,13 @@ describe('index', function () {
       // only use stream on server side
       let jpg = fixtures + '/cat.jpg'
       // TODO better for length
+      const content = await readFileAsync(jpg);
       let options = {
-        'Content-Length': fs.statSync(jpg).size
+        'Content-Length': fs.statSync(jpg).size,
+        'content-MD5': md5(content)
       }
 
-      let data = await client.putFile('/cat.jpg', fs.createReadStream(jpg), options)
-
+      let data = await client.putFile('/cat.jpg', content, options)
       expect(data).to.deep.equal({
         width: 500,
         frames: 1,

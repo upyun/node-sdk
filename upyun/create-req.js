@@ -26,8 +26,7 @@ export default function (endpoint, service, getHeaderSign) {
       path = config.url.substring(config.baseURL.length)
     }
     config.url = encodeURI(config.url)
-
-    return getHeaderSign(service, method, path).then((headers) => {
+    return getHeaderSign(service, method, path, config.headers['Content-MD5']).then((headers) => {
       config.headers.common = headers
       return Promise.resolve(config)
     })

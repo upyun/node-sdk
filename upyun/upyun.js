@@ -472,8 +472,8 @@ function isMeta (key) {
   return key.indexOf('x-upyun-meta-') === 0
 }
 
-function defaultGetHeaderSign (service, method, path) {
-  const headers = sign.getHeaderSign(service, method, path)
+function defaultGetHeaderSign () {
+  const headers = sign.getHeaderSign(...arguments)
   return Promise.resolve(headers)
 }
 

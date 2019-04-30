@@ -7,7 +7,10 @@ import axios from 'axios';
 
 // NOTE: choose node.js first
 // process is defined in client test
+
 var isBrowser = typeof window !== 'undefined' && (typeof process === 'undefined' || process.title === 'browser');
+
+var PARTSIZE = 1024 * 1024;
 
 var adapter = axios.defaults.adapter;
 
@@ -34,8 +37,7 @@ var createReq = function (endpoint, service, getHeaderSign) {
       path = config.url.substring(config.baseURL.length);
     }
     config.url = encodeURI(config.url);
-
-    return getHeaderSign(service, method, path).then(function (headers) {
+    return getHeaderSign(service, method, path, config.headers['Content-MD5']).then(function (headers) {
       config.headers.common = headers;
       return Promise.resolve(config);
     });
@@ -332,6 +334,7 @@ var main = "dist/upyun.common.js";
 var module$1 = "dist/upyun.esm.js";
 var scripts = { "build": "node build/build.js", "test": "npm run test:server && npm run test:client", "test:client": "karma start tests/karma.conf.js", "test:server": "mocha --compilers js:babel-register tests/server/*" };
 var repository = { "type": "git", "url": "git@github.com:upyun/node-sdk.git" };
+var engines = { "node": ">=8.0.0" };
 var keywords = ["upyun", "js", "nodejs", "sdk", "cdn", "cloud", "storage"];
 var author = "Leigh";
 var license = "MIT";
@@ -349,6 +352,7 @@ var pkg = {
 	module: module$1,
 	scripts: scripts,
 	repository: repository,
+	engines: engines,
 	keywords: keywords,
 	author: author,
 	license: license,
@@ -1114,7 +1118,6 @@ var Upyun = function () {
       var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
       var fileSizePromise = void 0;
-      var partSize = 1024 * 1024;
       var lowerOptions = key2LowerCase(options);
       var contentType = lowerOptions['x-upyun-multi-type'];
 
@@ -1148,7 +1151,7 @@ var Upyun = function () {
 
           return Promise.resolve({
             fileSize: fileSize,
-            partCount: Math.ceil(fileSize / partSize),
+            partCount: Math.ceil(fileSize / PARTSIZE),
             uuid: uuid
           });
         });
@@ -1159,8 +1162,7 @@ var Upyun = function () {
     value: function multipartUpload(remotePath, fileOrPath, multiUuid, partId) {
       var _this2 = this;
 
-      var partSize = 1024 * 1024;
-      var start = partId * partSize;
+      var start = partId * PARTSIZE;
       var fileSizePromise = void 0;
       var contentType = void 0;
 
@@ -1173,7 +1175,7 @@ var Upyun = function () {
       }
 
       var blockPromise = fileSizePromise.then(function (fileSize) {
-        var end = Math.min(start + partSize, fileSize);
+        var end = Math.min(start + PARTSIZE, fileSize);
         return utils.readBlockAsync(fileOrPath, start, end);
       });
 
@@ -1476,8 +1478,8 @@ function isMeta(key) {
   return key.indexOf('x-upyun-meta-') === 0;
 }
 
-function defaultGetHeaderSign(service, method, path) {
-  var headers = sign.getHeaderSign(service, method, path);
+function defaultGetHeaderSign() {
+  var headers = sign.getHeaderSign.apply(sign, arguments);
   return Promise.resolve(headers);
 }
 

@@ -14,6 +14,9 @@
     "type": "git",
     "url": "git@github.com:upyun/node-sdk.git"
   },
+  "engines": {
+    "node": ">=8.0.0"
+  },
   "keywords": [
     "upyun",
     "js",

@@ -1,5 +1,8 @@
 import md5 from 'md5'
 
+/**
+ * @class
+ */
 export default class Service {
   constructor (serviceName, operatorName = '', password = '') {
     // NOTE bucketName will be removed

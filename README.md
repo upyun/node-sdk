@@ -57,7 +57,7 @@ const client = new upyun.Client(service[, options][, getHeaderSignCallback])
 - `options`: 配置项，可以配置以下参数
   - `domain`: 又拍云 rest api 地址，默认 `v0.api.upyun.com` 其他可配置域名见又拍云[文档](http://docs.upyun.com/api/rest_api/)
   - `protocol`: 使用 `http|https` 协议，默认 `https` 协议
-- `getHeaderSignCallback`: 获取又拍云 HTTP Header 签名回调函数，服务端使用时不需要设置该参数。客户端使用必须设置该回调函数，它接受三个参数：`service, method, path`，用于计算当前请求签名，该函数必须返回一个 `Promise`
+- `getHeaderSignCallback`: 获取又拍云 HTTP Header 签名回调函数，服务端使用时不需要设置该参数。客户端使用必须设置该回调函数，它接受四个参数：`service, method, path, contentMD5`, 用于计算当前请求签名，其中 `contentMD5` 可选填。该函数必须返回一个 `Promise`
 
 **示例**
 
@@ -72,11 +72,12 @@ const client = new upyun.Client(service);
 
 ```js
 /**
- *@param service: Service 实例
- *@param method: 当前请求的 API 使用的方法
- *@param path: 当前请求的资源路径
+ * @param {!Service} service: Service 实例
+ * @param {!string} method: 当前请求的 API 使用的方法
+ * @param {!string} path: 当前请求的资源路径
+ * @param {?string} contentMD5 内容的 md5 值
  */
-function getSignHeader(service, method, path) {
+function getSignHeader(service, method, path, contentMD5 = null) {
   // 请求自己的服务器，计算当前 api 请求签名信息
   // 可以参考该项目 sample 目录中的示例代码
   ...

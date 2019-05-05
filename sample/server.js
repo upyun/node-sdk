@@ -14,7 +14,7 @@ http.createServer(function(req, res) {
     res.end(fs.readFileSync(path.join(__dirname, '../dist/upyun.js'), 'utf-8'))
   } else if (req.url.indexOf('/sign/head') !== -1) {
     const query = url.parse(req.url, true).query
-    const headSign = upyun.sign.getHeaderSign(bucket, query.method, query.path)
+    const headSign = upyun.sign.getHeaderSign(bucket, query.method, query.path, query.contentMD5)
     res.end(JSON.stringify(headSign))
   } else {
     res.writeHead(404)

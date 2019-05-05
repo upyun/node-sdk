@@ -29,9 +29,9 @@ export default class Upyun {
     }
 
     if (!isBrowser && (
-        typeof service.operatorName === 'undefined' ||
-        typeof service.password === 'undefined'
-      )) {
+      typeof service.operatorName === 'undefined' ||
+      typeof service.password === 'undefined'
+    )) {
       throw new Error('upyun - must config operateName and password in server side')
     }
 
@@ -131,9 +131,9 @@ export default class Upyun {
     // optional params
     const keys = ['Content-MD5', 'Content-Length', 'Content-Type', 'Content-Secret', 'x-gmkerl-thumb']
     let headers = {}
-    const optionsLower = {};
+    const optionsLower = {}
     for (const key of Object.keys(options)) {
-      optionsLower[key.toLowerCase()] = options[key];
+      optionsLower[key.toLowerCase()] = options[key]
     }
 
     for (const key of Object.keys(optionsLower)) {
@@ -174,7 +174,7 @@ export default class Upyun {
 
   initMultipartUpload (remotePath, fileOrPath, options = {}) {
     let fileSizePromise
-    const lowerOptions = key2LowerCase(options);
+    const lowerOptions = key2LowerCase(options)
     let contentType = lowerOptions['x-upyun-multi-type']
 
     if (isBrowser) {
@@ -214,14 +214,14 @@ export default class Upyun {
   multipartUpload (remotePath, fileOrPath, multiUuid, partId) {
     const start = partId * PARTSIZE
     let fileSizePromise
-    let contentType
+    // let contentType
 
     if (isBrowser) {
       fileSizePromise = Promise.resolve(fileOrPath.size)
-      contentType = fileOrPath.type
+      // contentType = fileOrPath.type
     } else {
       fileSizePromise = utils.getFileSizeAsync(fileOrPath)
-      contentType = utils.getContentType(fileOrPath)
+      // contentType = utils.getContentType(fileOrPath)
     }
 
     const blockPromise = fileSizePromise.then((fileSize) => {
@@ -234,7 +234,7 @@ export default class Upyun {
         headers: {
           'x-upyun-multi-stage': 'upload',
           'x-upyun-multi-uuid': multiUuid,
-          'x-upyun-part-id': partId
+          'x-upyun-part-id': partId,
         }
       }).then(({status}) => {
         return Promise.resolve(status === 204)

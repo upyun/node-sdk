@@ -6,10 +6,11 @@
   "module": "dist/upyun.esm.js",
   "scripts": {
     "build": "node build/build.js",
+    "lint": "eslint .",
     "test": "npm run test:server && npm run test:client",
     "test:client": "karma start tests/karma.conf.js",
     "test:server": "mocha --compilers js:babel-register tests/server/*",
-    "preversion": "npm run test",
+    "preversion": "npm run lint && npm run test",
     "version": "npm run build && git add -A dist",
     "postversion": "git push && git push --tags"
   },
@@ -61,6 +62,7 @@
     "babel-preset-env": "^1.4.0",
     "babel-register": "^6.24.1",
     "chai": "^3.5.0",
+    "eslint": "^5.16.0",
     "istanbul": "^0.4.3",
     "karma": "^1.7.0",
     "karma-chrome-launcher": "^2.1.1",

@@ -1,6 +1,5 @@
 const http = require('http')
 const url = require('url')
-const util = require('util')
 const upyun = require('../')
 const fs = require('fs')
 const path = require('path')

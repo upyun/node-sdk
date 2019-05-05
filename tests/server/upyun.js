@@ -8,7 +8,7 @@ import path from 'path'
 import {promisify} from 'util'
 import md5 from 'md5'
 
-const readFileAsync = promisify(fs.readFile);
+const readFileAsync = promisify(fs.readFile)
 
 const fixtures = path.join(__dirname, '../fixtures')
 
@@ -40,7 +40,7 @@ describe('index', function () {
       // only use stream on server side
       let jpg = fixtures + '/cat.jpg'
       // TODO better for length
-      const content = await readFileAsync(jpg);
+      const content = await readFileAsync(jpg)
       let options = {
         'Content-Length': fs.statSync(jpg).size,
         'content-MD5': md5(content)
@@ -198,7 +198,7 @@ describe('index', function () {
     it ('should upload file success', async () => {
       const remotePath = 'testMultipartUpload.jpg'
       const localPath = fixtures + '/cat.jpg'
-      const {fileSize, partCount, uuid} = await client.initMultipartUpload(remotePath, localPath)
+      const {/**fileSize, */partCount, uuid} = await client.initMultipartUpload(remotePath, localPath)
 
       await Promise.all(Array.apply(null, {length: partCount}).map(Function.call, index => {
         const partId = index

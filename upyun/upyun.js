@@ -267,8 +267,11 @@ export default class Upyun {
         return Promise.resolve(false)
       }
 
-      let params = ['x-upyun-file-type', 'x-upyun-file-size', 'x-upyun-file-date', 'Content-Md5']
-      let result = {}
+      let params = ['x-upyun-file-type', 'x-upyun-file-size', 'x-upyun-file-date']
+      let result = {
+        'Content-Md5': headers['content-md5'] || ''
+      }
+
       params.forEach(item => {
         let key = item.split('x-upyun-file-')[1]
         if (headers[item]) {

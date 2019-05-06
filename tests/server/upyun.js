@@ -93,8 +93,9 @@ describe('index', function () {
   describe('#headFile', () => {
     let filePath = '/headFile.txt'
     let dirPath = '/headDir'
+    let content = 'Dictum accumsan, convallis accumsan, cursus sit amet, ipsum. In pharetra sagittis.'
     before(async () => {
-      await client.putFile(filePath, 'Dictum accumsan, convallis accumsan, cursus sit amet, ipsum. In pharetra sagittis.')
+      await client.putFile(filePath, content)
       await client.makeDir(dirPath)
     })
 
@@ -102,6 +103,7 @@ describe('index', function () {
       let result = await client.headFile(filePath)
       expect(result['type']).to.equal('file')
       expect(result['size']).to.equal(82)
+      expect(result['Content-Md5']).to.equal(md5(content))
       expect(result).to.have.property('date')
     })
 

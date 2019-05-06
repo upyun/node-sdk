@@ -233,7 +233,7 @@ client.usage('/sub/dir').then(function(size) {
   'type': 'file', // 文件类型
   'size': 289239, // 文件大小
   'date': 1486053098, // 文件创建时间
-  'Content-Md5': '...'  // 文件 md5 值，该值可能不存在
+  'Content-Md5': '9a56c9d185758d2eda3751e03b891fce'  // 文件 md5 值
 }
 ```
 

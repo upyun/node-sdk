@@ -8,7 +8,10 @@
     "build": "node build/build.js",
     "test": "npm run test:server && npm run test:client",
     "test:client": "karma start tests/karma.conf.js",
-    "test:server": "mocha --compilers js:babel-register tests/server/*"
+    "test:server": "mocha --compilers js:babel-register tests/server/*",
+    "preversion": "npm run test",
+    "version": "npm run build && git add -A dist",
+    "postversion": "git push && git push --tags"
   },
   "repository": {
     "type": "git",

@@ -5,6 +5,9 @@ import axios from 'axios'
 import sign from './sign'
 import { isBrowser, PARTSIZE } from './constants'
 
+/**
+ * @class
+ */
 export default class Upyun {
   /**
    * @param {object} service - a instance of Service class

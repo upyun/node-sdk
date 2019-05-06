@@ -1,5 +1,5 @@
 /**
-  * UPYUN js-sdk 3.3.6
+  * UPYUN js-sdk 3.3.8
   * (c) 2019
   * @license MIT
   */
@@ -168,11 +168,11 @@ function formUpload(remoteUrl, localFile, _ref) {
 }
 
 var name = "upyun";
-var version = "3.3.6";
+var version = "3.3.8";
 var description = "UPYUN js sdk";
 var main = "dist/upyun.common.js";
 var module$1 = "dist/upyun.esm.js";
-var scripts = { "build": "node build/build.js", "test": "npm run test:server && npm run test:client", "test:client": "karma start tests/karma.conf.js", "test:server": "mocha --compilers js:babel-register tests/server/*" };
+var scripts = { "build": "node build/build.js", "lint": "eslint .", "test": "npm run test:server && npm run test:client", "test:client": "karma start tests/karma.conf.js", "test:server": "mocha --compilers js:babel-register tests/server/*", "preversion": "npm run lint && npm run test", "version": "npm run build && git add -A dist", "postversion": "git push && git push --tags" };
 var repository = { "type": "git", "url": "git@github.com:upyun/node-sdk.git" };
 var engines = { "node": ">=8.0.0" };
 var keywords = ["upyun", "js", "nodejs", "sdk", "cdn", "cloud", "storage"];
@@ -181,7 +181,7 @@ var license = "MIT";
 var bugs = { "url": "https://github.com/upyun/node-sdk/issues" };
 var homepage = "https://github.com/upyun/node-sdk";
 var contributors = [{ "name": "yejingx", "email": "yejingx@gmail.com" }, { "name": "Leigh", "email": "i@zhuli.me" }, { "name": "kaidiren", "email": "kaidiren@gmail.com" }, { "name": "Gaara", "email": "sabakugaara@users.noreply.github.com" }];
-var devDependencies = { "babel-cli": "^6.24.1", "babel-loader": "^7.0.0", "babel-plugin-external-helpers": "^6.22.0", "babel-plugin-transform-runtime": "^6.23.0", "babel-preset-env": "^1.4.0", "babel-register": "^6.24.1", "chai": "^3.5.0", "istanbul": "^0.4.3", "karma": "^1.7.0", "karma-chrome-launcher": "^2.1.1", "karma-mocha": "^1.3.0", "karma-sourcemap-loader": "^0.3.7", "karma-webpack": "^2.0.3", "mocha": "^3.4.1", "rollup": "^0.41.6", "rollup-plugin-alias": "^1.3.1", "rollup-plugin-babel": "^2.7.1", "rollup-plugin-commonjs": "^8.0.2", "rollup-plugin-json": "^2.1.1", "rollup-plugin-node-resolve": "^3.0.0", "should": "^9.0.2", "uglify-js": "^3.0.11", "webpack": "^2.5.1" };
+var devDependencies = { "babel-cli": "^6.24.1", "babel-loader": "^7.0.0", "babel-plugin-external-helpers": "^6.22.0", "babel-plugin-transform-runtime": "^6.23.0", "babel-preset-env": "^1.4.0", "babel-register": "^6.24.1", "chai": "^3.5.0", "eslint": "^5.16.0", "istanbul": "^0.4.3", "karma": "^1.7.0", "karma-chrome-launcher": "^2.1.1", "karma-mocha": "^1.3.0", "karma-sourcemap-loader": "^0.3.7", "karma-webpack": "^2.0.3", "mocha": "^3.4.1", "rollup": "^0.41.6", "rollup-plugin-alias": "^1.3.1", "rollup-plugin-babel": "^2.7.1", "rollup-plugin-commonjs": "^8.0.2", "rollup-plugin-json": "^2.1.1", "rollup-plugin-node-resolve": "^3.0.0", "should": "^9.0.2", "uglify-js": "^3.0.11", "webpack": "^2.5.1" };
 var dependencies = { "axios": "^0.16.1", "base-64": "^0.1.0", "form-data": "^2.1.4", "hmacsha1": "^1.0.0", "md5": "^2.2.1", "mime-types": "^2.1.15" };
 var browser = { "./upyun/utils.js": "./upyun/browser-utils.js", "./upyun/form-upload.js": "./upyun/browser-form-upload.js" };
 var pkg = {
@@ -385,6 +385,10 @@ var slicedToArray = function () {
     }
   };
 }();
+
+/**
+ * @class
+ */
 
 var Upyun = function () {
   /**
@@ -686,14 +690,14 @@ var Upyun = function () {
 
       var start = partId * PARTSIZE;
       var fileSizePromise = void 0;
-      var contentType = void 0;
+      // let contentType
 
       if (isBrowser) {
         fileSizePromise = Promise.resolve(fileOrPath.size);
-        contentType = fileOrPath.type;
+        // contentType = fileOrPath.type
       } else {
         fileSizePromise = utils.getFileSizeAsync(fileOrPath);
-        contentType = utils.getContentType(fileOrPath);
+        // contentType = utils.getContentType(fileOrPath)
       }
 
       var blockPromise = fileSizePromise.then(function (fileSize) {
@@ -751,8 +755,11 @@ var Upyun = function () {
           return Promise.resolve(false);
         }
 
-        var params = ['x-upyun-file-type', 'x-upyun-file-size', 'x-upyun-file-date', 'Content-Md5'];
-        var result = {};
+        var params = ['x-upyun-file-type', 'x-upyun-file-size', 'x-upyun-file-date'];
+        var result = {
+          'Content-Md5': headers['content-md5'] || ''
+        };
+
         params.forEach(function (item) {
           var key = item.split('x-upyun-file-')[1];
           if (headers[item]) {
@@ -1034,6 +1041,10 @@ function key2LowerCase(obj) {
 
   return objLower;
 }
+
+/**
+ * @class
+ */
 
 var Service = function Service(serviceName) {
   var operatorName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';

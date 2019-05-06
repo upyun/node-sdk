@@ -41,7 +41,7 @@ describe('index', function () {
       const f = new Blob(['text'], {type: 'text/plain'})
       f.name = 'testBlockUpload.txt'
 
-      const {fileSize, partCount, uuid} = await client.initMultipartUpload(remotePath, f)
+      const {/*fileSize, */partCount, uuid} = await client.initMultipartUpload(remotePath, f)
 
       await Promise.all(Array.apply(null, {length: partCount}).map(Function.call, index => {
         const partId = index

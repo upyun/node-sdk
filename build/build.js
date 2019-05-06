@@ -119,6 +119,7 @@ function buildEntry (config) {
 function write (dest, code, zip) {
   return new Promise((resolve, reject) => {
     function report (extra) {
+      // eslint-disable-next-line no-console
       console.log(blue(path.relative(process.cwd(), dest)) + ' ' + getSize(code) + (extra || ''))
       resolve()
     }
@@ -142,6 +143,7 @@ function getSize (code) {
 }
 
 function logError (e) {
+  // eslint-disable-next-line no-console
   console.log(e)
 }
 

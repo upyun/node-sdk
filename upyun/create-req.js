@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { isBrowser } from './constants'
 import isPromise from 'is-promise'
+import url from 'url'
 
 const adapter = axios.defaults.adapter
 
@@ -22,9 +23,10 @@ export default function (endpoint, service, getHeaderSign) {
 
   req.interceptors.request.use((config) => {
     let method = config.method.toUpperCase()
-    let path = config.url
-    if (config.url.indexOf(config.baseURL) === 0) {
-      path = config.url.substring(config.baseURL.length)
+    let path = url.resolve('/', config.url || '')
+
+    if (path.indexOf(config.baseURL) === 0) {
+      path = path.substring(config.baseURL.length)
     }
     config.url = encodeURI(config.url)
     let headerSign = getHeaderSign(service, method, path, config.headers['Content-MD5'])

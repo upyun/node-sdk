@@ -4,6 +4,7 @@ import formUpload from './form-upload'
 import axios from 'axios'
 import sign from './sign'
 import { isBrowser, PARTSIZE } from './constants'
+import isPromise from 'is-promise'
 
 /**
  * @class
@@ -440,15 +441,10 @@ export default class Upyun {
     params['service'] = this.service.serviceName
     params['save-key'] = remotePath
     let result = this.bodySignCallback(this.service, params)
-    if (typeof result.then !== 'function') {
-      result = Promise.resolve(result)
-    }
+    result = isPromise(result) ? result : Promise.resolve(result)
 
     return result.then((bodySign) => {
       return formUpload(this.endpoint + '/' + params['service'], localFile, bodySign)
-        .then((result) => {
-          return Promise.resolve(result)
-        })
     })
   }
 
@@ -479,8 +475,7 @@ function isMeta (key) {
 }
 
 function defaultGetHeaderSign () {
-  const headers = sign.getHeaderSign(...arguments)
-  return Promise.resolve(headers)
+  return sign.getHeaderSign(...arguments)
 }
 
 function key2LowerCase (obj) {

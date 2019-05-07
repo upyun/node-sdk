@@ -239,13 +239,15 @@ describe('index', function () {
     })
 
     it('should upload base64 encode file success', async () => {
+      const content = 'dGVzdCBiYXNlNjQgdXBsb2Fk'
       const options = {
         'content-type': 'text/plain',
         'b64encoded': 'on',
+        'content-md5': md5(content)
       }
       const result = await client.formPutFile(
         '/test-base64.txt',
-        'dGVzdCBiYXNlNjQgdXBsb2Fk',
+        content,
         options
       )
       expect(result.code).to.equal(200)

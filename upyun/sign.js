@@ -69,7 +69,8 @@ export function getPolicyAndAuthorization (service, params) {
   const authorization = genSign(service, {
     method: 'POST',
     path: '/' + service.serviceName,
-    policy
+    policy,
+    contentMd5: params['content-md5']
   })
   return {
     policy,

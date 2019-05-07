@@ -432,7 +432,12 @@ export default class Upyun {
     })
   }
 
-  formPutFile (remotePath, localFile, params = {}) {
+  formPutFile (remotePath, localFile, orignParams = {}) {
+    const params = {}
+    for (const key of Object.keys(orignParams)) {
+      params[key.toLowerCase()] = orignParams[key]
+    }
+
     if (typeof this.bodySignCallback !== 'function') {
       throw new Error('upyun - must setBodySignCallback first!')
     }

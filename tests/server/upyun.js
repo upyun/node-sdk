@@ -197,7 +197,7 @@ describe('index', function () {
   })
 
   describe('#multipartUpload', () => {
-    it ('should upload file success', async () => {
+    it('should upload file success', async () => {
       const remotePath = 'testMultipartUpload.jpg'
       const localPath = fixtures + '/cat.jpg'
       const {/**fileSize, */partCount, uuid} = await client.initMultipartUpload(remotePath, localPath)

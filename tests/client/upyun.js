@@ -36,7 +36,7 @@ describe('index', function () {
 
   describe('#multipartUpload', () => {
     it('should upload file success', async () => {
-      const remotePath = 'testMultipartUpload.txt'
+      const remotePath = '/testMultipartUpload.txt'
 
       const f = new Blob(['text'], {type: 'text/plain'})
       f.name = 'testBlockUpload.txt'

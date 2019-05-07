@@ -1,6 +1,7 @@
 # UPYUN JS SDK
 [![NPM version](https://img.shields.io/npm/v/upyun.svg?style=flat)](https://www.npmjs.org/package/upyun)
 [![Build Status](https://travis-ci.org/upyun/node-sdk.svg?branch=master)](https://travis-ci.org/upyun/node-sdk)
+[![dependencies Status](https://david-dm.org/upyun/node-sdk/status.svg)](https://david-dm.org/upyun/node-sdk)
 
 upyun js sdk, 支持服务端和客户端使用，集成：
 

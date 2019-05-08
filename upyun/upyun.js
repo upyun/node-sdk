@@ -44,6 +44,7 @@ export default class Upyun {
 
     this.endpoint = config.protocol + '://' + config.domain
     const {proxy} = config
+    this.proxy = proxy
     this.req = createReq(this.endpoint, service, getHeaderSign || defaultGetHeaderSign, {proxy})
     // NOTE this will be removed
     this.bucket = service
@@ -463,7 +464,8 @@ export default class Upyun {
     return axios.post(
       'http://purge.upyun.com/purge/',
       'purge=' + urls.join('\n'), {
-        headers
+        headers,
+        proxy: this.proxy
       }
     ).then(({data}) => {
       if (Object.keys(data.invalid_domain_of_url).length === 0) {

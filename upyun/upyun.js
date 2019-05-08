@@ -38,11 +38,13 @@ export default class Upyun {
 
     const config = Object.assign({
       domain: 'v0.api.upyun.com',
-      protocol: 'https'
+      protocol: 'https',
+      // proxy: false // 禁用代理 // 参考 axios 配置. 如: {host: '127.0.0.1', post: 1081}
     }, params)
-    this.endpoint = config.protocol + '://' + config.domain
 
-    this.req = createReq(this.endpoint, service, getHeaderSign || defaultGetHeaderSign)
+    this.endpoint = config.protocol + '://' + config.domain
+    const {proxy} = config
+    this.req = createReq(this.endpoint, service, getHeaderSign || defaultGetHeaderSign, {proxy})
     // NOTE this will be removed
     this.bucket = service
     this.service = service

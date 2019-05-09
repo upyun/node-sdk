@@ -7,6 +7,7 @@ import fs from 'fs'
 import path from 'path'
 import {promisify} from 'util'
 import md5 from 'md5'
+import delay from 'delay'
 
 const readFileAsync = promisify(fs.readFile)
 
@@ -25,7 +26,7 @@ describe('index', function () {
 
   describe('#putFile', () => {
     it('should upload string success', async () => {
-      let data = await client.putFile('/text.txt', 'Augue et arcu blandit tincidunt. Pellentesque.')
+      let data = await client.putFile('/textForPutfile.txt', 'Augue et arcu blandit tincidunt. Pellentesque.')
 
       expect(data).to.equal(true)
     })
@@ -57,8 +58,9 @@ describe('index', function () {
   })
 
   describe('#listDir', () => {
+    const txtFileName = 'textForListdir.txt'
     before(async () => {
-      await client.putFile('/text.txt', 'Augue et arcu blandit tincidunt. Pellentesque.')
+      await client.putFile(`/${txtFileName}`, 'Augue et arcu blandit tincidunt. Pellentesque.')
     })
 
     it('should get dir list success', async () => {
@@ -67,9 +69,9 @@ describe('index', function () {
       expect(data.files.length > 0).to.equal(true)
 
       let file = data.files.find(ele => {
-        return ele.name === 'text.txt'
+        return ele.name === txtFileName
       })
-      expect(file.name).to.equal('text.txt')
+      expect(file.name).to.equal(txtFileName)
       expect(file.size).to.equal(46)
       expect(file.time > 0).to.equal(true)
       expect(file.type).to.equal('N')
@@ -120,17 +122,26 @@ describe('index', function () {
   })
 
   describe('#deleteFile', () => {
-    let filePath = '/headFile.txt'
+    let syncPath = '/fileForSyncDeleteFile.txt'
+    let asyncPath = '/fileForAsyncDeleteFile.txt'
 
-    it('should delete success', async () => {
-      let result = await client.deleteFile(filePath)
-      expect(result).to.equal(true)
-    })
+    context('when file is exist', () => {
+      before(async () => {
+        await client.putFile(syncPath, 'Dictum accumsan, convallis accumsan.')
+        await client.putFile(asyncPath, 'Dictum accumsan, convallis accumsan.')
+      })
 
-    it('should async delete success', async () => {
-      await client.putFile('/async-path.txt', 'Dictum accumsan, convallis accumsan.')
-      let result = await client.deleteFile('/async-path.txt', true)
-      expect(result).to.equal(true)
+      it('should delete success', async () => {
+        await delay(1000) // 降低响应码 429 Too Many Requests 发生几率
+        let result = await client.deleteFile(syncPath)
+        expect(result).to.equal(true)
+      })
+
+      it('should async delete success', async () => {
+        await delay(1000) // 降低响应码 429 Too Many Requests 发生几率
+        let result = await client.deleteFile(asyncPath, true)
+        expect(result).to.equal(true)
+      })
     })
 
     it('should get false when file not exist', async () => {

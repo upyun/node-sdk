@@ -1,5 +1,5 @@
 /**
-  * UPYUN js-sdk 3.3.8
+  * UPYUN js-sdk 3.3.9
   * (c) 2019
   * @license MIT
   */
@@ -8,6 +8,8 @@
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
 var axios = _interopDefault(require('axios'));
+var isPromise = _interopDefault(require('is-promise'));
+var url = _interopDefault(require('url'));
 var fs = _interopDefault(require('fs'));
 var mime = _interopDefault(require('mime-types'));
 var FormData = _interopDefault(require('form-data'));
@@ -35,19 +37,27 @@ axios.defaults.adapter = function () {
 }();
 
 var createReq = function (endpoint, service, getHeaderSign) {
+  var _ref = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {},
+      proxy = _ref.proxy;
+
   var req = axios.create({
     baseURL: endpoint + '/' + service.serviceName,
-    maxRedirects: 0
+    maxRedirects: 0,
+    proxy: proxy
   });
 
   req.interceptors.request.use(function (config) {
     var method = config.method.toUpperCase();
-    var path = config.url;
-    if (config.url.indexOf(config.baseURL) === 0) {
-      path = config.url.substring(config.baseURL.length);
+    var path = url.resolve('/', config.url || '');
+
+    if (path.indexOf(config.baseURL) === 0) {
+      path = path.substring(config.baseURL.length);
     }
     config.url = encodeURI(config.url);
-    return getHeaderSign(service, method, path, config.headers['Content-MD5']).then(function (headers) {
+    var headerSign = getHeaderSign(service, method, path, config.headers['Content-MD5']);
+    headerSign = isPromise(headerSign) ? headerSign : Promise.resolve(headerSign);
+
+    return headerSign.then(function (headers) {
       config.headers.common = headers;
       return Promise.resolve(config);
     });
@@ -168,7 +178,7 @@ function formUpload(remoteUrl, localFile, _ref) {
 }
 
 var name = "upyun";
-var version = "3.3.8";
+var version = "3.3.9";
 var description = "UPYUN js sdk";
 var main = "dist/upyun.common.js";
 var module$1 = "dist/upyun.esm.js";
@@ -181,8 +191,8 @@ var license = "MIT";
 var bugs = { "url": "https://github.com/upyun/node-sdk/issues" };
 var homepage = "https://github.com/upyun/node-sdk";
 var contributors = [{ "name": "yejingx", "email": "yejingx@gmail.com" }, { "name": "Leigh", "email": "i@zhuli.me" }, { "name": "kaidiren", "email": "kaidiren@gmail.com" }, { "name": "Gaara", "email": "sabakugaara@users.noreply.github.com" }];
-var devDependencies = { "babel-cli": "^6.24.1", "babel-loader": "^7.0.0", "babel-plugin-external-helpers": "^6.22.0", "babel-plugin-transform-runtime": "^6.23.0", "babel-preset-env": "^1.4.0", "babel-register": "^6.24.1", "chai": "^3.5.0", "eslint": "^5.16.0", "istanbul": "^0.4.3", "karma": "^1.7.0", "karma-chrome-launcher": "^2.1.1", "karma-mocha": "^1.3.0", "karma-sourcemap-loader": "^0.3.7", "karma-webpack": "^2.0.3", "mocha": "^3.4.1", "rollup": "^0.41.6", "rollup-plugin-alias": "^1.3.1", "rollup-plugin-babel": "^2.7.1", "rollup-plugin-commonjs": "^8.0.2", "rollup-plugin-json": "^2.1.1", "rollup-plugin-node-resolve": "^3.0.0", "should": "^9.0.2", "uglify-js": "^3.0.11", "webpack": "^2.5.1" };
-var dependencies = { "axios": "^0.16.1", "base-64": "^0.1.0", "form-data": "^2.1.4", "hmacsha1": "^1.0.0", "md5": "^2.2.1", "mime-types": "^2.1.15" };
+var devDependencies = { "babel-cli": "^6.24.1", "babel-loader": "^7.0.0", "babel-plugin-external-helpers": "^6.22.0", "babel-plugin-transform-runtime": "^6.23.0", "babel-preset-env": "^1.4.0", "babel-register": "^6.24.1", "chai": "^3.5.0", "delay": "^4.2.0", "eslint": "^5.16.0", "istanbul": "^0.4.3", "karma": "^1.7.0", "karma-chrome-launcher": "^2.1.1", "karma-mocha": "^1.3.0", "karma-sourcemap-loader": "^0.3.7", "karma-webpack": "^2.0.3", "mocha": "^3.4.1", "rollup": "^0.41.6", "rollup-plugin-alias": "^1.3.1", "rollup-plugin-babel": "^2.7.1", "rollup-plugin-commonjs": "^8.0.2", "rollup-plugin-json": "^2.1.1", "rollup-plugin-node-resolve": "^3.0.0", "should": "^9.0.2", "uglify-js": "^3.0.11", "webpack": "^2.5.1" };
+var dependencies = { "axios": "^0.18.0", "base-64": "^0.1.0", "form-data": "^2.1.4", "hmacsha1": "^1.0.0", "is-promise": "^2.1.0", "md5": "^2.2.1", "mime-types": "^2.1.15" };
 var browser = { "./upyun/utils.js": "./upyun/browser-utils.js", "./upyun/form-upload.js": "./upyun/browser-form-upload.js" };
 var pkg = {
 	name: name,
@@ -271,7 +281,8 @@ function getPolicyAndAuthorization(service, params) {
   var authorization = genSign(service, {
     method: 'POST',
     path: '/' + service.serviceName,
-    policy: policy
+    policy: policy,
+    contentMd5: params['content-md5']
   });
   return {
     policy: policy,
@@ -421,10 +432,14 @@ var Upyun = function () {
     var config = Object.assign({
       domain: 'v0.api.upyun.com',
       protocol: 'https'
+      // proxy: false // 禁用代理 // 参考 axios 配置. 如: {host: '127.0.0.1', post: 1081}
     }, params);
-    this.endpoint = config.protocol + '://' + config.domain;
 
-    this.req = createReq(this.endpoint, service, getHeaderSign$$1 || defaultGetHeaderSign);
+    this.endpoint = config.protocol + '://' + config.domain;
+    var proxy = config.proxy;
+
+    this.proxy = proxy;
+    this.req = createReq(this.endpoint, service, getHeaderSign$$1 || defaultGetHeaderSign, { proxy: proxy });
     // NOTE this will be removed
     this.bucket = service;
     this.service = service;
@@ -959,7 +974,33 @@ var Upyun = function () {
     value: function formPutFile(remotePath, localFile) {
       var _this4 = this;
 
-      var params = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+      var orignParams = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+      var params = {};
+      var _iteratorNormalCompletion3 = true;
+      var _didIteratorError3 = false;
+      var _iteratorError3 = undefined;
+
+      try {
+        for (var _iterator3 = Object.keys(orignParams)[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+          var key = _step3.value;
+
+          params[key.toLowerCase()] = orignParams[key];
+        }
+      } catch (err) {
+        _didIteratorError3 = true;
+        _iteratorError3 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion3 && _iterator3.return) {
+            _iterator3.return();
+          }
+        } finally {
+          if (_didIteratorError3) {
+            throw _iteratorError3;
+          }
+        }
+      }
 
       if (typeof this.bodySignCallback !== 'function') {
         throw new Error('upyun - must setBodySignCallback first!');
@@ -968,14 +1009,10 @@ var Upyun = function () {
       params['service'] = this.service.serviceName;
       params['save-key'] = remotePath;
       var result = this.bodySignCallback(this.service, params);
-      if (typeof result.then !== 'function') {
-        result = Promise.resolve(result);
-      }
+      result = isPromise(result) ? result : Promise.resolve(result);
 
       return result.then(function (bodySign) {
-        return formUpload(_this4.endpoint + '/' + params['service'], localFile, bodySign).then(function (result) {
-          return Promise.resolve(result);
-        });
+        return formUpload(_this4.endpoint + '/' + params['service'], localFile, bodySign);
       });
     }
   }, {
@@ -986,7 +1023,8 @@ var Upyun = function () {
       }
       var headers = sign.getPurgeHeaderSign(this.service, urls);
       return axios.post('http://purge.upyun.com/purge/', 'purge=' + urls.join('\n'), {
-        headers: headers
+        headers: headers,
+        proxy: this.proxy
       }).then(function (_ref16) {
         var data = _ref16.data;
 
@@ -1008,33 +1046,32 @@ function isMeta(key) {
 }
 
 function defaultGetHeaderSign() {
-  var headers = sign.getHeaderSign.apply(sign, arguments);
-  return Promise.resolve(headers);
+  return sign.getHeaderSign.apply(sign, arguments);
 }
 
 function key2LowerCase(obj) {
   var objLower = {};
-  var _iteratorNormalCompletion3 = true;
-  var _didIteratorError3 = false;
-  var _iteratorError3 = undefined;
+  var _iteratorNormalCompletion4 = true;
+  var _didIteratorError4 = false;
+  var _iteratorError4 = undefined;
 
   try {
-    for (var _iterator3 = Object.keys(obj)[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-      var key = _step3.value;
+    for (var _iterator4 = Object.keys(obj)[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+      var key = _step4.value;
 
       objLower[key.toLowerCase()] = obj[key];
     }
   } catch (err) {
-    _didIteratorError3 = true;
-    _iteratorError3 = err;
+    _didIteratorError4 = true;
+    _iteratorError4 = err;
   } finally {
     try {
-      if (!_iteratorNormalCompletion3 && _iterator3.return) {
-        _iterator3.return();
+      if (!_iteratorNormalCompletion4 && _iterator4.return) {
+        _iterator4.return();
       }
     } finally {
-      if (_didIteratorError3) {
-        throw _iteratorError3;
+      if (_didIteratorError4) {
+        throw _iteratorError4;
       }
     }
   }

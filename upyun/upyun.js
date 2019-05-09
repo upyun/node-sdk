@@ -38,11 +38,14 @@ export default class Upyun {
 
     const config = Object.assign({
       domain: 'v0.api.upyun.com',
-      protocol: 'https'
+      protocol: 'https',
+      // proxy: false // 禁用代理 // 参考 axios 配置. 如: {host: '127.0.0.1', post: 1081}
     }, params)
-    this.endpoint = config.protocol + '://' + config.domain
 
-    this.req = createReq(this.endpoint, service, getHeaderSign || defaultGetHeaderSign)
+    this.endpoint = config.protocol + '://' + config.domain
+    const {proxy} = config
+    this.proxy = proxy
+    this.req = createReq(this.endpoint, service, getHeaderSign || defaultGetHeaderSign, {proxy})
     // NOTE this will be removed
     this.bucket = service
     this.service = service
@@ -461,7 +464,8 @@ export default class Upyun {
     return axios.post(
       'http://purge.upyun.com/purge/',
       'purge=' + urls.join('\n'), {
-        headers
+        headers,
+        proxy: this.proxy
       }
     ).then(({data}) => {
       if (Object.keys(data.invalid_domain_of_url).length === 0) {

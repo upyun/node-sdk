@@ -15,10 +15,11 @@ axios.defaults.adapter = (function () {
   return http
 })()
 
-export default function (endpoint, service, getHeaderSign) {
+export default function (endpoint, service, getHeaderSign, {proxy} = {}) {
   const req = axios.create({
     baseURL: endpoint + '/' + service.serviceName,
     maxRedirects: 0,
+    proxy
   })
 
   req.interceptors.request.use((config) => {

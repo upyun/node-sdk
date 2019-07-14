@@ -1,4 +1,5 @@
 import FormData from 'form-data'
+import path from 'path'
 
 export default function formUpload (remoteUrl, localFile, {authorization, policy}) {
   return new Promise((resolve, reject) => {
@@ -8,8 +9,12 @@ export default function formUpload (remoteUrl, localFile, {authorization, policy
     // NOTE when type of localFile is buffer/string,
     // force set filename=file, FormData will treat it as a file
     // real filename will be set by save-key in policy
+    const filename = (localFile.name || localFile.path) ?
+      path.basename(localFile.name || localFile.path) :
+      'file'
+
     data.append('file', localFile, {
-      filename: 'file'
+      filename: filename
     })
     data.submit(remoteUrl, (err, res) => {
       if (err) {

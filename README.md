@@ -281,7 +281,7 @@ client.getFile('/sample.txt', saveTo).then(function (stream) {
 })
 ```
 
-### formPutFile(remotePath, localFile, params = {})
+### formPutFile(remotePath, localFile, params = {}, opts = {})
 
 使用又拍云[表单 api](http://docs.upyun.com/api/form_api/) 上传文件。客户端使用该方法时，
 必须先设置获取又拍云 [HTTP Body 签名](http://docs.upyun.com/api/authorization/#http-body)的回调函数
@@ -291,6 +291,9 @@ client.getFile('/sample.txt', saveTo).then(function (stream) {
 - `remotePath`: 保存路径
 - `localFile`: 需要上传的文件，和 `putFile` 相同(**如果在浏览器端使用，只支持 String/Blob/File **)
 - `params`: 又拍云表单 api 支持的可选参数（`service(同 bucket)`, `save-key` 两个必选参数不需要手动在这里设置）
+- `opts`
+  - `filename` 可选参数. 用于指定上传字符串/ Blob 的文件名. 支持路径取 basename. 文件名取值优先级 `filename` > `localFile` 是文件 > 默认值 `"file"`
+
 
 **响应**
 

@@ -436,7 +436,7 @@ export default class Upyun {
     })
   }
 
-  formPutFile (remotePath, localFile, orignParams = {}) {
+  formPutFile (remotePath, localFile, orignParams = {}, opts = {}) {
     const params = {}
     for (const key of Object.keys(orignParams)) {
       params[key.toLowerCase()] = orignParams[key]
@@ -452,7 +452,7 @@ export default class Upyun {
     result = isPromise(result) ? result : Promise.resolve(result)
 
     return result.then((bodySign) => {
-      return formUpload(this.endpoint + '/' + params['service'], localFile, bodySign)
+      return formUpload(this.endpoint + '/' + params['service'], localFile, bodySign, opts)
     })
   }
 

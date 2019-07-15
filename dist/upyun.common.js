@@ -1,5 +1,5 @@
 /**
-  * UPYUN js-sdk 3.3.9
+  * UPYUN js-sdk 3.3.10
   * (c) 2019
   * @license MIT
   */
@@ -13,6 +13,7 @@ var url = _interopDefault(require('url'));
 var fs = _interopDefault(require('fs'));
 var mime = _interopDefault(require('mime-types'));
 var FormData = _interopDefault(require('form-data'));
+var path = _interopDefault(require('path'));
 var hmacsha1 = _interopDefault(require('hmacsha1'));
 var base64 = _interopDefault(require('base-64'));
 var md5 = _interopDefault(require('md5'));
@@ -48,13 +49,13 @@ var createReq = function (endpoint, service, getHeaderSign) {
 
   req.interceptors.request.use(function (config) {
     var method = config.method.toUpperCase();
-    var path = url.resolve('/', config.url || '');
+    var path$$1 = url.resolve('/', config.url || '');
 
-    if (path.indexOf(config.baseURL) === 0) {
-      path = path.substring(config.baseURL.length);
+    if (path$$1.indexOf(config.baseURL) === 0) {
+      path$$1 = path$$1.substring(config.baseURL.length);
     }
     config.url = encodeURI(config.url);
-    var headerSign = getHeaderSign(service, method, path, config.headers['Content-MD5']);
+    var headerSign = getHeaderSign(service, method, path$$1, config.headers['Content-MD5']);
     headerSign = isPromise(headerSign) ? headerSign : Promise.resolve(headerSign);
 
     return headerSign.then(function (headers) {
@@ -144,8 +145,10 @@ function formUpload(remoteUrl, localFile, _ref) {
     // NOTE when type of localFile is buffer/string,
     // force set filename=file, FormData will treat it as a file
     // real filename will be set by save-key in policy
+    var filename = localFile.name || localFile.path ? path.basename(localFile.name || localFile.path) : 'file';
+
     data.append('file', localFile, {
-      filename: 'file'
+      filename: filename
     });
     data.submit(remoteUrl, function (err, res) {
       if (err) {
@@ -178,7 +181,7 @@ function formUpload(remoteUrl, localFile, _ref) {
 }
 
 var name = "upyun";
-var version = "3.3.9";
+var version = "3.3.10";
 var description = "UPYUN js sdk";
 var main = "dist/upyun.common.js";
 var module$1 = "dist/upyun.esm.js";
@@ -220,14 +223,14 @@ var pkg = {
  * @param {string} path - storage path on upyun server, e.g: /your/dir/example.txt
  * @param {string} contentMd5 - md5 of the file that will be uploaded
  */
-function getHeaderSign(service, method, path) {
+function getHeaderSign(service, method, path$$1) {
   var contentMd5 = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
   var date = new Date().toGMTString();
-  path = '/' + service.serviceName + path;
+  path$$1 = '/' + service.serviceName + path$$1;
   var sign = genSign(service, {
     method: method,
-    path: path,
+    path: path$$1,
     date: date,
     contentMd5: contentMd5
   });
@@ -244,10 +247,10 @@ function getHeaderSign(service, method, path) {
  */
 function genSign(service, options) {
   var method = options.method,
-      path = options.path;
+      path$$1 = options.path;
 
 
-  var data = [method, encodeURI(path)];
+  var data = [method, encodeURI(path$$1)];
 
   // optional params
   ['date', 'policy', 'contentMd5'].forEach(function (item) {
@@ -473,9 +476,9 @@ var Upyun = function () {
   }, {
     key: 'usage',
     value: function usage() {
-      var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '/';
+      var path$$1 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '/';
 
-      return this.req.get(path + '?usage').then(function (_ref) {
+      return this.req.get(path$$1 + '?usage').then(function (_ref) {
         var data = _ref.data;
 
         return Promise.resolve(data);
@@ -484,7 +487,7 @@ var Upyun = function () {
   }, {
     key: 'listDir',
     value: function listDir() {
-      var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '/';
+      var path$$1 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '/';
 
       var _ref2 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
           _ref2$limit = _ref2.limit,
@@ -509,7 +512,7 @@ var Upyun = function () {
         requestHeaders['x-list-iter'] = iter;
       }
 
-      return this.req.get(path, {
+      return this.req.get(path$$1, {
         headers: requestHeaders
       }).then(function (_ref3) {
         var data = _ref3.data,

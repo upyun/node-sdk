@@ -1,5 +1,5 @@
 /**
-  * UPYUN js-sdk 3.3.9
+  * UPYUN js-sdk 3.3.10
   * (c) 2019
   * @license MIT
   */
@@ -1743,7 +1743,7 @@ var base64 = createCommonjsModule(function (module, exports) {
 });
 
 var name = "upyun";
-var version = "3.3.9";
+var version = "3.3.10";
 var description = "UPYUN js sdk";
 var main = "dist/upyun.common.js";
 var module$1 = "dist/upyun.esm.js";

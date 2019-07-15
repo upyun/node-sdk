@@ -1,5 +1,5 @@
 /**
-  * UPYUN js-sdk 3.3.10
+  * UPYUN js-sdk 3.3.11
   * (c) 2019
   * @license MIT
   */
@@ -138,6 +138,9 @@ function formUpload(remoteUrl, localFile, _ref) {
   var authorization = _ref.authorization,
       policy = _ref.policy;
 
+  var _ref2 = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {},
+      filename = _ref2.filename;
+
   return new Promise(function (resolve, reject) {
     var data = new FormData();
     data.append('authorization', authorization);
@@ -145,7 +148,7 @@ function formUpload(remoteUrl, localFile, _ref) {
     // NOTE when type of localFile is buffer/string,
     // force set filename=file, FormData will treat it as a file
     // real filename will be set by save-key in policy
-    var filename = localFile.name || localFile.path ? path.basename(localFile.name || localFile.path) : 'file';
+    filename = filename || localFile.name || localFile.path ? path.basename(filename || localFile.name || localFile.path) : 'file';
 
     data.append('file', localFile, {
       filename: filename
@@ -181,7 +184,7 @@ function formUpload(remoteUrl, localFile, _ref) {
 }
 
 var name = "upyun";
-var version = "3.3.10";
+var version = "3.3.11";
 var description = "UPYUN js sdk";
 var main = "dist/upyun.common.js";
 var module$1 = "dist/upyun.esm.js";
@@ -978,6 +981,7 @@ var Upyun = function () {
       var _this4 = this;
 
       var orignParams = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+      var opts = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
       var params = {};
       var _iteratorNormalCompletion3 = true;
@@ -1015,7 +1019,7 @@ var Upyun = function () {
       result = isPromise(result) ? result : Promise.resolve(result);
 
       return result.then(function (bodySign) {
-        return formUpload(_this4.endpoint + '/' + params['service'], localFile, bodySign);
+        return formUpload(_this4.endpoint + '/' + params['service'], localFile, bodySign, opts);
       });
     }
   }, {

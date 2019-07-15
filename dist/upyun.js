@@ -1,15 +1,16 @@
 /**
-  * UPYUN js-sdk 3.3.10
+  * UPYUN js-sdk 3.3.11
   * (c) 2019
   * @license MIT
   */
 (function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('axios')) :
-	typeof define === 'function' && define.amd ? define(['axios'], factory) :
-	(global.upyun = factory(global.axios));
-}(this, (function (axios) { 'use strict';
+	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('axios'), require('path')) :
+	typeof define === 'function' && define.amd ? define(['axios', 'path'], factory) :
+	(global.upyun = factory(global.axios,global.path));
+}(this, (function (axios,path) { 'use strict';
 
 axios = 'default' in axios ? axios['default'] : axios;
+path = 'default' in path ? path['default'] : path;
 
 // NOTE: choose node.js first
 // process is defined in client test
@@ -1453,13 +1454,13 @@ var createReq = function (endpoint, service, getHeaderSign) {
 
   req.interceptors.request.use(function (config) {
     var method = config.method.toUpperCase();
-    var path = url.resolve('/', config.url || '');
+    var path$$1 = url.resolve('/', config.url || '');
 
-    if (path.indexOf(config.baseURL) === 0) {
-      path = path.substring(config.baseURL.length);
+    if (path$$1.indexOf(config.baseURL) === 0) {
+      path$$1 = path$$1.substring(config.baseURL.length);
     }
     config.url = encodeURI(config.url);
-    var headerSign = getHeaderSign(service, method, path, config.headers['Content-MD5']);
+    var headerSign = getHeaderSign(service, method, path$$1, config.headers['Content-MD5']);
     headerSign = isPromise_1(headerSign) ? headerSign : Promise.resolve(headerSign);
 
     return headerSign.then(function (headers) {
@@ -1507,16 +1508,21 @@ function formUpload(remoteUrl, localFile, _ref) {
   var authorization = _ref.authorization,
       policy = _ref.policy;
 
+  var _ref2 = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {},
+      filename = _ref2.filename;
+
   var data = new FormData();
   data.append('authorization', authorization);
   data.append('policy', policy);
   if (typeof localFile === 'string') {
     localFile = new Blob([localFile], { type: 'text/plain' });
   }
-  data.append('file', localFile);
-  return axios.post(remoteUrl, data).then(function (_ref2) {
-    var status = _ref2.status,
-        data = _ref2.data;
+
+  filename = filename ? path.basename(filename) : filename;
+  data.append('file', localFile, filename);
+  return axios.post(remoteUrl, data).then(function (_ref3) {
+    var status = _ref3.status,
+        data = _ref3.data;
 
     if (status === 200) {
       return Promise.resolve(data);
@@ -1743,7 +1749,7 @@ var base64 = createCommonjsModule(function (module, exports) {
 });
 
 var name = "upyun";
-var version = "3.3.10";
+var version = "3.3.11";
 var description = "UPYUN js sdk";
 var main = "dist/upyun.common.js";
 var module$1 = "dist/upyun.esm.js";
@@ -2103,14 +2109,14 @@ var md5 = createCommonjsModule(function (module) {
  * @param {string} path - storage path on upyun server, e.g: /your/dir/example.txt
  * @param {string} contentMd5 - md5 of the file that will be uploaded
  */
-function getHeaderSign(service, method, path) {
+function getHeaderSign(service, method, path$$1) {
   var contentMd5 = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
   var date = new Date().toGMTString();
-  path = '/' + service.serviceName + path;
+  path$$1 = '/' + service.serviceName + path$$1;
   var sign = genSign(service, {
     method: method,
-    path: path,
+    path: path$$1,
     date: date,
     contentMd5: contentMd5
   });
@@ -2127,10 +2133,10 @@ function getHeaderSign(service, method, path) {
  */
 function genSign(service, options) {
   var method = options.method,
-      path = options.path;
+      path$$1 = options.path;
 
 
-  var data = [method, encodeURI(path)];
+  var data = [method, encodeURI(path$$1)];
 
   // optional params
   ['date', 'policy', 'contentMd5'].forEach(function (item) {
@@ -2356,9 +2362,9 @@ var Upyun = function () {
   }, {
     key: 'usage',
     value: function usage() {
-      var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '/';
+      var path$$1 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '/';
 
-      return this.req.get(path + '?usage').then(function (_ref) {
+      return this.req.get(path$$1 + '?usage').then(function (_ref) {
         var data = _ref.data;
 
         return Promise.resolve(data);
@@ -2367,7 +2373,7 @@ var Upyun = function () {
   }, {
     key: 'listDir',
     value: function listDir() {
-      var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '/';
+      var path$$1 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '/';
 
       var _ref2 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
           _ref2$limit = _ref2.limit,
@@ -2392,7 +2398,7 @@ var Upyun = function () {
         requestHeaders['x-list-iter'] = iter;
       }
 
-      return this.req.get(path, {
+      return this.req.get(path$$1, {
         headers: requestHeaders
       }).then(function (_ref3) {
         var data = _ref3.data,
@@ -2858,6 +2864,7 @@ var Upyun = function () {
       var _this4 = this;
 
       var orignParams = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+      var opts = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
       var params = {};
       var _iteratorNormalCompletion3 = true;
@@ -2895,7 +2902,7 @@ var Upyun = function () {
       result = isPromise_1(result) ? result : Promise.resolve(result);
 
       return result.then(function (bodySign) {
-        return formUpload(_this4.endpoint + '/' + params['service'], localFile, bodySign);
+        return formUpload(_this4.endpoint + '/' + params['service'], localFile, bodySign, opts);
       });
     }
   }, {

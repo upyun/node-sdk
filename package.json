@@ -4,6 +4,7 @@
   "description": "UPYUN js sdk",
   "main": "dist/upyun.common.js",
   "module": "dist/upyun.esm.js",
+  "types": "upyun.d.ts",
   "scripts": {
     "build": "node build/build.js",
     "lint": "eslint .",

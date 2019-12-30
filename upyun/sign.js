@@ -4,7 +4,8 @@ import pkg from '../package.json'
 import md5 from 'md5'
 
 /**
- * generate head sign
+ * generate head sign for rest api
+ * {@link http://docs.upyun.com/api/authorization/#_2}
  * @param {object} service
  * @param {string} path - storage path on upyun server, e.g: /your/dir/example.txt
  * @param {string} contentMd5 - md5 of the file that will be uploaded
@@ -26,6 +27,7 @@ export function getHeaderSign (service, method, path, contentMd5 = null) {
 
 /**
  * generate signature string which can be used in head sign or body sign
+ * {@link http://docs.upyun.com/api/authorization/#_2}
  * @param {object} service
  * @param {object} options - must include key is method, path
  */
@@ -78,6 +80,14 @@ export function getPolicyAndAuthorization (service, params) {
   }
 }
 
+/**
+ * get Authorization and Date for purge api
+ * {@link http://docs.upyun.com/api/purge/#_1}
+ *
+ * @param {!object} service
+ * @param {!string[]} urls
+ *
+ */
 export function getPurgeHeaderSign (service, urls) {
   const date = new Date().toGMTString()
   const str = urls.join('\n')

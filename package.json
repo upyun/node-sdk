@@ -1,6 +1,6 @@
 {
   "name": "upyun",
-  "version": "3.3.11",
+  "version": "3.3.12",
   "description": "UPYUN js sdk",
   "main": "dist/upyun.common.js",
   "module": "dist/upyun.esm.js",

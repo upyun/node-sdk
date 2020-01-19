@@ -1,6 +1,6 @@
 /**
-  * UPYUN js-sdk 3.3.11
-  * (c) 2019
+  * UPYUN js-sdk 3.3.12
+  * (c) 2020
   * @license MIT
   */
 'use strict';
@@ -13,7 +13,7 @@ var url = _interopDefault(require('url'));
 var fs = _interopDefault(require('fs'));
 var mime = _interopDefault(require('mime-types'));
 var FormData = _interopDefault(require('form-data'));
-var path = _interopDefault(require('path'));
+var Path = _interopDefault(require('path'));
 var hmacsha1 = _interopDefault(require('hmacsha1'));
 var base64 = _interopDefault(require('base-64'));
 var md5 = _interopDefault(require('md5'));
@@ -49,13 +49,13 @@ var createReq = function (endpoint, service, getHeaderSign) {
 
   req.interceptors.request.use(function (config) {
     var method = config.method.toUpperCase();
-    var path$$1 = url.resolve('/', config.url || '');
+    var path = url.resolve('/', config.url || '');
 
-    if (path$$1.indexOf(config.baseURL) === 0) {
-      path$$1 = path$$1.substring(config.baseURL.length);
+    if (path.indexOf(config.baseURL) === 0) {
+      path = path.substring(config.baseURL.length);
     }
     config.url = encodeURI(config.url);
-    var headerSign = getHeaderSign(service, method, path$$1, config.headers['Content-MD5']);
+    var headerSign = getHeaderSign(service, method, path, config.headers['Content-MD5']);
     headerSign = isPromise(headerSign) ? headerSign : Promise.resolve(headerSign);
 
     return headerSign.then(function (headers) {
@@ -148,7 +148,7 @@ function formUpload(remoteUrl, localFile, _ref) {
     // NOTE when type of localFile is buffer/string,
     // force set filename=file, FormData will treat it as a file
     // real filename will be set by save-key in policy
-    filename = filename || localFile.name || localFile.path ? path.basename(filename || localFile.name || localFile.path) : 'file';
+    filename = filename || localFile.name || localFile.path ? Path.basename(filename || localFile.name || localFile.path) : 'file';
 
     data.append('file', localFile, {
       filename: filename
@@ -184,7 +184,7 @@ function formUpload(remoteUrl, localFile, _ref) {
 }
 
 var name = "upyun";
-var version = "3.3.11";
+var version = "3.3.12";
 var description = "UPYUN js sdk";
 var main = "dist/upyun.common.js";
 var module$1 = "dist/upyun.esm.js";
@@ -221,19 +221,20 @@ var pkg = {
 };
 
 /**
- * generate head sign
+ * generate head sign for rest api
+ * {@link http://docs.upyun.com/api/authorization/#_2}
  * @param {object} service
  * @param {string} path - storage path on upyun server, e.g: /your/dir/example.txt
  * @param {string} contentMd5 - md5 of the file that will be uploaded
  */
-function getHeaderSign(service, method, path$$1) {
+function getHeaderSign(service, method, path) {
   var contentMd5 = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
   var date = new Date().toGMTString();
-  path$$1 = '/' + service.serviceName + path$$1;
+  path = '/' + service.serviceName + path;
   var sign = genSign(service, {
     method: method,
-    path: path$$1,
+    path: path,
     date: date,
     contentMd5: contentMd5
   });
@@ -245,15 +246,16 @@ function getHeaderSign(service, method, path$$1) {
 
 /**
  * generate signature string which can be used in head sign or body sign
+ * {@link http://docs.upyun.com/api/authorization/#_2}
  * @param {object} service
  * @param {object} options - must include key is method, path
  */
 function genSign(service, options) {
   var method = options.method,
-      path$$1 = options.path;
+      path = options.path;
 
 
-  var data = [method, encodeURI(path$$1)];
+  var data = [method, encodeURI(path)];
 
   // optional params
   ['date', 'policy', 'contentMd5'].forEach(function (item) {
@@ -296,6 +298,14 @@ function getPolicyAndAuthorization(service, params) {
   };
 }
 
+/**
+ * get Authorization and Date for purge api
+ * {@link http://docs.upyun.com/api/purge/#_1}
+ *
+ * @param {!object} service
+ * @param {!string[]} urls
+ *
+ */
 function getPurgeHeaderSign(service, urls) {
   var date = new Date().toGMTString();
   var str = urls.join('\n');
@@ -479,9 +489,9 @@ var Upyun = function () {
   }, {
     key: 'usage',
     value: function usage() {
-      var path$$1 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '/';
+      var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '/';
 
-      return this.req.get(path$$1 + '?usage').then(function (_ref) {
+      return this.req.get(path + '?usage').then(function (_ref) {
         var data = _ref.data;
 
         return Promise.resolve(data);
@@ -490,7 +500,7 @@ var Upyun = function () {
   }, {
     key: 'listDir',
     value: function listDir() {
-      var path$$1 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '/';
+      var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '/';
 
       var _ref2 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
           _ref2$limit = _ref2.limit,
@@ -515,7 +525,7 @@ var Upyun = function () {
         requestHeaders['x-list-iter'] = iter;
       }
 
-      return this.req.get(path$$1, {
+      return this.req.get(path, {
         headers: requestHeaders
       }).then(function (_ref3) {
         var data = _ref3.data,
@@ -765,12 +775,72 @@ var Upyun = function () {
         return Promise.resolve(status === 200);
       });
     }
+
+    /**
+     * copy file
+     *
+     * {@link https://help.upyun.com/knowledge-base/rest_api/#e5a48de588b6e69687e4bbb6 }
+     *
+     * @param {!string} targetPath
+     * @param {!string} sourcePath
+     * @param {?object} options={} - 可传入参数 `x-upyun-metadata-directive`, `content-md5`, `content-length`
+     */
+
+  }, {
+    key: 'copy',
+    value: function copy(targetPath, sourcePath) {
+      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+      var lowerOptions = key2LowerCase(options);
+
+      var headers = Object.assign(lowerOptions, {
+        'x-upyun-copy-source': Path.join('/', this.service.serviceName, sourcePath)
+      });
+
+      return this.req.put(targetPath, null, {
+        headers: headers
+      }).then(function (_ref9) {
+        var status = _ref9.status;
+
+        return Promise.resolve(status === 200);
+      });
+    }
+
+    /**
+     * move file
+     *
+     * {@link https://help.upyun.com/knowledge-base/rest_api/#e7a7bbe58aa8e69687e4bbb6 }
+     *
+     * @param {!string} targetPath
+     * @param {!string} sourcePath
+     * @param {?object} options={} - 可传入参数 `x-upyun-metadata-directive`, `content-md5`, `content-length`
+     */
+
+  }, {
+    key: 'move',
+    value: function move(targetPath, sourcePath) {
+      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+      var lowerOptions = key2LowerCase(options);
+
+      var headers = Object.assign(lowerOptions, {
+        'x-upyun-move-source': Path.join('/', this.service.serviceName, sourcePath)
+      });
+
+      return this.req.put(targetPath, null, {
+        headers: headers
+      }).then(function (_ref10) {
+        var status = _ref10.status;
+
+        return Promise.resolve(status === 200);
+      });
+    }
   }, {
     key: 'headFile',
     value: function headFile(remotePath) {
-      return this.req.head(remotePath).then(function (_ref9) {
-        var headers = _ref9.headers,
-            status = _ref9.status;
+      return this.req.head(remotePath).then(function (_ref11) {
+        var headers = _ref11.headers,
+            status = _ref11.status;
 
         if (status === 404) {
           return Promise.resolve(false);
@@ -804,8 +874,8 @@ var Upyun = function () {
       }
       return this.req.delete(remotePath, {
         headers: headers
-      }).then(function (_ref10) {
-        var status = _ref10.status;
+      }).then(function (_ref12) {
+        var status = _ref12.status;
 
         return Promise.resolve(status === 200);
       });
@@ -866,8 +936,8 @@ var Upyun = function () {
         }
       }
 
-      return this.req.patch(remotePath + '?metadata=' + operate, null, { headers: metaHeaders }).then(function (_ref11) {
-        var status = _ref11.status;
+      return this.req.patch(remotePath + '?metadata=' + operate, null, { headers: metaHeaders }).then(function (_ref13) {
+        var status = _ref13.status;
 
         return Promise.resolve(status === 200);
       });
@@ -878,9 +948,9 @@ var Upyun = function () {
   }, {
     key: 'getMetadata',
     value: function getMetadata(remotePath) {
-      return this.req.get(remotePath).then(function (_ref12) {
-        var headers = _ref12.headers,
-            status = _ref12.status;
+      return this.req.get(remotePath).then(function (_ref14) {
+        var headers = _ref14.headers,
+            status = _ref14.status;
 
         if (status !== 200) {
           return Promise.resolve(false);
@@ -931,8 +1001,8 @@ var Upyun = function () {
 
         return _this3.req.put(remotePath, null, {
           headers: options
-        }).then(function (_ref13) {
-          var headers = _ref13.headers;
+        }).then(function (_ref15) {
+          var headers = _ref15.headers;
 
           var uuid = headers['x-upyun-multi-uuid'];
           var nextId = headers['x-upyun-next-part-id'];
@@ -950,8 +1020,8 @@ var Upyun = function () {
                     'x-upyun-multi-uuid': uuid,
                     'x-upyun-part-id': nextId
                   }
-                }).then(function (_ref14) {
-                  var headers = _ref14.headers;
+                }).then(function (_ref16) {
+                  var headers = _ref16.headers;
 
                   nextId = headers['x-upyun-next-part-id'];
                   return Promise.resolve(nextId);
@@ -966,8 +1036,8 @@ var Upyun = function () {
                 'x-upyun-multi-stage': 'complete',
                 'x-upyun-multi-uuid': uuid
               }
-            }).then(function (_ref15) {
-              var status = _ref15.status;
+            }).then(function (_ref17) {
+              var status = _ref17.status;
 
               return Promise.resolve(status === 204 || status === 201);
             });
@@ -1032,8 +1102,8 @@ var Upyun = function () {
       return axios.post('http://purge.upyun.com/purge/', 'purge=' + urls.join('\n'), {
         headers: headers,
         proxy: this.proxy
-      }).then(function (_ref16) {
-        var data = _ref16.data;
+      }).then(function (_ref18) {
+        var data = _ref18.data;
 
         if (Object.keys(data.invalid_domain_of_url).length === 0) {
           return true;

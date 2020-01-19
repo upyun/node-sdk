@@ -301,7 +301,7 @@ client.getFile('/sample.txt', saveTo).then(function (stream) {
 
 ### copy(targetPath, sourcePath, options = {})
 
-将文件 sourcePath 拷贝至 targetPath
+将文件 `sourcePath` 拷贝至 `targetPath`，不适用于文件夹。
 
 **参数**
 
@@ -316,7 +316,7 @@ client.getFile('/sample.txt', saveTo).then(function (stream) {
 
 ### move(targetPath, sourcePath, options = {})
 
-将文件 sourcePath 移动并重命名至 targetPath
+将文件 `sourcePath` 移动并重命名至 `targetPath`，不适用于文件夹。
 
 **参数**
 
@@ -329,7 +329,7 @@ client.getFile('/sample.txt', saveTo).then(function (stream) {
 操作成功返回 `true`, 反之返回 `false`
 
 
-## Service
+## Servic**e**
 
 又拍云服务，包含以下属性
 

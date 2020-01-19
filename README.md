@@ -299,6 +299,36 @@ client.getFile('/sample.txt', saveTo).then(function (stream) {
 
 成功返回一个对象，详细说明见[异步通知规则](http://docs.upyun.com/api/form_api/#notify_return)参数说明部分，失败返回 `false`
 
+### copy(targetPath, sourcePath, options = {})
+
+将文件 sourcePath 拷贝至 targetPath
+
+**参数**
+
+- `sourcePath`: 原文件地址
+- `targetPath`: 目标文件地址
+- `options`: 其他可选参数 `x-upyun-metadata-directive | content-md5 | content-length`（无视大小写）
+
+**响应**
+
+操作成功返回 `true`, 反之返回 `false`
+
+
+### move(targetPath, sourcePath, options = {})
+
+将文件 sourcePath 移动并重命名至 targetPath
+
+**参数**
+
+- `sourcePath`: 原文件地址
+- `targetPath`: 目标文件地址
+- `options`: 其他可选参数 `x-upyun-metadata-directive | content-md5 | content-length`（无视大小写）
+
+**响应**
+
+操作成功返回 `true`, 反之返回 `false`
+
+
 ## Service
 
 又拍云服务，包含以下属性

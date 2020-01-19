@@ -5,6 +5,7 @@ import axios from 'axios'
 import sign from './sign'
 import { isBrowser, PARTSIZE } from './constants'
 import isPromise from 'is-promise'
+import Path from 'path'
 
 /**
  * @class
@@ -260,6 +261,52 @@ export default class Upyun {
   makeDir (remotePath) {
     return this.req.post(remotePath, null, {
       headers: { folder: 'true' }
+    }).then(({status}) => {
+      return Promise.resolve(status === 200)
+    })
+  }
+
+  /**
+   * copy file
+   *
+   * {@link https://help.upyun.com/knowledge-base/rest_api/#e5a48de588b6e69687e4bbb6 }
+   *
+   * @param {!string} targetPath
+   * @param {!string} sourcePath
+   * @param {?object} options={} - 可传入参数 `x-upyun-metadata-directive`, `content-md5`, `content-length`
+   */
+  copy (targetPath, sourcePath, options = {}) {
+    const lowerOptions = key2LowerCase(options)
+
+    const headers = Object.assign(lowerOptions, {
+      'x-upyun-copy-source': Path.join('/', this.service.serviceName, sourcePath),
+    })
+
+    return this.req.put(targetPath, null, {
+      headers: headers,
+    }).then(({status}) => {
+      return Promise.resolve(status === 200)
+    })
+  }
+
+  /**
+   * move file
+   *
+   * {@link https://help.upyun.com/knowledge-base/rest_api/#e7a7bbe58aa8e69687e4bbb6 }
+   *
+   * @param {!string} targetPath
+   * @param {!string} sourcePath
+   * @param {?object} options={} - 可传入参数 `x-upyun-metadata-directive`, `content-md5`, `content-length`
+   */
+  move (targetPath, sourcePath, options = {}) {
+    const lowerOptions = key2LowerCase(options)
+
+    const headers = Object.assign(lowerOptions, {
+      'x-upyun-move-source': Path.join('/', this.service.serviceName, sourcePath),
+    })
+
+    return this.req.put(targetPath, null, {
+      headers: headers,
     }).then(({status}) => {
       return Promise.resolve(status === 200)
     })

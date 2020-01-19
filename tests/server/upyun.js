@@ -284,4 +284,59 @@ describe('index', function () {
       throw new Error('should get error')
     })
   })
+
+  describe('#copy', function () {
+    context('when source file is exist', () => {
+      const sourcePath = '/copysource.txt'
+      const targetPath = '/copytarget.txt'
+
+      before(async () => {
+        await delay(2000) // 降低响应码 429 Too Many Requests 发生几率
+        await client.putFile(sourcePath, 'copy file')
+      })
+
+      it('should copy file success', async () => {
+        await delay(2000) // 降低响应码 429 Too Many Requests 发生几率
+        const result = await client.copy(targetPath, sourcePath)
+        expect(result).to.equal(true)
+      })
+    })
+
+    context('when source file is not exist', () => {
+      const sourcePath = '/test/notExistCopySource.txt'
+      const targetPath = '/test/notExistCopyTarget.txt'
+      it('should copy file that does not exist', async () => {
+        await delay(2000) // 降低响应码 429 Too Many Requests 发生几率
+        const result = await client.copy(targetPath, sourcePath)
+        expect(result).to.equal(false)
+      })
+    })
+  })
+
+  describe('#move', function () {
+    context('when source file is exist', () => {
+      const sourcePath = '/test/movesource.txt'
+      const targetPath = '/test/movetarget.txt'
+      before(async () => {
+        await delay(2000) // 降低响应码 429 Too Many Requests 发生几率
+        await client.putFile(sourcePath, 'move file')
+      })
+
+      it('should move file success', async () => {
+        await delay(2000) // 降低响应码 429 Too Many Requests 发生几率
+        const result = await client.move(targetPath, sourcePath)
+        expect(result).to.equal(true)
+      })
+    })
+
+    context('when source file is not exist', () => {
+      const sourcePath = '/test/notExistMoveSource.txt'
+      const targetPath = '/test/notExistMoveTarget.txt'
+      it('should move file that does not exist', async () => {
+        await delay(2000) // 降低响应码 429 Too Many Requests 发生几率
+        const result = await client.move(targetPath, sourcePath)
+        expect(result).to.equal(false)
+      })
+    })
+  })
 })

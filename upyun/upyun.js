@@ -5,7 +5,7 @@ import axios from 'axios'
 import sign from './sign'
 import { isBrowser, PARTSIZE } from './constants'
 import isPromise from 'is-promise'
-import Path from 'path'
+import path from 'path'
 
 /**
  * @class
@@ -72,13 +72,13 @@ export default class Upyun {
     this.bodySignCallback = getBodySign
   }
 
-  usage (path = '/') {
-    return this.req.get(path + '?usage').then(({data}) => {
+  usage (dir = '/') {
+    return this.req.get(dir + '?usage').then(({data}) => {
       return Promise.resolve(data)
     })
   }
 
-  listDir (path = '/', {limit = 100, order = 'asc', iter = ''} = {}) {
+  listDir (dir = '/', {limit = 100, order = 'asc', iter = ''} = {}) {
     const requestHeaders = {}
 
     // NOTE: 默认值可以省去请求头设置，避免跨域影响
@@ -94,7 +94,7 @@ export default class Upyun {
       requestHeaders['x-list-iter'] = iter
     }
 
-    return this.req.get(path, {
+    return this.req.get(dir, {
       headers: requestHeaders
     }).then(({data, headers, status}) => {
       if (status === 404) {
@@ -279,7 +279,7 @@ export default class Upyun {
     const lowerOptions = key2LowerCase(options)
 
     const headers = Object.assign(lowerOptions, {
-      'x-upyun-copy-source': Path.join('/', this.service.serviceName, sourcePath),
+      'x-upyun-copy-source': path.join('/', this.service.serviceName, sourcePath),
     })
 
     return this.req.put(targetPath, null, {
@@ -302,7 +302,7 @@ export default class Upyun {
     const lowerOptions = key2LowerCase(options)
 
     const headers = Object.assign(lowerOptions, {
-      'x-upyun-move-source': Path.join('/', this.service.serviceName, sourcePath),
+      'x-upyun-move-source': path.join('/', this.service.serviceName, sourcePath),
     })
 
     return this.req.put(targetPath, null, {

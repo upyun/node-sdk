@@ -285,7 +285,7 @@ export default class Upyun {
     return this.req.put(targetPath, null, {
       headers: headers,
     }).then(({status}) => {
-      return Promise.resolve(status === 200)
+      return Promise.resolve(utils.isSuccess(status))
     })
   }
 
@@ -308,7 +308,7 @@ export default class Upyun {
     return this.req.put(targetPath, null, {
       headers: headers,
     }).then(({status}) => {
-      return Promise.resolve(status === 200)
+      return Promise.resolve(utils.isSuccess(status))
     })
   }
 

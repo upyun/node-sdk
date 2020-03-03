@@ -47,8 +47,13 @@ export function getContentType (filePath) {
   return mime.lookup(filePath)
 }
 
+export function isSuccess(statusCode) {
+  return (statusCode >= 200 && statusCode < 300)
+}
+
 export default {
   readBlockAsync,
   getFileSizeAsync,
-  getContentType
+  getContentType,
+  isSuccess,
 }

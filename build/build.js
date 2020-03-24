@@ -13,7 +13,7 @@ const cjs = require('rollup-plugin-commonjs')
 const json = require('rollup-plugin-json')
 const node = require('rollup-plugin-node-resolve')
 const builtins = require('rollup-plugin-node-builtins')
-const builtinModules = require('builtin-modules');
+const builtinModules = require('builtin-modules')
 const pkg = require('../package.json')
 const resolve = _path => path.resolve(__dirname, _path)
 const version = process.env.VERSION || pkg.version

@@ -1,5 +1,5 @@
 /**
-  * UPYUN js-sdk 3.4.1
+  * UPYUN js-sdk 3.4.2
   * (c) 2020
   * @license MIT
   */
@@ -128,15 +128,10 @@ function getContentType(filePath) {
   return mime.lookup(filePath);
 }
 
-function isSuccess(statusCode) {
-  return statusCode >= 200 && statusCode < 300;
-}
-
 var utils = {
   readBlockAsync: readBlockAsync,
   getFileSizeAsync: getFileSizeAsync,
-  getContentType: getContentType,
-  isSuccess: isSuccess
+  getContentType: getContentType
 };
 
 function formUpload(remoteUrl, localFile, _ref) {
@@ -189,7 +184,7 @@ function formUpload(remoteUrl, localFile, _ref) {
 }
 
 var name = "upyun";
-var version = "3.4.1";
+var version = "3.4.2";
 var description = "UPYUN js sdk";
 var main = "dist/upyun.common.js";
 var module$1 = "dist/upyun.esm.js";
@@ -807,7 +802,7 @@ var Upyun = function () {
       }).then(function (_ref9) {
         var status = _ref9.status;
 
-        return Promise.resolve(utils.isSuccess(status));
+        return Promise.resolve(status >= 200 && status < 300);
       });
     }
 
@@ -837,7 +832,7 @@ var Upyun = function () {
       }).then(function (_ref10) {
         var status = _ref10.status;
 
-        return Promise.resolve(utils.isSuccess(status));
+        return Promise.resolve(status >= 200 && status < 300);
       });
     }
   }, {

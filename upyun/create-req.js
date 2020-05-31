@@ -50,6 +50,7 @@ export default function (endpoint, service, getHeaderSign, {proxy} = {}) {
       }
 
       if (response.status !== 404) {
+        if (response.data && response.data.msg) throw new Error('upyun - ' + response.data.msg);
         throw new Error('upyun - response error: ' + error.message)
       } else {
         return response

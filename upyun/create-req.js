@@ -24,12 +24,12 @@ export default function (endpoint, service, getHeaderSign, {proxy} = {}) {
 
   req.interceptors.request.use((config) => {
     let method = config.method.toUpperCase()
-    let path = url.resolve('/', config.url || '')
+    let path = url.resolve('/', encodeURI(config.url || ''))
 
     if (path.indexOf(config.baseURL) === 0) {
       path = path.substring(config.baseURL.length)
     }
-    config.url = encodeURI(config.url)
+    config.url = path
     let headerSign = getHeaderSign(service, method, path, config.headers['Content-MD5'])
     headerSign = isPromise(headerSign) ? headerSign : Promise.resolve(headerSign)
 

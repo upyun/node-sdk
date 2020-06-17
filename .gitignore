@@ -1,4 +1,5 @@
 tests/fixtures/getFile.txt
+tests/fixtures/中文带 空格.txt
 dev-test/*
 # Logs
 logs

@@ -160,7 +160,7 @@ describe('index', function () {
   })
 
   describe('#getFile', () => {
-    let filePath = '/getFile.txt'
+    let filePath = '/中文带 空格.txt'
     before(async () => {
       await client.putFile(filePath, 'Dictum accumsan, convallis accumsan.')
     })
@@ -171,8 +171,8 @@ describe('index', function () {
     })
 
     it('should pipe file content to stream success', async () => {
-      await client.getFile(filePath, fs.createWriteStream(fixtures + '/getFile.txt'))
-      let result = fs.readFileSync(fixtures + '/getFile.txt', 'utf-8')
+      await client.getFile(filePath, fs.createWriteStream(fixtures + filePath))
+      let result = fs.readFileSync(fixtures + filePath, 'utf-8')
       expect(result).to.equal('Dictum accumsan, convallis accumsan.')
     })
 

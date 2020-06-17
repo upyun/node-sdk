@@ -1,5 +1,5 @@
 /**
-  * UPYUN js-sdk 3.4.3
+  * UPYUN js-sdk 3.4.4
   * (c) 2020
   * @license MIT
   */
@@ -1447,12 +1447,12 @@ var createReq = function (endpoint, service, getHeaderSign) {
 
   req.interceptors.request.use(function (config) {
     var method = config.method.toUpperCase();
-    var path = url.resolve('/', config.url || '');
+    var path = url.resolve('/', encodeURI(config.url || ''));
 
     if (path.indexOf(config.baseURL) === 0) {
       path = path.substring(config.baseURL.length);
     }
-    config.url = encodeURI(config.url);
+    config.url = path;
     var headerSign = getHeaderSign(service, method, path, config.headers['Content-MD5']);
     headerSign = isPromise_1(headerSign) ? headerSign : Promise.resolve(headerSign);
 
@@ -1980,7 +1980,7 @@ var base64 = createCommonjsModule(function (module, exports) {
 });
 
 var name = "upyun";
-var version = "3.4.3";
+var version = "3.4.4";
 var description = "UPYUN js sdk";
 var main = "dist/upyun.common.js";
 var module$1 = "dist/upyun.esm.js";
@@ -2369,7 +2369,7 @@ function genSign(service, options) {
       path = options.path;
 
 
-  var data = [method, encodeURI(path)];
+  var data = [method, path];
 
   // optional params
   ['date', 'policy', 'contentMd5'].forEach(function (item) {

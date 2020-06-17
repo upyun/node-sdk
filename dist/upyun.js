@@ -1,5 +1,5 @@
 /**
-  * UPYUN js-sdk 3.4.2
+  * UPYUN js-sdk 3.4.3
   * (c) 2020
   * @license MIT
   */
@@ -1480,7 +1480,11 @@ var createReq = function (endpoint, service, getHeaderSign) {
     }
 
     if (response.status !== 404) {
-      throw new Error('upyun - response error: ' + error.message);
+      var err = new Error('upyun - response error: ' + error.message);
+      if (error.response.data && error.response.data.code) {
+        err.code = error.response.data.code;
+      }
+      throw err;
     } else {
       return response;
     }
@@ -1982,7 +1986,7 @@ var base64 = createCommonjsModule(function (module, exports) {
 });
 
 var name = "upyun";
-var version = "3.4.2";
+var version = "3.4.3";
 var description = "UPYUN js sdk";
 var main = "dist/upyun.common.js";
 var module$1 = "dist/upyun.esm.js";

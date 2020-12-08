@@ -160,14 +160,14 @@ client.usage('/sub/dir').then(function(size) {
 如果上传失败，返回 `false`
 
 
-### initMultipartUpload(remotePath, localFile, options = {})
+### initMultipartUpload(remotePath, fileOrPath, options = {})
 
 初始化一个并行式断点续传任务
 
 **参数**
 
 - `remotePath`: 文件保存路径 *需包含文件名*（**路径不需要 encodeURI，sdk 会统一处理**）
-- `localFile`: 需要上传的文件。服务端支持 `String | Stream | Buffer`, 浏览器端支持 `File | String` **注意 `String` 表示文件内容，不是本地文件路径**
+- `fileOrPath`: 需要上传的文件。服务端支持文件路径 `String`, 浏览器端支持 `File`
 - `options`: 其他可选参数 `Content-MD5 | X-Upyun-Multi-Type | X-Upyun-Meta-X | X-Upyun-Meta-Ttl`（大小写无关，详见[上传参数](http://docs.upyun.com/api/rest_api/#_2)），其中 `Content-Type` 未设置时，将会根据文件路径设置默认值。
 
 **响应**
@@ -189,7 +189,7 @@ client.usage('/sub/dir').then(function(size) {
 **参数**
 
 - `remotePath`: 文件保存路径 *需包含文件名*（**路径不需要 encodeURI，sdk 会统一处理**）
-- `localFile`: 需要上传的文件。服务端支持 `String | Stream | Buffer`, 浏览器端支持 `File | String` **注意 `String` 表示文件内容，不是本地文件路径**
+- `fileOrPath`: 需要上传的文件。服务端支持文件路径 `String`, 浏览器端支持 `File`
 - `multiUuid`: 任务标识，初始化时生成。即 `X-Upyun-Multi-Uuid`
 - `partId` 	分块序号，序号从 0 开始. 即 `X-Upyun-Part-Id`
 

@@ -1,5 +1,5 @@
 /**
-  * UPYUN js-sdk 3.4.4
+  * UPYUN js-sdk 3.4.5
   * (c) 2020
   * @license MIT
   */
@@ -188,7 +188,7 @@ function formUpload(remoteUrl, localFile, _ref) {
 }
 
 var name = "upyun";
-var version = "3.4.4";
+var version = "3.4.5";
 var description = "UPYUN js sdk";
 var main = "dist/upyun.common.js";
 var module$1 = "dist/upyun.esm.js";
@@ -686,8 +686,13 @@ var Upyun = function () {
         fileSizePromise = Promise.resolve(fileOrPath.size);
         contentType = contentType || fileOrPath.type;
       } else {
-        fileSizePromise = utils.getFileSizeAsync(fileOrPath);
-        contentType = contentType || utils.getContentType(fileOrPath);
+        if (Buffer.isBuffer(fileOrPath)) {
+          fileSizePromise = Promise.resolve(fileOrPath.length);
+          contentType = contentType || 'application/octet-stream';
+        } else {
+          fileSizePromise = utils.getFileSizeAsync(fileOrPath);
+          contentType = contentType || utils.getContentType(fileOrPath);
+        }
       }
 
       return fileSizePromise.then(function (fileSize) {
@@ -731,13 +736,18 @@ var Upyun = function () {
         fileSizePromise = Promise.resolve(fileOrPath.size);
         // contentType = fileOrPath.type
       } else {
-        fileSizePromise = utils.getFileSizeAsync(fileOrPath);
-        // contentType = utils.getContentType(fileOrPath)
+        if (Buffer.isBuffer(fileOrPath)) {
+          fileSizePromise = Promise.resolve(fileOrPath.length);
+        } else {
+          fileSizePromise = utils.getFileSizeAsync(fileOrPath);
+          // contentType = utils.getContentType(fileOrPath)
+        }
       }
 
       var blockPromise = fileSizePromise.then(function (fileSize) {
         var end = Math.min(start + PARTSIZE, fileSize);
-        return utils.readBlockAsync(fileOrPath, start, end);
+
+        return Buffer.isBuffer(fileOrPath) ? fileOrPath.slice(start, end) : utils.readBlockAsync(fileOrPath, start, end);
       });
 
       return blockPromise.then(function (block) {

@@ -222,6 +222,23 @@ describe('index', function () {
 
       expect(result).to.equal(true)
     })
+
+    it('should upload buffer success', async () => {
+      const remotePath = 'testMultipartUploadForBuffer.jpg'
+      const buf = await fs.promises.readFile(fixtures + '/cat.jpg')
+      const {/**fileSize, */partCount, uuid} = await client.initMultipartUpload(remotePath, buf, {
+        'x-upyun-multi-type': 'image/jpeg',
+      })
+
+      await Promise.all(Array.apply(null, {length: partCount}).map(Function.call, index => {
+        const partId = index
+        return client.multipartUpload(remotePath, buf, uuid, partId)
+      }))
+
+      const result = await client.completeMultipartUpload(remotePath, uuid)
+
+      expect(result).to.equal(true)
+    })
   })
 
   describe('#formUpload', () => {

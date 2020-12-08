@@ -186,8 +186,13 @@ export default class Upyun {
       fileSizePromise = Promise.resolve(fileOrPath.size)
       contentType = contentType || fileOrPath.type
     } else {
-      fileSizePromise = utils.getFileSizeAsync(fileOrPath)
-      contentType = contentType || utils.getContentType(fileOrPath)
+      if (Buffer.isBuffer(fileOrPath)) {
+        fileSizePromise = Promise.resolve(fileOrPath.length)
+        contentType = contentType || 'application/octet-stream'
+      } else {
+        fileSizePromise = utils.getFileSizeAsync(fileOrPath)
+        contentType = contentType || utils.getContentType(fileOrPath)
+      }
     }
 
     return fileSizePromise.then((fileSize) => {
@@ -225,13 +230,18 @@ export default class Upyun {
       fileSizePromise = Promise.resolve(fileOrPath.size)
       // contentType = fileOrPath.type
     } else {
-      fileSizePromise = utils.getFileSizeAsync(fileOrPath)
-      // contentType = utils.getContentType(fileOrPath)
+      if (Buffer.isBuffer(fileOrPath)) {
+        fileSizePromise = Promise.resolve(fileOrPath.length)
+      } else {
+        fileSizePromise = utils.getFileSizeAsync(fileOrPath)
+        // contentType = utils.getContentType(fileOrPath)
+      }
     }
 
     const blockPromise = fileSizePromise.then((fileSize) => {
       const end = Math.min(start + PARTSIZE, fileSize)
-      return utils.readBlockAsync(fileOrPath, start, end)
+
+      return Buffer.isBuffer(fileOrPath) ? fileOrPath.slice(start, end) : utils.readBlockAsync(fileOrPath, start, end)
     })
 
     return blockPromise.then((block) => {

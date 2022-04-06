@@ -84,7 +84,7 @@
     "webpack": "^2.5.1"
   },
   "dependencies": {
-    "axios": "^0.19.1",
+    "axios": "^0.26.1",
     "base-64": "^0.1.0",
     "form-data": "^3.0.0",
     "hmacsha1": "^1.0.0",

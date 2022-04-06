@@ -1,5 +1,5 @@
 /**
-  * UPYUN js-sdk 3.4.5
+  * UPYUN js-sdk 3.4.6
   * (c) 2022
   * @license MIT
   */
@@ -13,13 +13,10 @@ var isBrowser = typeof window !== 'undefined' && (typeof process === 'undefined'
 var PARTSIZE = 1024 * 1024;
 
 var isPromise_1 = isPromise;
-var default_1 = isPromise;
 
 function isPromise(obj) {
   return !!obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function';
 }
-
-isPromise_1.default = default_1;
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -1815,7 +1812,7 @@ function b64_hmac_sha1(k,d,_p,_z){
 var hmacsha1 = b64_hmac_sha1;
 
 var base64 = createCommonjsModule(function (module, exports) {
-/*! https://mths.be/base64 v1.0.0 by @mathias | MIT license */
+/*! http://mths.be/base64 v0.1.0 by @mathias | MIT license */
 (function(root) {
 
 	// Detect free variables `exports`.
@@ -1908,6 +1905,7 @@ var base64 = createCommonjsModule(function (module, exports) {
 		var a;
 		var b;
 		var c;
+		var d;
 		var buffer;
 		// Make sure any padding is handled outside of the loop.
 		var length = input.length - padding;
@@ -1953,7 +1951,7 @@ var base64 = createCommonjsModule(function (module, exports) {
 	var base64 = {
 		'encode': encode,
 		'decode': decode,
-		'version': '1.0.0'
+		'version': '0.1.0'
 	};
 
 	// Some AMD build optimizers, like r.js, check for specific condition patterns
@@ -1982,7 +1980,7 @@ var base64 = createCommonjsModule(function (module, exports) {
 });
 
 var name = "upyun";
-var version = "3.4.5";
+var version = "3.4.6";
 var description = "UPYUN js sdk";
 var main = "dist/upyun.common.js";
 var module$1 = "dist/upyun.esm.js";
@@ -2190,7 +2188,7 @@ var md5 = createCommonjsModule(function (module) {
         message = utf8.stringToBytes(message);
     else if (isBuffer(message))
       message = Array.prototype.slice.call(message, 0);
-    else if (!Array.isArray(message) && message.constructor !== Uint8Array)
+    else if (!Array.isArray(message))
       message = message.toString();
     // else, assume byte array already
 

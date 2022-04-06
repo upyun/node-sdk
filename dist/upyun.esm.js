@@ -1,6 +1,6 @@
 /**
   * UPYUN js-sdk 3.4.5
-  * (c) 2020
+  * (c) 2022
   * @license MIT
   */
 import axios from 'axios';
@@ -13,10 +13,13 @@ var isBrowser = typeof window !== 'undefined' && (typeof process === 'undefined'
 var PARTSIZE = 1024 * 1024;
 
 var isPromise_1 = isPromise;
+var default_1 = isPromise;
 
 function isPromise(obj) {
   return !!obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function';
 }
+
+isPromise_1.default = default_1;
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -1994,7 +1997,7 @@ var bugs = { "url": "https://github.com/upyun/node-sdk/issues" };
 var homepage = "https://github.com/upyun/node-sdk";
 var contributors = [{ "name": "yejingx", "email": "yejingx@gmail.com" }, { "name": "Leigh", "email": "i@zhuli.me" }, { "name": "kaidiren", "email": "kaidiren@gmail.com" }, { "name": "Gaara", "email": "sabakugaara@users.noreply.github.com" }];
 var devDependencies = { "babel-cli": "^6.24.1", "babel-loader": "^7.0.0", "babel-plugin-external-helpers": "^6.22.0", "babel-plugin-transform-runtime": "^6.23.0", "babel-preset-env": "^1.4.0", "babel-register": "^6.24.1", "builtin-modules": "^3.1.0", "chai": "^3.5.0", "delay": "^4.2.0", "eslint": "^5.16.0", "istanbul": "^0.4.3", "karma": "^1.7.0", "karma-chrome-launcher": "^2.1.1", "karma-mocha": "^1.3.0", "karma-sourcemap-loader": "^0.3.7", "karma-webpack": "^2.0.3", "mocha": "^3.4.1", "rollup": "^0.41.6", "rollup-plugin-alias": "^1.3.1", "rollup-plugin-babel": "^2.7.1", "rollup-plugin-commonjs": "^8.0.2", "rollup-plugin-json": "^2.1.1", "rollup-plugin-node-builtins": "^2.1.2", "rollup-plugin-node-resolve": "^3.0.0", "should": "^9.0.2", "uglify-js": "^3.0.11", "webpack": "^2.5.1" };
-var dependencies = { "axios": "^0.19.1", "base-64": "^0.1.0", "form-data": "^3.0.0", "hmacsha1": "^1.0.0", "is-promise": "^2.1.0", "md5": "^2.2.1", "mime-types": "^2.1.15" };
+var dependencies = { "axios": "^0.26.1", "base-64": "^0.1.0", "form-data": "^3.0.0", "hmacsha1": "^1.0.0", "is-promise": "^2.1.0", "md5": "^2.2.1", "mime-types": "^2.1.15" };
 var browser = { "./upyun/utils.js": "./upyun/browser-utils.js", "./upyun/form-upload.js": "./upyun/browser-form-upload.js" };
 var pkg = {
 	name: name,
@@ -2188,7 +2191,7 @@ var md5 = createCommonjsModule(function (module) {
         message = utf8.stringToBytes(message);
     else if (isBuffer(message))
       message = Array.prototype.slice.call(message, 0);
-    else if (!Array.isArray(message))
+    else if (!Array.isArray(message) && message.constructor !== Uint8Array)
       message = message.toString();
     // else, assume byte array already
 

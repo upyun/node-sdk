@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "types": ["@types/node"],
+    "declarationDir": "./",
+    "declaration": true,
+    "outDir": "./dist"
+  }
+}

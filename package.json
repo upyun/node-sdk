@@ -4,6 +4,7 @@
   "description": "UPYUN js sdk",
   "main": "dist/upyun.common.js",
   "module": "dist/upyun.esm.js",
+  "types": "./index.d.ts",
   "scripts": {
     "build": "node build/build.js",
     "lint": "eslint .",
@@ -84,6 +85,7 @@
     "webpack": "^2.5.1"
   },
   "dependencies": {
+    "@types/node": "^18.15.8",
     "axios": "^0.26.1",
     "base-64": "^1.0.0",
     "form-data": "^4.0.0",

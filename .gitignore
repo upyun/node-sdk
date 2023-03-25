@@ -39,3 +39,4 @@ Session.vim
 
 package-lock.json
 yarn.lock
+pnpm-lock.json
